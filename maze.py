@@ -46,15 +46,19 @@ class Maze:
                 direction.remove(dir)
         #remove the direction if there is no wall to break or if next is path
         for dir in direction:
-            if self.maze[int(current[0] + dir[0]/2)][int(current[0] + dir[0]/2)] == "." or self.maze[current[0] + dir[0]][current[1] + dir[1]] == ".":
+            if self.maze[current[0] + dir[0]//2][current[1] + dir[1]//2] == "." or self.maze[current[0] + dir[0]][current[1] + dir[1]] == ".":
                 direction.remove(dir)
-        random.shuffle(direction)
-        randomDirection = random.choice(direction)
-        direction.remove(randomDirection)
-        self.maze[current[0] + randomDirection[0] // 2][current[1] + randomDirection[1] // 2] = "."
+        if len(direction) != 0:
+            random.shuffle(direction)
+            randomDirection = random.choice(direction)
+            direction.remove(randomDirection)
+            self.maze[current[0] + randomDirection[0] // 2][current[1] + randomDirection[1] // 2] = "."
+            print(randomDirection, direction, current, current[0] + randomDirection[0], current[1] + randomDirection[1])
+        else:
+            return
         self.print_maze()
-        print('')
-        self.generate_maze(next=[current[0] + randomDirection[0], current[1] + randomDirection[1]])
+        if len(unvisited) != 0:
+            self.generate_maze(next=[current[0] + randomDirection[0], current[1] + randomDirection[1]])
 
     def print_maze(self):
         for i in range(self.height+1):
