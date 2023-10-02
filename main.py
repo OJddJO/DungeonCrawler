@@ -1,5 +1,5 @@
 import random
-from maze2 import Maze
+from maze import Maze
 
 class bc:
     gray = '\033[30m'
@@ -44,6 +44,34 @@ class Dungeon:
     def __init__(self):
         self.rooms = []
 
+    def addRoom(self, room):
+        self.rooms.append(room)
+
+    def makeDungeon(self, nbRoom = random.randint(5, 10)):
+        for i in range(nbRoom):
+            self.addRoom(Room())
+
+
+class Lobby:
+    def __init__(self):
+        self.lobby = []
+        self.createRoom()
+
+    def createRoom(self):
+        self.lobby.append(["#" for i in range(21)])
+        for i in range(8):
+            self.lobby.append(["#"] + ["." for i in range(19)] + ["#"])
+        self.lobby.append(["#" for i in range(21)])
+
+    def __str__(self):
+        lobby = []
+        for row in self.lobby:
+            lobby.append(''.join(row))
+        return '\n'.join(lobby)
+    
+    def placePlayer(self):
+        #place player in the middle of the lobby
+        self.lobby[5][10] = "@"
 
 
 class Room(Maze):
@@ -87,5 +115,5 @@ class Room(Maze):
             maze.append(''.join(row))
         return '\n'.join(maze)
 
-room = Room()
+room = Lobby()
 print(room)
