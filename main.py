@@ -1,4 +1,20 @@
 import random
+from maze2 import Maze
+
+class bc:
+    header = '\033[95m'
+    blue = '\033[94m'
+    cyan = '\033[96m'
+    green = '\033[92m'
+    yellow = '\033[93m'
+    red = '\033[91m'
+    end = '\033[0m'
+    bold = '\033[1m'
+    underline = '\033[4m'
+
+
+def color(string, color):
+    return f'{color}{string}{bc.end}'
 
 class Player:
     def __init__(self):
@@ -13,7 +29,7 @@ class Item:
         self.name = name
         self.description = description
         self.value = value
-    
+
 
 class Weapon(Item):
     def __init__(self, name, description, value, damage):
@@ -26,44 +42,47 @@ class Dungeon:
         self.rooms = []
 
 
-class Room:
+
+class Room(Maze):
     def __init__(self):
-        self.matrix = [["¤" for i in range(10)] for i in range(10)]
+        super().__init__(20, 10)
+        self.make_maze()
+        self.maze = self.create_matrix()
+        self.placePlayer()
+        self.colorMaze()
 
-    def generate(self):
-        # Generate maze
-        wall = "#"
-        path = " "
-        #Start Pos
-        orientation = random.randint(0, 3)
-        if orientation == 0:
-            sx = 0
-            sy = random.randint(0, 9)
-        elif orientation == 1:
-            sx = random.randint(0, 9)
-            sy = 0
-        elif orientation == 2:
-            sx = 9
-            sy = random.randint(0, 9)
-        elif orientation == 3:
-            sx = random.randint(0, 9)
-            sy = 9
-        self.matrix[sx][sy] = path
-        walls = []
-        walls.append([sx+1, sy])
-        walls.append([sx-1, sy])
-        walls.append([sx, sy+1])
-        walls.append([sx, sy-1])
-        self.matrix[sx+1][sy] = wall
-        self.matrix[sx-1][sy] = wall
-        self.matrix[sx][sy+1] = wall
-        self.matrix[sx][sy-1] = wall
+    def colorMaze(self):
+        colorDict = {
+            '#': bc.yellow,
+            '@': bc.cyan,
+        }
+        for i, row in enumerate(self.maze):
+            for j, element in enumerate(row):
+                if element != '.':
+                    self.maze[i][j] = color(element, colorDict[element])
 
-        
+    def placePlayer(self):
+        #list all the path that is surrounded by 3 walls
+        possiblePath = []
+        for i, row in enumerate(self.maze):
+            for j, element in enumerate(row):
+                if element == ".":
+                    walls = 0
+                    direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
+                    for dir in direction:
+                        if self.maze[i + dir[0]][j + dir[1]] == "#":
+                            walls += 1
+                    if walls == 3:
+                        possiblePath.append((i, j))
 
+        coord = random.choice(possiblePath)
+        self.maze[coord[0]][coord[1]] = "@"
 
-    def display(self):
-        for i in range(10):
-            for j in range(10):
-                print(self.matrix[i][j], end="")
-            print("")
+    def __str__(self):
+        maze = []
+        for row in self.maze:
+            maze.append(''.join(row))
+        return '\n'.join(maze)
+
+room = Room()
+print(room)
