@@ -2,7 +2,7 @@ import random
 from maze2 import Maze
 
 class bc:
-    header = '\033[95m'
+    gray = '\033[30m'
     blue = '\033[94m'
     cyan = '\033[96m'
     green = '\033[92m'
@@ -22,6 +22,9 @@ class Player:
         self.weapon = None
         self.armor = None
         self.inventory = []
+
+    def __str__(self):
+        return '@'
 
 
 class Item:
@@ -53,13 +56,13 @@ class Room(Maze):
 
     def colorMaze(self):
         colorDict = {
-            '#': bc.yellow,
-            '@': bc.cyan,
+            '#': '\033[47m \033[0m',
+            '@': '\033[32m@\033[0m',
+            '.': ' ',
         }
         for i, row in enumerate(self.maze):
             for j, element in enumerate(row):
-                if element != '.':
-                    self.maze[i][j] = color(element, colorDict[element])
+                self.maze[i][j] = colorDict[element]
 
     def placePlayer(self):
         #list all the path that is surrounded by 3 walls
