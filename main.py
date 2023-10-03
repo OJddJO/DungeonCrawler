@@ -70,7 +70,7 @@ class Room(Maze):
         render = self.map.copy()
         for i, row in enumerate(render):
             for j, element in enumerate(row):
-                self.maze[i][j] = colorDict[element]
+                self.map[i][j] = colorDict[element]
 
     def placePlayer(self):
         #list all the path that is surrounded by 3 walls
