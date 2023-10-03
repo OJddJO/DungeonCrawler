@@ -67,11 +67,29 @@ class Room(Maze):
             Player: '\033[32m@\033[0m',
             '.': ' ',
         }
-        render = self.map.copy()
-        for i, row in enumerate(render):
+        render = []
+        for i, row in enumerate(self.map):
+            render.append([])
             for j, element in enumerate(row):
-                self.map[i][j] = colorDict[element]
+                render[i].append('\033[40m \033[0m')
+        coord = self.getPlayerCoord()
+        #arround the player in a square of 5x5 use colorDict
+        for i in range(coord[0] - 2, coord[0] + 3):
+            for j in range(coord[1] - 2, coord[1] + 3):
+                try:
+                    if type(self.map[i][j]) == Player:
+                        render[i][j] = colorDict[Player]
+                    else:
+                        render[i][j] = colorDict[self.map[i][j]]
+                except:
+                    pass
         return render
+    
+    def getPlayerCoord(self):
+        for i, row in enumerate(self.map):
+            for j, element in enumerate(row):
+                if type(element) == Player:
+                    return (i, j)
 
     def placePlayer(self):
         #list all the path that is surrounded by 3 walls
@@ -88,7 +106,7 @@ class Room(Maze):
                         possiblePath.append((i, j))
 
         coord = random.choice(possiblePath)
-        self.map[coord[0]][coord[1]] = Player
+        self.map[coord[0]][coord[1]] = Player()
 
     def __str__(self):
         map = []
