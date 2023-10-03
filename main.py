@@ -90,7 +90,9 @@ class Room(Maze):
         }
         for i, row in enumerate(self.maze):
             for j, element in enumerate(row):
-                self.maze[i][j] = colorDict[element]
+                # shadow effect
+                self.maze[i][j] = f'\033[40 \033[0m'
+        
 
     def placePlayer(self):
         #list all the path that is surrounded by 3 walls
