@@ -37,12 +37,13 @@ class Item:
 class Weapon(Item):
     def __init__(self, name, description, value, damage):
         super().__init__(name, description, value)
-        self.damage = damage
+        self.baseDamage = damage
 
 
 class Dungeon:
     def __init__(self):
         self.rooms = []
+        self.floor = 0 #index of the current room
 
     def addRoom(self, room):
         self.rooms.append(room)
@@ -52,70 +53,66 @@ class Dungeon:
             self.addRoom(Room())
 
 
-class Lobby:
-    def __init__(self):
-        self.lobby = []
-        self.createRoom()
-
-    def createRoom(self):
-        self.lobby.append(["#" for i in range(21)])
-        for i in range(8):
-            self.lobby.append(["#"] + ["." for i in range(19)] + ["#"])
-        self.lobby.append(["#" for i in range(21)])
-
-    def __str__(self):
-        lobby = []
-        for row in self.lobby:
-            lobby.append(''.join(row))
-        return '\n'.join(lobby)
-    
-    def placePlayer(self):
-        #place player in the middle of the lobby
-        self.lobby[5][10] = "@"
-
-
 class Room(Maze):
-    def __init__(self):
-        super().__init__(20, 10)
+    def __init__(self, width = 20, height = 10):
+        super().__init__(width, height)
         self.make_maze()
-        self.maze = self.create_matrix()
+        self.map = self.create_matrix()
         self.placePlayer()
-        self.colorMaze()
+        self.render = self.colorMaze()
 
     def colorMaze(self):
         colorDict = {
             '#': '\033[47m \033[0m',
-            '@': '\033[32m@\033[0m',
+            Player: '\033[32m@\033[0m',
             '.': ' ',
         }
-        for i, row in enumerate(self.maze):
+        render = self.map.copy()
+        for i, row in enumerate(render):
             for j, element in enumerate(row):
-                # shadow effect
-                self.maze[i][j] = f'\033[40 \033[0m'
-        
+                self.maze[i][j] = colorDict[element]
 
     def placePlayer(self):
         #list all the path that is surrounded by 3 walls
         possiblePath = []
-        for i, row in enumerate(self.maze):
+        for i, row in enumerate(self.map):
             for j, element in enumerate(row):
                 if element == ".":
                     walls = 0
                     direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
                     for dir in direction:
-                        if self.maze[i + dir[0]][j + dir[1]] == "#":
+                        if self.map[i + dir[0]][j + dir[1]] == "#":
                             walls += 1
                     if walls == 3:
                         possiblePath.append((i, j))
 
         coord = random.choice(possiblePath)
-        self.maze[coord[0]][coord[1]] = "@"
+        self.map[coord[0]][coord[1]] = Player
 
     def __str__(self):
-        maze = []
-        for row in self.maze:
-            maze.append(''.join(row))
-        return '\n'.join(maze)
+        map = []
+        for row in self.render:
+            map.append(''.join(row))
+        return '\n'.join(map)
 
-room = Lobby()
-print(room)
+
+class Lobby(Room):
+    def __init__(self):
+        self.map = []
+        self.createRoom()
+        self.placePlayer()
+        self.render = self.colorMaze()
+
+    def createRoom(self):
+        self.map.append(["#" for i in range(41)])
+        for i in range(19):
+            self.map.append(["#"] + ["." for i in range(39)] + ["#"])
+        self.map.append(["#" for i in range(41)])
+    
+    def placePlayer(self):
+        #place player in the middle of the lobby
+        self.map[10][20] = "@"
+
+
+maze = Room()
+print(maze)
