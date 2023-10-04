@@ -196,14 +196,18 @@ class Game:
             element.append(self.currentRoom.map[coord[0] + dir[0]][coord[1] + dir[1]])
         #if there is a portal go to next room
         if Portal in element:
-            if self.currentRoom.portal.room2 == None:
-                #go to lobby
-                self.currentRoom = self.lobby
-                #regenerate dungeon
-                self.lobby.dungeon.makeDungeon()
-                self.lobby.placePortal()
+            if type(self.currentRoom) == Lobby:
+                print("go to dungeon")
+                self.currentRoom = self.currentRoom.dungeon.rooms[0]
             else:
-                self.currentRoom = self.currentRoom.portal.room2
+                if self.currentRoom.portal.room2 == None:
+                    #go to lobby
+                    self.currentRoom = self.lobby
+                    #regenerate dungeon
+                    self.lobby.dungeon.makeDungeon()
+                    self.lobby.placePortal()
+                else:
+                    self.currentRoom = self.currentRoom.portal.room2
         #if there is an item add it to the inventory
         elif Item in element:
             self.player.inventory.append(element[Item])
@@ -211,6 +215,8 @@ class Game:
         #if there is an enemy fight it
         elif Enemy in element:
             self.fight(element)
+
+        print(element)
 
         while keyboard.is_pressed('space'): #wait for the key to be released
             pass
@@ -253,6 +259,8 @@ class Game:
                 self.playerMove('left')
             elif keyboard.is_pressed('right'):
                 self.playerMove('right')
+            elif keyboard.is_pressed('space'):
+                self.playerInteraction()
 
 
 if __name__ == "__main__":
