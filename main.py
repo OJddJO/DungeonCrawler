@@ -194,19 +194,15 @@ class Game:
                 if type(self.currentRoom) == Lobby:
                     self.currentRoom = self.currentRoom.dungeon.rooms[0]
                 else:
-                    if self.currentRoom.portal.room2 == None:
+                    if self.currentRoom.portal.room2 == None: #if there is no next room -> last room of the dungeon, go back to lobby
                         #go to lobby
                         self.currentRoom = self.lobby
-                        #regenerate dungeon
+                        #regenerate dungeon that is initialized in the lobby
                         self.lobby.dungeon.makeDungeon()
-                        self.lobby.placePortal()
-                    else:
+                        self.lobby.placePortal() #replace portal in lobby to link to the new dungeon
+                    else: #if there is a next room -> go to next room
                         self.currentRoom = self.currentRoom.portal.room2
                         self.lobby.dungeon.floor += 1
-            #if there is an item add it to the inventory
-            elif type(element) == Item:
-                self.player.inventory.append(element[Item])
-                self.currentRoom.map[coord[0]][coord[1]] = '.' #remove the item from the map
             #if there is an enemy fight it
             # elif type(element) == Enemy:
             #     self.fight(element)
@@ -252,20 +248,39 @@ class Game:
         sleep(0.1) #delay to avoid multiple key press
         self.printRoom()
 
+    def bar(self, current, maximum, length = 20): #print a bar with current/max
+        bar = "■" * (current // (maximum // length))
+        bar += " " * (length - current // (maximum // length))
+        bar = f'[{bar}]'
+        return bar
+
     def printRoom(self): #print the room and all infos -> called after every player action
+        separator = "─" * 41
         os.system('cls')
+        print(separator)
         #print current room name
         print("Current room: ", end="")
         if type(self.currentRoom) == Lobby:
             print("Lobby")
         else:
             print("Dungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1)
+        print(separator)
         if self.currentRoom == self.lobby:
             mist = False
         else:
             mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
+
         print(self.currentRoom)
+
+        print(separator)
+        #print player info
+        healthText = f'Health: {self.player.health}/100'
+        healthBar = self.bar(self.player.health, 100)
+        whiteSpace = " " * (41 - len(healthText) - len(healthBar)) #healthText + healthBar length should be 41
+        print(healthText + whiteSpace + healthBar)
+        print(separator)
+
         self.interactionInfo()
 
     def run(self):
