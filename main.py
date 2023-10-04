@@ -1,6 +1,7 @@
 import random
 import os
 import keyboard
+import time
 from maze import Maze
 
 class Player:
@@ -95,14 +96,14 @@ class Room(Maze):
         if mist:
             coord = self.getPlayerCoord()
             #arround the player in a square of 5x5 use colorDict
-            for i in range(coord[0] - 2, coord[0] + 3):
-                for j in range(coord[1] - 2, coord[1] + 3):
+            for i in range(coord[0] - 4, coord[0] + 5):
+                for j in range(coord[1] - 4, coord[1] + 5):
                     #test if the coord is in the map
                     if i >= 0 and i < len(self.map) and j >= 0 and j < len(self.map[0]):
-                        if type(element) == str:
-                            render[i].append(colorDict[element])
+                        if type(self.map[i][j]) == str:
+                            render[i][j] = colorDict[self.map[i][j]]
                         else:
-                            render[i].append(colorDict[type(element)])
+                            render[i][j] = colorDict[type(self.map[i][j])]
         return render
 
     def getPlayerCoord(self):
@@ -126,6 +127,7 @@ class Room(Maze):
                         possiblePath.append((i, j))
 
         coord = random.choice(possiblePath)
+        self.portal = Portal(self, room)
         self.map[coord[0]][coord[1]] = Portal(self, room)
 
     def placePlayer(self):
@@ -191,36 +193,40 @@ class Game:
         #get element adjacent to the player
         coord = self.currentRoom.getPlayerCoord()
         direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
-        element = []
+        adjList = []
         for dir in direction:
-            element.append(self.currentRoom.map[coord[0] + dir[0]][coord[1] + dir[1]])
+            adjList.append(self.currentRoom.map[coord[0] + dir[0]][coord[1] + dir[1]])
         #if there is a portal go to next room
-        if Portal in element:
-            if type(self.currentRoom) == Lobby:
-                print(self.currentRoom.dungeon.rooms[0])
-                self.currentRoom = self.currentRoom.dungeon.rooms[0]
-            else:
-                if self.currentRoom.portal.room2 == None:
-                    #go to lobby
-                    self.currentRoom = self.lobby
-                    #regenerate dungeon
-                    self.lobby.dungeon.makeDungeon()
-                    self.lobby.placePortal()
+        for element in adjList:
+            if type(element) == Portal:
+                if type(self.currentRoom) == Lobby:
+                    self.currentRoom = self.currentRoom.dungeon.rooms[0]
                 else:
-                    self.currentRoom = self.currentRoom.portal.room2
-        #if there is an item add it to the inventory
-        elif Item in element:
-            self.player.inventory.append(element[Item])
-            self.currentRoom.map[coord[0]][coord[1]] = '.' #remove the item from the map
-        #if there is an enemy fight it
-        elif Enemy in element:
-            self.fight(element)
+                    if self.currentRoom.portal.room2 == None:
+                        #go to lobby
+                        self.currentRoom = self.lobby
+                        #regenerate dungeon
+                        self.lobby.dungeon.makeDungeon()
+                        self.lobby.placePortal()
+                    else:
+                        self.currentRoom = self.currentRoom.portal.room2
+            #if there is an item add it to the inventory
+            elif type(element) == Item:
+                self.player.inventory.append(element[Item])
+                self.currentRoom.map[coord[0]][coord[1]] = '.' #remove the item from the map
+            #if there is an enemy fight it
+            # elif type(element) == Enemy:
+            #     self.fight(element)
 
         while keyboard.is_pressed('space'): #wait for the key to be released
             pass
 
-        # os.system('cls')
-        self.currentRoom.render = self.currentRoom.colorMap(mist=True)
+        os.system('cls')
+        if self.currentRoom == self.lobby:
+            mist = False
+        else:
+            mist = True
+        self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
         print(self.currentRoom)
 
     def playerMove(self, direction):
@@ -246,7 +252,11 @@ class Game:
             pass
 
         os.system('cls')
-        self.currentRoom.render = self.currentRoom.colorMap(mist=False)
+        if self.currentRoom == self.lobby:
+            mist = False
+        else:
+            mist = True
+        self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
         print(self.currentRoom)
 
     def run(self):
