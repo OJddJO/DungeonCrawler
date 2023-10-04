@@ -1,7 +1,6 @@
 import random
 import os
 import keyboard
-import time
 from maze import Maze
 
 class Player:
