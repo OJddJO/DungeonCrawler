@@ -197,7 +197,7 @@ class Game:
         #if there is a portal go to next room
         if Portal in element:
             if type(self.currentRoom) == Lobby:
-                print("go to dungeon")
+                print(self.currentRoom.dungeon.rooms[0])
                 self.currentRoom = self.currentRoom.dungeon.rooms[0]
             else:
                 if self.currentRoom.portal.room2 == None:
@@ -219,8 +219,9 @@ class Game:
         while keyboard.is_pressed('space'): #wait for the key to be released
             pass
 
-        os.system('cls')
+        # os.system('cls')
         self.currentRoom.render = self.currentRoom.colorMap(mist=True)
+        print(self.currentRoom)
 
     def playerMove(self, direction):
         coord = self.currentRoom.getPlayerCoord()
