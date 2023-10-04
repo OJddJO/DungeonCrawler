@@ -216,10 +216,11 @@ class Game:
         elif Enemy in element:
             self.fight(element)
 
-        print(element)
-
         while keyboard.is_pressed('space'): #wait for the key to be released
             pass
+
+        os.system('cls')
+        self.currentRoom.render = self.currentRoom.colorMap(mist=True)
 
     def playerMove(self, direction):
         coord = self.currentRoom.getPlayerCoord()
