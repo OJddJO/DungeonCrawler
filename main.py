@@ -1,6 +1,7 @@
 import random
 import os
 import keyboard
+from time import sleep
 from maze import Maze
 
 class Player:
@@ -74,7 +75,7 @@ class Room(Maze):
         self.placePortal(nextRoom)
         self.render = self.colorMap()
 
-    def colorMap(self, mist = True):
+    def colorMap(self, mist = True): #color the map for printing
         colorDict = {
             '#': '\033[47m \033[0m',
             '.': '\033[30m.\033[0m',
@@ -105,15 +106,15 @@ class Room(Maze):
                             render[i][j] = colorDict[type(self.map[i][j])]
         return render
 
-    def getPlayerCoord(self):
+    def getPlayerCoord(self): #get the coord of the player in the map
         for i, row in enumerate(self.map):
             for j, element in enumerate(row):
                 if type(element) == Player:
                     return (i, j)
-
-    def placePortal(self, room):
+                
+    def get3Walls(self):
         #list all the path that is surrounded by 3 walls
-        possiblePath = []
+        paths = []
         for i, row in enumerate(self.map):
             for j, element in enumerate(row):
                 if element == ".":
@@ -123,26 +124,17 @@ class Room(Maze):
                         if self.map[i + dir[0]][j + dir[1]] == "#":
                             walls += 1
                     if walls == 3:
-                        possiblePath.append((i, j))
+                        paths.append((i, j))
+        return paths
 
+    def placePortal(self, room):
+        possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
         self.portal = Portal(self, room)
         self.map[coord[0]][coord[1]] = Portal(self, room)
 
     def placePlayer(self):
-        #list all the path that is surrounded by 3 walls
-        possiblePath = []
-        for i, row in enumerate(self.map):
-            for j, element in enumerate(row):
-                if element == ".":
-                    walls = 0
-                    direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
-                    for dir in direction:
-                        if self.map[i + dir[0]][j + dir[1]] == "#":
-                            walls += 1
-                    if walls == 3:
-                        possiblePath.append((i, j))
-
+        possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
         self.map[coord[0]][coord[1]] = Player()
 
@@ -158,10 +150,10 @@ class Lobby(Room):
         self.map = []
         self.createRoom()
         self.placePlayer()
-        self.dungeon = Dungeon()
-        self.dungeon.makeDungeon()
+        self.dungeon = Dungeon() #init dungeon in lobby for changing rooms
+        self.dungeon.makeDungeon() # dungeon will be reset when the player goes back to the lobby
         self.placePortal()
-        self.render = self.colorMap(mist = False)
+        self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
         self.map.append(["#" for i in range(41)])
@@ -174,7 +166,7 @@ class Lobby(Room):
         self.map[10][20] = Player()
 
     def placePortal(self):
-        #place portal in the middle of the lobby
+        #place portal on the top middle of the lobby
         self.map[1][20] = Portal(self, self.dungeon.rooms[0])
 
 
@@ -184,18 +176,19 @@ class Game:
         self.lobby = Lobby()
         self.currentRoom = self.lobby #base room is the lobby
 
-    def start(self):
-        os.system('cls')
-        print(self.currentRoom)
-
-    def playerInteraction(self):
+    def getElementAroundPlayer(self): #get all interactable element around the player
         #get element adjacent to the player
         coord = self.currentRoom.getPlayerCoord()
         direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
         adjList = []
         for dir in direction:
             adjList.append(self.currentRoom.map[coord[0] + dir[0]][coord[1] + dir[1]])
+        return adjList
+
+    def playerInteraction(self): #player interaction handler
         #if there is a portal go to next room
+        coord = self.currentRoom.getPlayerCoord()
+        adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal:
                 if type(self.currentRoom) == Lobby:
@@ -209,6 +202,7 @@ class Game:
                         self.lobby.placePortal()
                     else:
                         self.currentRoom = self.currentRoom.portal.room2
+                        self.lobby.dungeon.floor += 1
             #if there is an item add it to the inventory
             elif type(element) == Item:
                 self.player.inventory.append(element[Item])
@@ -219,16 +213,21 @@ class Game:
 
         while keyboard.is_pressed('space'): #wait for the key to be released
             pass
+        self.printRoom()
 
-        os.system('cls')
-        if self.currentRoom == self.lobby:
-            mist = False
-        else:
-            mist = True
-        self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
-        print(self.currentRoom)
+    def interactionInfo(self): #print info about the interaction with the element around the player
+        adjList = self.getElementAroundPlayer()
+        for element in adjList:
+            if type(element) == Portal:
+                if type(self.currentRoom) == Lobby:
+                    print("Info: Press space to start a dungeon")
+                else:
+                    if self.currentRoom.portal.room2 == None:
+                        print("Info: Press space to go back to the lobby")
+                    else:
+                        print("Info: Press space to go to the next room")
 
-    def playerMove(self, direction):
+    def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
         if direction == 'up':
             if self.currentRoom.map[coord[0] - 1][coord[1]] == '.':
@@ -247,21 +246,35 @@ class Game:
                 self.currentRoom.map[coord[0]][coord[1]] = '.'
                 self.currentRoom.map[coord[0]][coord[1] + 1] = self.player
 
-        while keyboard.is_pressed(direction): #wait for the key to be released
-            pass
+        # while keyboard.is_pressed(direction): #wait for the key to be released
+        #     pass
 
+        sleep(0.1) #delay to avoid multiple key press
+        self.printRoom()
+
+    def printRoom(self): #print the room and all infos -> called after every player action
         os.system('cls')
+        #print current room name
+        print("Current room: ", end="")
+        if type(self.currentRoom) == Lobby:
+            print("Lobby")
+        else:
+            print("Dungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1)
         if self.currentRoom == self.lobby:
             mist = False
         else:
             mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
         print(self.currentRoom)
+        self.interactionInfo()
 
     def run(self):
         run = True
+        self.printRoom()
         while run:
-            #get input from the player
+            #get input from the player and manage it
+            #all modification of the map are done in the playerMove function and the playerInteraction function
+            #the room is also printed in those functions
             if keyboard.is_pressed('up'):
                 self.playerMove('up')
             elif keyboard.is_pressed('down'):
@@ -276,5 +289,4 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.start()
     game.run()
