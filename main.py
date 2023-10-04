@@ -212,6 +212,9 @@ class Game:
         elif Enemy in element:
             self.fight(element)
 
+        while keyboard.is_pressed('space'): #wait for the key to be released
+            pass
+
     def playerMove(self, direction):
         coord = self.currentRoom.getPlayerCoord()
         if direction == 'up':
