@@ -303,6 +303,7 @@ class Game:
 
 
 class Menu:
+    separator = "─" * 61
     def __init__(self):
         self.title = open("ascii/title.txt", "r").read()
         self.option = ["New Game", "Continue", "Quit"]
@@ -311,10 +312,11 @@ class Menu:
     def printMenu(self):
         os.system('cls')
         print(self.title)
-        #selected option will be in green
+        print(self.separator)
+        #selected option will in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f'\033[32m>{option}\033[0m')
+                print(f"\033[32m>{option}\033[0m")
             else:
                 print(option)
 
@@ -327,8 +329,6 @@ class Menu:
                 self.select -= 1
                 if self.select < 0:
                     self.select = len(self.option) - 1
-                while keyboard.is_pressed('up'): pass #wait for the key to be released
-                getInput = False
             elif keyboard.is_pressed('down'):
                 key = 'down'
                 self.select += 1
