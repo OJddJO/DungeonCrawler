@@ -136,7 +136,7 @@ class Room(Maze):
     def placePlayer(self):
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
-        self.map[coord[0]][coord[1]] = Player()
+        self.map[coord[0]][coord[1]] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
 
     def __str__(self):
         map = []
@@ -163,7 +163,7 @@ class Lobby(Room):
 
     def placePlayer(self):
         #place player in the middle of the lobby
-        self.map[10][20] = Player()
+        self.map[10][20] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
 
     def placePortal(self):
         #place portal on the top middle of the lobby
@@ -187,7 +187,6 @@ class Game:
 
     def playerInteraction(self): #player interaction handler
         #if there is a portal go to next room
-        coord = self.currentRoom.getPlayerCoord()
         adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal:
@@ -197,6 +196,7 @@ class Game:
                     if self.currentRoom.portal.room2 == None: #if there is no next room -> last room of the dungeon, go back to lobby
                         #go to lobby
                         self.currentRoom = self.lobby
+                        self.player.health = 100 #reset player health
                         #regenerate dungeon that is initialized in the lobby
                         self.lobby.dungeon.makeDungeon()
                         self.lobby.placePortal() #replace portal in lobby to link to the new dungeon
@@ -216,12 +216,12 @@ class Game:
         for element in adjList:
             if type(element) == Portal:
                 if type(self.currentRoom) == Lobby:
-                    print("Info: Press space to start a dungeon")
+                    print("Info: Press ˽ to start a dungeon")
                 else:
                     if self.currentRoom.portal.room2 == None:
-                        print("Info: Press space to go back to the lobby")
+                        print("Info: Press ˽ to go back to the lobby")
                     else:
-                        print("Info: Press space to go to the next room")
+                        print("Info: Press ˽ to go to the next room")
 
     def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
@@ -302,6 +302,59 @@ class Game:
                 self.playerInteraction()
 
 
+class Menu:
+    def __init__(self):
+        self.title = open("ascii/title.txt", "r").read()
+        self.option = ["New Game", "Continue", "Quit"]
+        self.select = 0
+
+    def printMenu(self):
+        os.system('cls')
+        print(self.title)
+        #selected option will be in green
+        for i, option in enumerate(self.option):
+            if i == self.select:
+                print(f'\033[32m>{option}\033[0m')
+            else:
+                print(option)
+
+    def selectOption(self):
+        getInput = True
+        key = None
+        while getInput:
+            if keyboard.is_pressed('up'):
+                key = 'up'
+                self.select -= 1
+                if self.select < 0:
+                    self.select = len(self.option) - 1
+                while keyboard.is_pressed('up'): pass #wait for the key to be released
+                getInput = False
+            elif keyboard.is_pressed('down'):
+                key = 'down'
+                self.select += 1
+                if self.select > len(self.option) - 1:
+                    self.select = 0
+            elif keyboard.is_pressed('space'):
+                key = 'space'
+                match self.select:
+                    case 0:
+                        game = Game()
+                        game.run()
+                    case 1:
+                        pass
+                    case 2:
+                        exit()
+            if key != None:
+                while keyboard.is_pressed(key): pass
+                getInput = False
+
+    def run(self):
+        run = True
+        while run:
+            self.printMenu()
+            self.selectOption()
+
+
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    mainMenu = Menu()
+    mainMenu.run()
