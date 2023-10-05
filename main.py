@@ -171,6 +171,7 @@ class Lobby(Room):
 
 
 class Game:
+    separator = "─" * 41
     def __init__(self):
         self.player = Player()
         self.lobby = Lobby()
@@ -222,6 +223,7 @@ class Game:
                         print("Info: Press ˽ to go back to the lobby")
                     else:
                         print("Info: Press ˽ to go to the next room")
+                print(self.separator)
 
     def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
@@ -255,16 +257,15 @@ class Game:
         return bar
 
     def printRoom(self): #print the room and all infos -> called after every player action
-        separator = "─" * 41
         os.system('cls')
-        print(separator)
+        print(self.separator)
         #print current room name
         print("Current room: ", end="")
         if type(self.currentRoom) == Lobby:
             print("Lobby")
         else:
             print("Dungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1)
-        print(separator)
+        print(self.separator)
         if self.currentRoom == self.lobby:
             mist = False
         else:
@@ -273,13 +274,13 @@ class Game:
 
         print(self.currentRoom)
 
-        print(separator)
+        print(self.separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
         healthBar = self.bar(self.player.health, 100)
         whiteSpace = " " * (41 - len(healthText) - len(healthBar)) #healthText + healthBar length should be 41
         print(healthText + whiteSpace + healthBar)
-        print(separator)
+        print(self.separator)
 
         self.interactionInfo()
 
@@ -292,13 +293,13 @@ class Game:
             #the room is also printed in those functions
             if keyboard.is_pressed('up'):
                 self.playerMove('up')
-            elif keyboard.is_pressed('down'):
+            if keyboard.is_pressed('down'):
                 self.playerMove('down')
-            elif keyboard.is_pressed('left'):
+            if keyboard.is_pressed('left'):
                 self.playerMove('left')
-            elif keyboard.is_pressed('right'):
+            if keyboard.is_pressed('right'):
                 self.playerMove('right')
-            elif keyboard.is_pressed('space'):
+            if keyboard.is_pressed('space'):
                 self.playerInteraction()
 
 
