@@ -7,6 +7,7 @@ from maze import Maze
 class Player:
     def __init__(self, weapon = None, armor = None):
         self.health = 100
+        self.mana = 100
         self.weapon = weapon
         self.armor = armor
         self.inventory = []
@@ -66,7 +67,7 @@ class Portal:
 
 
 class Room(Maze):
-    def __init__(self, difficulty, nextRoom, width = 20, height = 10):
+    def __init__(self, difficulty, nextRoom, width = 30, height = 10):
         super().__init__(width, height)
         self.difficulty = difficulty
         self.make_maze()
@@ -79,8 +80,8 @@ class Room(Maze):
         colorDict = {
             '#': '\033[47m \033[0m',
             '.': '\033[30m.\033[0m',
-            Player: '\033[32m@\033[0m',
-            Portal: '\033[31mO\033[0m',
+            Player: '\033[1;32m@\033[0m',
+            Portal: '\033[1;33mO\033[0m',
         }
         render = []
         for i, row in enumerate(self.map):
@@ -156,22 +157,22 @@ class Lobby(Room):
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
-        self.map.append(["#" for i in range(41)])
+        self.map.append(["#" for i in range(61)])
         for i in range(19):
-            self.map.append(["#"] + ["." for i in range(39)] + ["#"])
-        self.map.append(["#" for i in range(41)])
+            self.map.append(["#"] + ["." for i in range(59)] + ["#"])
+        self.map.append(["#" for i in range(61)])
 
     def placePlayer(self):
         #place player in the middle of the lobby
-        self.map[10][20] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
+        self.map[10][30] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
 
     def placePortal(self):
         #place portal on the top middle of the lobby
-        self.map[1][20] = Portal(self, self.dungeon.rooms[0])
+        self.map[1][30] = Portal(self, self.dungeon.rooms[0])
 
 
 class Game:
-    separator = "─" * 41
+    separator = "─" * 61
     def __init__(self):
         self.player = Player()
         self.lobby = Lobby()
@@ -277,9 +278,13 @@ class Game:
         print(self.separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
+        manaText = f'Mana: {self.player.mana}/100'
+        whiteSpace = " " * (61 - len(healthText) - len(manaText))
+        print(healthText + whiteSpace + manaText)
         healthBar = self.bar(self.player.health, 100)
-        whiteSpace = " " * (41 - len(healthText) - len(healthBar)) #healthText + healthBar length should be 41
-        print(healthText + whiteSpace + healthBar)
+        manaBar = self.bar(self.player.mana, 100)
+        whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
+        print(healthBar + whiteSpace + manaBar)
         print(self.separator)
 
         self.interactionInfo()
@@ -317,7 +322,7 @@ class Menu:
         #selected option will in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f"\033[32m>{option}\033[0m")
+                print(f"\033[32m> {option}\033[0m")
             else:
                 print(option)
 
