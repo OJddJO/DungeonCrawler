@@ -218,12 +218,12 @@ class Game:
         for element in adjList:
             if type(element) == Portal:
                 if type(self.currentRoom) == Lobby:
-                    print("Info: Press ˽ to start a dungeon")
+                    print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to start a \033[1;35mdungeon\033[0m")
                 else:
                     if self.currentRoom.portal.room2 == None:
-                        print("Info: Press ˽ to go back to the lobby")
+                        print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go back to the \033[32mlobby\033[0m")
                     else:
-                        print("Info: Press ˽ to go to the next room")
+                        print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go to the next \033[1;35mroom\033[0m")
                 print(self.separator)
 
     def playerMove(self, direction): #player movement handler
