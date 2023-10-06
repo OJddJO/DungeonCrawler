@@ -317,12 +317,12 @@ class Menu:
 
     def printMenu(self):
         os.system('cls')
-        print(self.title)
+        print('\033[1m' + self.title + '\033[0m')
         print(self.separator)
         #selected option will in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f"\033[32m> {option}\033[0m")
+                print(f"\033[1;32m> {option}\033[0m")
             else:
                 print(option)
 
