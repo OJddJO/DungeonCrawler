@@ -261,11 +261,11 @@ class Game:
         os.system('cls')
         print(self.separator)
         #print current room name
-        print("Current room: ", end="")
+        print("\033[1mCurrent room:\033[0m ", end="")
         if type(self.currentRoom) == Lobby:
-            print("Lobby")
+            print("\033[32mLobby\033[0m")
         else:
-            print("Dungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1)
+            print("\033[1;35mDungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1, "\033[0m")
         print(self.separator)
         if self.currentRoom == self.lobby:
             mist = False
@@ -280,11 +280,11 @@ class Game:
         healthText = f'Health: {self.player.health}/100'
         manaText = f'Mana: {self.player.mana}/100'
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
-        print(healthText + whiteSpace + manaText)
+        print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
         healthBar = self.bar(self.player.health, 100)
         manaBar = self.bar(self.player.mana, 100)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
-        print(healthBar + whiteSpace + manaBar)
+        print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
         print(self.separator)
 
         self.interactionInfo()
