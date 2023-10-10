@@ -171,6 +171,24 @@ class Lobby(Room):
         self.map[1][30] = Portal(self, self.dungeon.rooms[0])
 
 
+class Fight:
+    def __init__(self, player, enemy):
+        self.player = player
+        self.enemy = enemy
+
+    def turn(self):
+        #player turn
+        if self.player.health > 0:
+            pass
+        else:
+            pass
+        #enemy turn
+        if self.enemy.health > 0:
+            pass
+        else:
+            pass
+
+
 class Game:
     separator = "─" * 61
     def __init__(self):
