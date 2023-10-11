@@ -12,6 +12,7 @@ def keyPress(key):
         return True
     return False
 
+
 class Game:
     separator = "─" * 61
     def __init__(self):

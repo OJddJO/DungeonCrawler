@@ -1,5 +1,6 @@
-**"Dungeon Crawler: Endless Descent."**
+Jeremy (je n'ai pas de groupe)
 
+**"Dungeon Crawler: Endless Descent."**
 Jeu au tour par tour, entièrement dans le terminal (peut etre en faire un jeu avec des graphismes)
 
 **Concept** :
@@ -9,7 +10,6 @@ Jeu au tour par tour, entièrement dans le terminal (peut etre en faire un jeu a
 
 **Donjons Générés de Manière Procédurale** : Le jeu propose des donjons générés aléatoirement avec une variété de salles, de pièges, d'énigmes et d'ennemis. Chaque descente dans le donjon est unique, offrant un défi frais.
 
-**Classes de Personnages** : Les joueurs peuvent choisir parmi différentes classes de personnages telles que guerrier, mage, archer ou voleur, chacune ayant ses capacités uniques et son style de jeu.
 
 **Combat** : Participez à des combats en temps réel contre une grande variété de monstres et de boss.
 

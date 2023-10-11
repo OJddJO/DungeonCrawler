@@ -16,7 +16,8 @@ class Dungeon:
         self.addRoom(Room(difficulty=self.difficulty, nextRoom=None))
         for i in range(nbRoom-1):
             self.addRoom(Room(difficulty=self.difficulty, nextRoom=self.rooms[-1]))
-        self.rooms.reverse()
+        self.rooms.reverse() # first room is the last room of the list
+
 
 class Room(Maze):
     def __init__(self, difficulty, nextRoom, width = 30, height = 10):
