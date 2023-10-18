@@ -81,3 +81,8 @@ class Maze:
             current_cell = next_cell
             nv += 1
 
+if __name__ == "__main__":
+    maze = Maze(20, 10)
+    maze.make_maze()
+    for element in maze.create_matrix():
+        print(element)

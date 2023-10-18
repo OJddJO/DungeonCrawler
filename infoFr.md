@@ -1,5 +1,3 @@
-Jeremy (je n'ai pas de groupe)
-
 **"Dungeon Crawler: Endless Descent."**
 Jeu au tour par tour, entièrement dans le terminal (peut etre en faire un jeu avec des graphismes)
 
