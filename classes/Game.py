@@ -4,6 +4,7 @@ import random
 from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
+from classes.Console import console
 
 def keyPress(key):
     """return True if the key is pressed and wait for the key to be released"""
@@ -60,13 +61,13 @@ class Game:
         for element in adjList:
             if type(element) == Portal:
                 if type(self.currentRoom) == Lobby:
-                    print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to start a \033[1;35mdungeon\033[0m")
+                    console.print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to start a \033[1;35mdungeon\033[0m")
                 else:
                     if self.currentRoom.portal.room2 == None:
-                        print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go back to the \033[32mlobby\033[0m")
+                        console.print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go back to the \033[32mlobby\033[0m")
                     else:
-                        print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go to the next \033[1;35mroom\033[0m")
-                print(self.separator)
+                        console.print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go to the next \033[1;35mroom\033[0m")
+                console.print(self.separator)
 
     def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
@@ -100,34 +101,34 @@ class Game:
         return bar
 
     def printRoom(self): #print the room and all infos -> called after every player action
-        os.system('cls')
-        print(self.separator)
+        console.clear(home=False)
+        console.print(self.separator)
         #print current room name
-        print("\033[1mCurrent room:\033[0m ", end="")
+        console.print("\033[1mCurrent room:\033[0m ", end="")
         if type(self.currentRoom) == Lobby:
-            print("\033[32mLobby\033[0m")
+            console.print("\033[32mLobby\033[0m")
         else:
-            print("\033[1;35mDungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1, "\033[0m")
-        print(self.separator)
+            console.print("\033[1;35mDungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1, "\033[0m")
+        console.print(self.separator)
         if self.currentRoom == self.lobby:
             mist = False
         else:
             mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
 
-        print(self.currentRoom)
+        console.print(self.currentRoom)
 
-        print(self.separator)
+        console.print(self.separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
         manaText = f'Mana: {self.player.mana}/100'
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
-        print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
+        console.print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
         healthBar = self.bar(self.player.health, 100)
         manaBar = self.bar(self.player.mana, 100)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
-        print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
-        print(self.separator)
+        console.print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
+        console.print(self.separator)
 
         self.interactionInfo()
 
@@ -158,15 +159,15 @@ class Menu:
         self.select = 0
 
     def printMenu(self):
-        os.system('cls')
-        print('\033[1m' + self.title + '\033[0m')
-        print(self.separator)
+        console.clear(home=False)
+        console.print('[bold]' + self.title)
+        console.print(self.separator)
         #selected option will in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f"\033[1;32m> {option}\033[0m")
+                console.print(f"[bold green]> {option}")
             else:
-                print(option)
+                console.print(option)
 
     def selectOption(self):
         getInput = True
@@ -224,8 +225,8 @@ class Fight:
     def playerTurn(self):
         #player choose an action
         #attack skill item
-        print("Choose an action:")
-        print("1. Attack    2. Skill    3. Item")
+        console.print("Choose an action:")
+        console.print("1. Attack    2. Skill    3. Item")
         getInput = True
         while getInput:
             if keyPress('1'):
@@ -242,7 +243,7 @@ class Fight:
             baseAtk = self.player.weapon.baseDamage
             atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5)
             self.enemy.health -= atk
-            print("You deal", atk, "damage")
+            console.print("You deal", atk, "damage")
         #skill
         elif key == '2':
             pass
@@ -250,7 +251,7 @@ class Fight:
         elif key == '3':
             pass
         #press any key to continue
-        print("Press \033[1m˽\033[0m to continue")
+        console.print("Press \033[1m˽\033[0m to continue")
         wait = True
         while wait:
             if keyPress('space'):
@@ -264,10 +265,10 @@ class Fight:
 
     def endMessage(self):
         if self.player.health > 0:
-            print("You win")
-            print("You gain", self.enemy.exp, "exp")
+            console.print("You win")
+            console.print("You gain", self.enemy.exp, "exp")
         else:
-            print("You lose")
+            console.print("You lose")
 
     def run(self):
         turn = 0
