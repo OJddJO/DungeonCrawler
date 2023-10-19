@@ -1,6 +1,7 @@
 import random
 from classes.Maze import Maze
 from classes.Player import Player
+from classes.Enemy import Enemy
 
 class Dungeon:
     def __init__(self, difficulty = 1):
@@ -92,6 +93,14 @@ class Room(Maze):
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
         self.map[coord[0]][coord[1]] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
+
+    def placeEnemies(self):
+        nbEnemies = random.randint(1, 3) * self.difficulty
+        for i in range(nbEnemies):
+            pos = (random.randint(1, self.height - 2), random.randint(1, self.width - 2)) #select random pos
+            if self.map(pos[0], pos[1]) == ".": #if the pos is a path
+                self.map[pos[0]][pos[1]] = Enemy(self.difficulty)
+
 
     def __str__(self):
         map = []
