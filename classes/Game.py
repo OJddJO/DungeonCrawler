@@ -100,7 +100,7 @@ class Game:
         return bar
 
     def printRoom(self): #print the room and all infos -> called after every player action
-        os.system('cls')
+        os.system('clear')
         print(self.separator)
         #print current room name
         print("\033[1mCurrent room:\033[0m ", end="")
@@ -158,7 +158,7 @@ class Menu:
         self.select = 0
 
     def printMenu(self):
-        os.system('cls')
+        os.system('clear')
         print('\033[1m' + self.title + '\033[0m')
         print(self.separator)
         #selected option will in green
