@@ -5,6 +5,15 @@ from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
 
+def clear():
+    # for windows
+    if os.name == 'nt':
+        os.system('cls')
+    # for mac and ²
+    else:
+        os.system('clear')
+
+
 def keyPress(key):
     """return True if the key is pressed and wait for the key to be released"""
     if keyboard.is_pressed(key):
@@ -100,7 +109,7 @@ class Game:
         return bar
 
     def printRoom(self): #print the room and all infos -> called after every player action
-        os.system('clear')
+        clear()
         print(self.separator)
         #print current room name
         print("\033[1mCurrent room:\033[0m ", end="")
@@ -158,7 +167,7 @@ class Menu:
         self.select = 0
 
     def printMenu(self):
-        os.system('clear')
+        clear()
         print('\033[1m' + self.title + '\033[0m')
         print(self.separator)
         #selected option will in green
