@@ -9,7 +9,7 @@ def clear():
     # for windows
     if os.name == 'nt':
         os.system('cls')
-    # for mac and ²
+    # for mac and linux
     else:
         os.system('clear')
 
