@@ -102,9 +102,11 @@ class Game:
         sleep(0.1) #delay to avoid multiple key press
         self.printRoom()
 
-    def bar(self, current, maximum, length = 20): #print a bar with current/max
+    def bar(self, current, maximum, reversed = False, length = 20): #print a bar with current/max
         bar = "■" * (current // (maximum // length))
         bar += " " * (length - current // (maximum // length))
+        if reversed:
+            bar = bar[::-1]
         bar = f'[{bar}]'
         return bar
 
@@ -133,7 +135,7 @@ class Game:
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
         print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
         healthBar = self.bar(self.player.health, 100)
-        manaBar = self.bar(self.player.mana, 100)
+        manaBar = self.bar(self.player.mana, 100, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
         print(self.separator)
