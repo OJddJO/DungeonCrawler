@@ -22,6 +22,73 @@ def keyPress(key):
     return False
 
 
+class Menu:
+    separator = "─" * 61
+    def __init__(self, title, option):
+        self.title = title
+        self.option = option
+        self.select = 0
+
+    def printMenu(self):
+        clear()
+        print('\033[1m' + self.title + '\033[0m')
+        print(self.separator)
+        #selected option will in green
+        for i, option in enumerate(self.option):
+            if i == self.select:
+                print(f"\033[1;32m> {option}\033[0m")
+            else:
+                print(option)
+
+    def selectOption(self, on_space):
+        getInput = True
+        key = None
+        while getInput:
+            if keyboard.is_pressed('up'):
+                key = 'up'
+                self.select -= 1
+                if self.select < 0:
+                    self.select = len(self.option) - 1
+            elif keyboard.is_pressed('down'):
+                key = 'down'
+                self.select += 1
+                if self.select > len(self.option) - 1:
+                    self.select = 0
+            elif keyboard.is_pressed('space'):
+                key = 'space'
+                getInput = False
+                on_space(self.select)
+            if key != None:
+                while keyboard.is_pressed(key): pass
+                getInput = False
+
+
+class MainMenu(Menu):
+    separator = "─" * 61
+    def __init__(self):
+        title = open("ascii/title", "r").read()
+        options = ("Play", "Continue", "Options", "Exit")
+        super().__init__(title, options)
+
+    def validateOption(self, select):
+        match select:
+            case 0:
+                game = Game()
+                game.run()
+            case 1:
+                pass
+            case 2:
+                pass
+            case 3:
+                exit()
+
+    def run(self):
+        run = True
+        while run:
+            self.printMenu()
+            self.selectOption(self.validateOption)
+
+
 class Game:
     separator = "─" * 61
     def __init__(self):
@@ -159,59 +226,6 @@ class Game:
                 self.playerMove('right')
             if keyboard.is_pressed('space'):
                 self.playerInteraction()
-
-
-class Menu:
-    separator = "─" * 61
-    def __init__(self):
-        self.title = open("ascii/title.txt", "r").read()
-        self.option = ["New Game", "Continue", "Quit"]
-        self.select = 0
-
-    def printMenu(self):
-        clear()
-        print('\033[1m' + self.title + '\033[0m')
-        print(self.separator)
-        #selected option will in green
-        for i, option in enumerate(self.option):
-            if i == self.select:
-                print(f"\033[1;32m> {option}\033[0m")
-            else:
-                print(option)
-
-    def selectOption(self):
-        getInput = True
-        key = None
-        while getInput:
-            if keyboard.is_pressed('up'):
-                key = 'up'
-                self.select -= 1
-                if self.select < 0:
-                    self.select = len(self.option) - 1
-            elif keyboard.is_pressed('down'):
-                key = 'down'
-                self.select += 1
-                if self.select > len(self.option) - 1:
-                    self.select = 0
-            elif keyboard.is_pressed('space'):
-                key = 'space'
-                match self.select:
-                    case 0:
-                        game = Game()
-                        game.run()
-                    case 1:
-                        pass
-                    case 2:
-                        exit()
-            if key != None:
-                while keyboard.is_pressed(key): pass
-                getInput = False
-
-    def run(self):
-        run = True
-        while run:
-            self.printMenu()
-            self.selectOption()
 
 
 class Fight:
