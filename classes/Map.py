@@ -28,15 +28,17 @@ class Room(Maze):
         self.map = self.create_matrix()
         self.placePlayer()
         self.placePortal(nextRoom)
+        self.placeEnemies()
         self.render = self.colorMap()
 
     def colorMap(self, mist = True): #color the map for printing
-        # mist = False #testing
+        mist = False #testing
         colorDict = {
             '#': '\033[47m \033[0m',
             '.': '\033[30m.\033[0m',
             Player: '\033[1;32m@\033[0m',
             Portal: '\033[1;33mO\033[0m',
+            Enemy: '\033[1;31mM\033[0m'
         }
         render = []
         for i, row in enumerate(self.map):
@@ -95,11 +97,18 @@ class Room(Maze):
         self.map[coord[0]][coord[1]] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
 
     def placeEnemies(self):
-        nbEnemies = random.randint(1, 3) * self.difficulty
+        height, width = len(self.map), len(self.map[0])
+        nbEnemies = random.randint(5, 10) * self.difficulty
+        if nbEnemies > 50:
+            nbEnemies = 50
         for i in range(nbEnemies):
-            pos = (random.randint(1, self.height - 2), random.randint(1, self.width - 2)) #select random pos
-            if self.map(pos[0], pos[1]) == ".": #if the pos is a path
-                self.map[pos[0]][pos[1]] = Enemy(self.difficulty)
+            pos = (random.randint(1, height - 2), random.randint(1, width - 2)) #select random pos
+            if self.map[pos[0]][pos[1]] == ".": #if the pos is a path
+                # if player is not around
+                if self.map[pos[0] + 1][pos[1]] != Player and self.map[pos[0] - 1][pos[1]] != Player and self.map[pos[0]][pos[1] + 1] != Player and self.map[pos[0]][pos[1] - 1] != Player:
+                    self.map[pos[0]][pos[1]] = Enemy("Monster", random.randint(5, 10) * 10 * self.difficulty, int(1.5 * self.difficulty), random.randint(5, 10) * self.difficulty)
+                else:
+                    i -= 1
 
 
     def __str__(self):

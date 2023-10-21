@@ -1,9 +1,24 @@
 import keyboard
 import os
+import json
 import random
 from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
+
+os.makedirs("save", exist_ok=True)
+if os.path.exists("save/keybind.json"):
+    with open("save/keybind.json", "r") as f:
+        keybind = json.load(f)
+else:
+    keybind = {
+        "up": "up",
+        "down": "down",
+        "left": "left",
+        "right": "right"
+    }
+    with open("save/keybind.json", "w") as f:
+        json.dump(keybind, f)
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -41,22 +56,21 @@ class Menu:
         getInput = True
         key = None
         while getInput:
-            if keyboard.is_pressed('up'):
-                key = 'up'
+            if keyPress(keybind['up']):
+                key = keybind['up']
                 self.select -= 1
                 if self.select < 0:
                     self.select = len(self.option) - 1
-            elif keyboard.is_pressed('down'):
-                key = 'down'
+            elif keyPress(keybind['down']):
+                key = keybind['down']
                 self.select += 1
                 if self.select > len(self.option) - 1:
                     self.select = 0
-            elif keyboard.is_pressed('space'):
+            elif keyPress('space'):
                 key = 'space'
                 getInput = False
                 self.onSpace(self.select)
             if key != None:
-                while keyboard.is_pressed(key): pass
                 getInput = False
 
     def run(self):
@@ -91,7 +105,7 @@ class OptionMenu(Menu):
     def onSpace(self, select):
         match select:
             case 0:
-                pass
+                KeybindMenu().run()
             case 1:
                 self.runVar = False
 
@@ -99,34 +113,43 @@ class OptionMenu(Menu):
 class KeybindMenu(Menu):
     def __init__(self):
         title = open("ascii/keybind", "r").read()
-        options = ("Up", "Down", "Left", "Right", "Back")
+        options = [f"Up: [{keybind['up']}]", f"Down: [{keybind['down']}]", f"Left: [{keybind['left']}]", f"Right: [{keybind['right']}]", "Back"]
         super().__init__(title, options, self.onSpace)
 
     def redifineOptionsName(self):
-        pass
+        global keybind
+        self.option[0] = f"Up: [{keybind['up']}]"
+        self.option[1] = f"Down: [{keybind['down']}]"
+        self.option[2] = f"Left: [{keybind['left']}]"
+        self.option[3] = f"Right: [{keybind['right']}]"
 
     def replaceKey(self, key):
         clear()
         print("Press the key you want to replace", key, "with")
         print("Press \033[1m˽\033[0m to cancel")
         inputKey = keyboard.read_key()
+        while keyboard.is_pressed(inputKey): pass
         if inputKey == 'space':
             return key
         else:
             return inputKey
 
     def onSpace(self, select):
+        global keybind
         match select:
             case 0:
-                key = self.replaceKey('up')
+                keybind['up'] = self.replaceKey(keybind['up'])
             case 1:
-                key = self.replaceKey('down')
+                keybind['down'] = self.replaceKey(keybind['down'])
             case 2:
-                key = self.replaceKey('left')
+                keybind['left'] = self.replaceKey(keybind['left'])
             case 3:
-                key = self.replaceKey('right')
-            case 5:
+                keybind['right'] = self.replaceKey(keybind['right'])
+            case 4:
+                with open("save/keybind.json", "w") as f:
+                    json.dump(keybind, f)
                 self.runVar = False
+        self.redifineOptionsName()
 
 
 class Game:
@@ -256,13 +279,13 @@ class Game:
             #get input from the player and manage it
             #all modification of the map are done in the playerMove function and the playerInteraction function
             #the room is also printed in those functions
-            if keyboard.is_pressed('up'):
+            if keyboard.is_pressed(keybind['up']):
                 self.playerMove('up')
-            if keyboard.is_pressed('down'):
+            if keyboard.is_pressed(keybind['down']):
                 self.playerMove('down')
-            if keyboard.is_pressed('left'):
+            if keyboard.is_pressed(keybind['left']):
                 self.playerMove('left')
-            if keyboard.is_pressed('right'):
+            if keyboard.is_pressed(keybind['right']):
                 self.playerMove('right')
             if keyboard.is_pressed('space'):
                 self.playerInteraction()
