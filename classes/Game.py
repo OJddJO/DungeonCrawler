@@ -6,12 +6,7 @@ from classes.Map import Lobby, Portal
 from classes.Player import Player
 
 def clear():
-    # for windows
-    if os.name == 'nt':
-        os.system('cls')
-    # for mac and linux
-    else:
-        os.system('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def keyPress(key):
@@ -24,10 +19,12 @@ def keyPress(key):
 
 class Menu:
     separator = "─" * 61
-    def __init__(self, title, option):
+    def __init__(self, title, option, onSpace):
         self.title = title
         self.option = option
         self.select = 0
+        self.onSpace = onSpace
+        self.runVar = True
 
     def printMenu(self):
         clear()
@@ -40,7 +37,7 @@ class Menu:
             else:
                 print(option)
 
-    def selectOption(self, on_space):
+    def selectOption(self):
         getInput = True
         key = None
         while getInput:
@@ -57,36 +54,79 @@ class Menu:
             elif keyboard.is_pressed('space'):
                 key = 'space'
                 getInput = False
-                on_space(self.select)
+                self.onSpace(self.select)
             if key != None:
                 while keyboard.is_pressed(key): pass
                 getInput = False
 
+    def run(self):
+        while self.runVar:
+            self.printMenu()
+            self.selectOption()
 
 class MainMenu(Menu):
-    separator = "─" * 61
     def __init__(self):
         title = open("ascii/title", "r").read()
         options = ("Play", "Continue", "Options", "Exit")
-        super().__init__(title, options)
+        super().__init__(title, options, self.onSpace)
 
-    def validateOption(self, select):
+    def onSpace(self, select):
         match select:
             case 0:
-                game = Game()
-                game.run()
+                Game().run()
             case 1:
                 pass
             case 2:
-                pass
+                OptionMenu().run()
             case 3:
                 exit()
 
-    def run(self):
-        run = True
-        while run:
-            self.printMenu()
-            self.selectOption(self.validateOption)
+
+class OptionMenu(Menu):
+    def __init__(self):
+        title = open("ascii/options", "r").read()
+        options = ("Keybind", "Back")
+        super().__init__(title, options, self.onSpace)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                pass
+            case 1:
+                self.runVar = False
+
+
+class KeybindMenu(Menu):
+    def __init__(self):
+        title = open("ascii/keybind", "r").read()
+        options = ("Up", "Down", "Left", "Right", "Back")
+        super().__init__(title, options, self.onSpace)
+
+    def redifineOptionsName(self):
+        pass
+
+    def replaceKey(self, key):
+        clear()
+        print("Press the key you want to replace", key, "with")
+        print("Press \033[1m˽\033[0m to cancel")
+        inputKey = keyboard.read_key()
+        if inputKey == 'space':
+            return key
+        else:
+            return inputKey
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                key = self.replaceKey('up')
+            case 1:
+                key = self.replaceKey('down')
+            case 2:
+                key = self.replaceKey('left')
+            case 3:
+                key = self.replaceKey('right')
+            case 5:
+                self.runVar = False
 
 
 class Game:
