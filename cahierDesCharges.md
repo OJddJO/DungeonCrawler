@@ -27,6 +27,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 -   Événements Aléatoires *: Introduction d'événements aléatoires pour pimenter le gameplay.
 -   Multijoueur *: Possibilité de jouer en coopération.
     Le multijoueur sera du multijoueur local soit directement sur le même ordinateur soit sur le même réseau (mis en place avec la librairie Python "socket")
+
 *: ne sera pas implémenté dans le jeu lors de la première version, le 8 novembre 2023 
 
 4. Exigences Techniques
@@ -36,6 +37,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 -   Interface Utilisateur : Création d'une interface utilisateur basée sur le terminal.
 -   Graphismes et Son : Intégration de graphismes ASCII, pas de son.
 -   Multijoueur *: Mise en place d'une fonctionnalité multijoueur locale.
+
 *: ne sera pas implémenté dans le jeu lors de la première version, rendu le 8 novembre 2023 
 
 5. Échéancier
