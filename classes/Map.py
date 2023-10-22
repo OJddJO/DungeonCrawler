@@ -88,8 +88,8 @@ class Room(Maze):
     def placePortal(self, room):
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
-        self.portal = Portal(self, room)
         self.map[coord[0]][coord[1]] = Portal(self, room)
+        self.portalCoord = coord
 
     def placePlayer(self):
         possiblePath = self.get3Walls()
@@ -98,17 +98,25 @@ class Room(Maze):
 
     def placeEnemies(self):
         height, width = len(self.map), len(self.map[0])
+        allowedPath = self.get3Walls()
         nbEnemies = random.randint(5, 10) * self.difficulty
         if nbEnemies > 50:
             nbEnemies = 50
-        for i in range(nbEnemies):
-            pos = (random.randint(1, height - 2), random.randint(1, width - 2)) #select random pos
-            if self.map[pos[0]][pos[1]] == ".": #if the pos is a path
-                # if player is not around
-                if self.map[pos[0] + 1][pos[1]] != Player and self.map[pos[0] - 1][pos[1]] != Player and self.map[pos[0]][pos[1] + 1] != Player and self.map[pos[0]][pos[1] - 1] != Player:
-                    self.map[pos[0]][pos[1]] = Enemy("Monster", random.randint(5, 10) * 10 * self.difficulty, int(1.5 * self.difficulty), random.randint(5, 10) * self.difficulty)
-                else:
-                    i -= 1
+        # place an enemy around portal
+        direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
+        for dir in direction:
+            if self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] == ".":
+                self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] = Enemy("Monster", random.randint(5, 10) * 10 * self.difficulty, int(1.5 * self.difficulty), random.randint(5, 10) * self.difficulty)
+        for i in range(nbEnemies-1):
+            direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
+            pos = random.choice(allowedPath)
+            enemyPlaced = False
+            for dir in direction:
+                if self.map[pos[0] + dir[0]][pos[1] + dir[1]] == ".":
+                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Monster", random.randint(5, 10) * 10 * self.difficulty, int(1.5 * self.difficulty), random.randint(5, 10) * self.difficulty)
+                    enemyPlaced = True
+            if not enemyPlaced:
+                i -= 1
 
 
     def __str__(self):
