@@ -1,5 +1,5 @@
 Cahier des charges de "Dungeon Crawler: Endless Descent"
-(Disponible aussi sur GitHub)
+(Disponible aussi sur GitHub: https://github.com/OJddJO/DungeonCrawler )
 
 1. Introduction
 

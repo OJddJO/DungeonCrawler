@@ -1,5 +1,5 @@
 Technical Specifications for 'Dungeon Crawler: Endless Descent'
-(Also available on GitHub)
+(Also available on GitHub: https://github.com/OJddJO/DungeonCrawler )
 
 1. Introduction
 
