@@ -97,7 +97,6 @@ class Room(Maze):
         self.map[coord[0]][coord[1]] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
 
     def placeEnemies(self):
-        height, width = len(self.map), len(self.map[0])
         allowedPath = self.get3Walls()
         nbEnemies = random.randint(5, 10) * self.difficulty
         if nbEnemies > 50:

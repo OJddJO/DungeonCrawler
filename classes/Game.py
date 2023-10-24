@@ -189,9 +189,6 @@ class Game:
             #if there is an enemy fight it
             # elif type(element) == Enemy:
             #     self.fight(element)
-
-        while keyboard.is_pressed('space'): #wait for the key to be released
-            pass
         self.printRoom()
 
     def interactionInfo(self): #print info about the interaction with the element around the player
@@ -287,7 +284,7 @@ class Game:
                 self.playerMove('left')
             if keyboard.is_pressed(keybind['right']):
                 self.playerMove('right')
-            if keyboard.is_pressed('space'):
+            if keyPress('space'):
                 self.playerInteraction()
 
 
