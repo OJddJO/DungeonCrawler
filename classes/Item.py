@@ -53,6 +53,7 @@ def randomWeapon(role, level):
 
     return Weapon(weapon["name"], weapon["description"], level, baseDamage, rarity, mana)
 
+
 if __name__ == '__main__':
     weapon = randomWeapon("warrior", 3)
     print(f"{weapon.name} - {weapon.description} - {weapon.trueDamage} - {weapon.mana} - {weapon.rarity}")

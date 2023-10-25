@@ -88,7 +88,8 @@ class Room(Maze):
     def placePortal(self, room):
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
-        self.map[coord[0]][coord[1]] = Portal(self, room)
+        self.portal = Portal(self, room)
+        self.map[coord[0]][coord[1]] = self.portal
         self.portalCoord = coord
 
     def placePlayer(self):
@@ -105,14 +106,14 @@ class Room(Maze):
         direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
         for dir in direction:
             if self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] == ".":
-                self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] = Enemy("Monster", random.randint(5, 10) * 10 * self.difficulty, int(1.5 * self.difficulty), random.randint(5, 10) * self.difficulty)
+                self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] = Enemy("Portal Guardian", self.difficulty, (self.portalCoord[0] + dir[0], self.portalCoord[1] + dir[1]))
         for i in range(nbEnemies-1):
             direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
             pos = random.choice(allowedPath)
             enemyPlaced = False
             for dir in direction:
                 if self.map[pos[0] + dir[0]][pos[1] + dir[1]] == ".":
-                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Monster", random.randint(5, 10) * 10 * self.difficulty, int(1.5 * self.difficulty), random.randint(5, 10) * self.difficulty)
+                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Enemy", self.difficulty, (pos[0] + dir[0], pos[1] + dir[1]))
                     enemyPlaced = True
             if not enemyPlaced:
                 i -= 1

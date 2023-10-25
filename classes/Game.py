@@ -5,6 +5,7 @@ import random
 from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
+from classes.Enemy import Enemy
 
 os.makedirs("save", exist_ok=True)
 if os.path.exists("save/keybind.json"):
@@ -89,7 +90,8 @@ class MainMenu(Menu):
             case 0:
                 Game().run()
             case 1:
-                pass
+                if os.path.exists("save"):
+                    pass
             case 2:
                 OptionMenu().run()
             case 3:
@@ -187,8 +189,34 @@ class Game:
                         self.currentRoom = self.currentRoom.portal.room2
                         self.lobby.dungeon.floor += 1
             #if there is an enemy fight it
-            # elif type(element) == Enemy:
-            #     self.fight(element)
+            elif type(element) == Enemy:
+                fight = Fight(self.player, element)
+                runFight = True
+                while runFight:
+                    runFight = not fight.turn() #if the fight is not over, runFight = True
+                    self.printRoom()
+                win = fight.endMessage()
+                if win:
+                    self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
+                    print("You win")
+                    print("You gain", element.exp, "exp")
+                    self.player.exp += element.exp
+                    if self.player.exp >= (self.player.level*10)**2:
+                        self.player.exp = 0
+                        self.player.level += 1
+                        print("You level up")
+                        print("You are now level", self.player.level)
+                else:
+                    self.currentRoom = self.lobby
+                    self.player.health = 100
+                    self.lobby.dungeon.makeDungeon()
+                    self.lobby.placePortal()
+                    print("\033[3mInfo:\033[0m You died, you will be teleported back to the \033[32mlobby\033[0m")
+                print("Press \033[1m˽\033[0m to continue")
+                wait = True
+                while wait:
+                    if keyPress('space'):
+                        wait = False
         self.printRoom()
 
     def interactionInfo(self): #print info about the interaction with the element around the player
@@ -202,6 +230,9 @@ class Game:
                         print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go back to the \033[32mlobby\033[0m")
                     else:
                         print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go to the next \033[1;35mroom\033[0m")
+                print(self.separator)
+            elif type(element) == Enemy:
+                print(f"\033[3mInfo:\033[0m You encounter \033[3;31m{element.name}\033[0m.\nPress \033[1m˽\033[0m to start the \033[31mfight\033[0m")
                 print(self.separator)
 
     def playerMove(self, direction): #player movement handler
@@ -297,13 +328,31 @@ class Fight:
         #player turn
         if self.player.health > 0:
             self.playerTurn()
-        else:
-            pass
         #enemy turn
         if self.enemy.health > 0:
+            self.enemyTurn()
+        return self.endFight()
+
+    def enemyTurn(self):
+        print(f"{self.enemy.name}'s turn")
+        randomAction = random.randint(1, 2)
+        if randomAction == 1:
+            print(f"{self.enemy.name} attacks you !")
+            baseAtk = self.enemy.weapon.baseDamage
+            atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5)
+            self.player.health -= atk
+            print("He deals", atk, "damage")
+        elif randomAction == 2:
+            print(f"{self.enemy.name} uses a skill")
             pass
-        else:
-            pass
+        # elif randomAction == 3:
+        #     print(f"{self.enemy.name} uses an item")
+        #     pass
+        print("Press \033[1m˽\033[0m to continue")
+        wait = True
+        while wait:
+            if keyPress('space'):
+                wait = False
 
     def playerTurn(self):
         #player choose an action
@@ -346,15 +395,8 @@ class Fight:
         else:
             return False
 
-    def endMessage(self):
+    def endMessage(self): #return True if the player win else False
+        win = False
         if self.player.health > 0:
-            print("You win")
-            print("You gain", self.enemy.exp, "exp")
-        else:
-            print("You lose")
-
-    def run(self):
-        turn = 0
-        while not self.endFight():
-            self.turn()
-            turn += 1
+            win = True
+        return win
