@@ -289,10 +289,9 @@ class Game:
 
 
 class Fight:
-    def __init__(self, player, enemy, maxTurn):
+    def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
-        self.maxTurn = maxTurn
 
     def turn(self):
         #player turn
@@ -356,6 +355,6 @@ class Fight:
 
     def run(self):
         turn = 0
-        while turn < self.maxTurn:
+        while not self.endFight():
             self.turn()
             turn += 1
