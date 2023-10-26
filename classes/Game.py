@@ -6,6 +6,7 @@ from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
 from classes.Enemy import Enemy
+from classes.Item import Treasure
 
 os.makedirs("save", exist_ok=True)
 if os.path.exists("save/keybind.json"):
@@ -23,7 +24,6 @@ else:
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
-
 
 def keyPress(key):
     """return True if the key is pressed and wait for the key to be released"""
@@ -156,9 +156,10 @@ class KeybindMenu(Menu):
 
 class Game:
     separator = "─" * 61
-    def __init__(self):
-        self.player = Player()
-        self.lobby = Lobby()
+    def __init__(self, new = True): #new = True if the player start a new game
+        if new:
+            self.player = Player()
+        self.lobby = Lobby(self.player)
         self.currentRoom = self.lobby #base room is the lobby
 
     def getElementAroundPlayer(self): #get all interactable element around the player
@@ -171,10 +172,9 @@ class Game:
         return adjList
 
     def playerInteraction(self): #player interaction handler
-        #if there is a portal go to next room
         adjList = self.getElementAroundPlayer()
         for element in adjList:
-            if type(element) == Portal:
+            if type(element) == Portal: #if there is a portal go to next room
                 if type(self.currentRoom) == Lobby:
                     self.currentRoom = self.currentRoom.dungeon.rooms[0]
                 else:
@@ -183,13 +183,35 @@ class Game:
                         self.currentRoom = self.lobby
                         self.player.health = 100 #reset player health
                         #regenerate dungeon that is initialized in the lobby
-                        self.lobby.dungeon.makeDungeon()
+                        self.lobby.dungeon.makeDungeon(self.player.level)
                         self.lobby.placePortal() #replace portal in lobby to link to the new dungeon
                     else: #if there is a next room -> go to next room
                         self.currentRoom = self.currentRoom.portal.room2
                         self.lobby.dungeon.floor += 1
-            #if there is an enemy fight it
-            elif type(element) == Enemy:
+            elif type(element) == Treasure: #if there is a treasure open it
+                item = element.randomLoot()
+                money =  element.gold
+                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED TO ADD TO INVENTORY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                if item.rarity == 1:
+                    color = "\033[1;37m"
+                elif item.rarity == 2:
+                    color = "\033[1;36m"
+                elif item.rarity == 3:
+                    color = "\033[1;34m"
+                elif item.rarity == 4:
+                    color = "\033[1;35m"
+                elif item.rarity == 5:
+                    color = "\033[1;33m"
+                elif item.rarity == 6:
+                    color = "\033[1;31m"
+                print(f"You found '{color}{item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
+                self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
+                print("Press \033[1m˽\033[0m to continue")
+                wait = True
+                while wait:
+                    if keyPress('space'):
+                        wait = False
+            elif type(element) == Enemy: #if there is an enemy fight it
                 fight = Fight(self.player, element)
                 runFight = True
                 while runFight:
@@ -209,7 +231,7 @@ class Game:
                 else:
                     self.currentRoom = self.lobby
                     self.player.health = 100
-                    self.lobby.dungeon.makeDungeon()
+                    self.lobby.dungeon.makeDungeon(self.player.level)
                     self.lobby.placePortal()
                     print("\033[3mInfo:\033[0m You died, you will be teleported back to the \033[32mlobby\033[0m")
                 print("Press \033[1m˽\033[0m to continue")
@@ -233,6 +255,9 @@ class Game:
                 print(self.separator)
             elif type(element) == Enemy:
                 print(f"\033[3mInfo:\033[0m You encounter \033[3;31m{element.name}\033[0m.\nPress \033[1m˽\033[0m to start the \033[31mfight\033[0m")
+                print(self.separator)
+            elif type(element) == Treasure:
+                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to open the \033[33mtreasure\033[0m")
                 print(self.separator)
 
     def playerMove(self, direction): #player movement handler
@@ -296,6 +321,13 @@ class Game:
         manaBar = self.bar(self.player.mana, 100, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
+        print(self.separator)
+        expText = f'Exp: {self.player.exp}/{(self.player.level*10)**2}'
+        levelText = f'Level: {self.player.level}'
+        whiteSpace = " " * (61 - len(expText) - len(levelText))
+        print(f'\033[33m{expText}\033[0m{whiteSpace}\033[33m{levelText}\033[0m')
+        expBar = self.bar(self.player.exp, (self.player.level*10)**2, length=59)
+        print(f'\033[33m{expBar}\033[0m')
         print(self.separator)
 
         self.interactionInfo()
@@ -382,12 +414,6 @@ class Fight:
         #item
         elif key == '3':
             pass
-        #press any key to continue
-        print("Press \033[1m˽\033[0m to continue")
-        wait = True
-        while wait:
-            if keyPress('space'):
-                wait = False
 
     def endFight(self):
         if self.enemy.health <= 0 or self.player.health <= 0:
