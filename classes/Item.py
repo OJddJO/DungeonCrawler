@@ -78,7 +78,7 @@ def randomWeapon(role, level):
     rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
-    baseDamage = random.randint(1, 10)*level
+    baseDamage = random.randint(5, 15)*level
     modifier = int(baseDamage*rarity*0.5)
     baseDamage += modifier
 
