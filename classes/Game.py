@@ -32,9 +32,17 @@ def keyPress(key):
         return True
     return False
 
+def bar(current, maximum, reversed = False, length = 20): #print a bar with current/max
+    bar = "■" * (current // (maximum // length))
+    bar += " " * (length - current // (maximum // length))
+    if reversed:
+        bar = bar[::-1]
+    bar = f'[{bar}]'
+    return bar
+
+separator = "─" * 61
 
 class Menu:
-    separator = "─" * 61
     def __init__(self, title, option, onSpace):
         self.title = title
         self.option = option
@@ -45,7 +53,7 @@ class Menu:
     def printMenu(self):
         clear()
         print('\033[1m' + self.title + '\033[0m')
-        print(self.separator)
+        print(separator)
         #selected option will in green
         for i, option in enumerate(self.option):
             if i == self.select:
@@ -192,19 +200,15 @@ class Game:
                 item = element.randomLoot()
                 money =  element.gold
                 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED TO ADD TO INVENTORY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                if item.rarity == 1:
-                    color = "\033[1;37m"
-                elif item.rarity == 2:
-                    color = "\033[1;36m"
-                elif item.rarity == 3:
-                    color = "\033[1;34m"
-                elif item.rarity == 4:
-                    color = "\033[1;35m"
-                elif item.rarity == 5:
-                    color = "\033[1;33m"
-                elif item.rarity == 6:
-                    color = "\033[1;31m"
-                print(f"You found '{color}{item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
+                color = {
+                    1: "\033[1;37m Common",
+                    2: "\033[1;36m Uncommon",
+                    3: "\033[1;34m Rare",
+                    4: "\033[1;35m Epic",
+                    5: "\033[1;33m Legendary",
+                    6: "\033[1;31m Mythic"
+                }
+                print(f"You found '{color[item.rarity]} {item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                 print("Press \033[1m˽\033[0m to continue")
                 wait = True
@@ -214,11 +218,14 @@ class Game:
             elif type(element) == Enemy: #if there is an enemy fight it
                 fight = Fight(self.player, element)
                 runFight = True
+                fight.print()
                 while runFight:
-                    runFight = not fight.turn() #if the fight is not over, runFight = True
-                    self.printRoom()
+                    runFight = not fight.turn() #if the fight is not over, runFight = True -> see Fight.turn() -> Fight.endFight()
+                    fight.print()
                 win = fight.endMessage()
-                if win:
+                if win == "flee":
+                    print("\033[3mInfo:\033[0m You flee the fight")
+                elif win == True:
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                     print("You win")
                     print("You gain", element.exp, "exp")
@@ -234,7 +241,7 @@ class Game:
                     self.lobby.dungeon.makeDungeon(self.player.level)
                     self.lobby.placePortal()
                     print("\033[3mInfo:\033[0m You died, you will be teleported back to the \033[32mlobby\033[0m")
-                print("Press \033[1m˽\033[0m to continue")
+                print("      Press \033[1m˽\033[0m to continue")
                 wait = True
                 while wait:
                     if keyPress('space'):
@@ -252,13 +259,13 @@ class Game:
                         print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go back to the \033[32mlobby\033[0m")
                     else:
                         print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go to the next \033[1;35mroom\033[0m")
-                print(self.separator)
+                print(separator)
             elif type(element) == Enemy:
-                print(f"\033[3mInfo:\033[0m You encounter \033[3;31m{element.name}\033[0m.\nPress \033[1m˽\033[0m to start the \033[31mfight\033[0m")
-                print(self.separator)
+                print(f"\033[3mInfo:\033[0m You encounter \033[3;31m{element.name}\033[0m.\n      Press \033[1m˽\033[0m to start the \033[31mfight\033[0m")
+                print(separator)
             elif type(element) == Treasure:
                 print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to open the \033[33mtreasure\033[0m")
-                print(self.separator)
+                print(separator)
 
     def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
@@ -285,24 +292,16 @@ class Game:
         sleep(0.1) #delay to avoid multiple key press
         self.printRoom()
 
-    def bar(self, current, maximum, reversed = False, length = 20): #print a bar with current/max
-        bar = "■" * (current // (maximum // length))
-        bar += " " * (length - current // (maximum // length))
-        if reversed:
-            bar = bar[::-1]
-        bar = f'[{bar}]'
-        return bar
-
     def printRoom(self): #print the room and all infos -> called after every player action
         clear()
-        print(self.separator)
+        print(separator)
         #print current room name
         print("\033[1mCurrent room:\033[0m ", end="")
         if type(self.currentRoom) == Lobby:
             print("\033[32mLobby\033[0m")
         else:
             print("\033[1;35mDungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1, "\033[0m")
-        print(self.separator)
+        print(separator)
         if self.currentRoom == self.lobby:
             mist = False
         else:
@@ -311,24 +310,24 @@ class Game:
 
         print(self.currentRoom)
 
-        print(self.separator)
+        print(separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
         manaText = f'Mana: {self.player.mana}/100'
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
         print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
-        healthBar = self.bar(self.player.health, 100)
-        manaBar = self.bar(self.player.mana, 100, reversed=True)
+        healthBar = bar(self.player.health, 100)
+        manaBar = bar(self.player.mana, 100, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
-        print(self.separator)
+        print(separator)
         expText = f'Exp: {self.player.exp}/{(self.player.level*10)**2}'
         levelText = f'Level: {self.player.level}'
         whiteSpace = " " * (61 - len(expText) - len(levelText))
         print(f'\033[33m{expText}\033[0m{whiteSpace}\033[33m{levelText}\033[0m')
-        expBar = self.bar(self.player.exp, (self.player.level*10)**2, length=59)
+        expBar = bar(self.player.exp, (self.player.level*10)**2, length=59)
         print(f'\033[33m{expBar}\033[0m')
-        print(self.separator)
+        print(separator)
 
         self.interactionInfo()
 
@@ -355,6 +354,7 @@ class Fight:
     def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
+        self.flee = False
 
     def turn(self):
         #player turn
@@ -363,6 +363,8 @@ class Fight:
         #enemy turn
         if self.enemy.health > 0:
             self.enemyTurn()
+        if self.flee:
+            return True
         return self.endFight()
 
     def enemyTurn(self):
@@ -390,7 +392,7 @@ class Fight:
         #player choose an action
         #attack skill item
         print("Choose an action:")
-        print("1. Attack    2. Skill    3. Item")
+        print("1. Attack    2. Skill    3. Item    4. Run")
         getInput = True
         while getInput:
             if keyPress('1'):
@@ -401,6 +403,9 @@ class Fight:
                 getInput = False
             elif keyPress('3'):
                 key = '3'
+                getInput = False
+            elif keyPress('4'):
+                key = '4'
                 getInput = False
         #attack
         if key == '1':
@@ -414,6 +419,15 @@ class Fight:
         #item
         elif key == '3':
             pass
+        #run
+        elif key == '4':
+            print("You try to flee")
+            flee = random.randint(1, 2)
+            if flee == 1:
+                print("You successfully flee")
+                self.flee = True
+            else:
+                print("You failed to flee")
 
     def endFight(self):
         if self.enemy.health <= 0 or self.player.health <= 0:
@@ -425,4 +439,27 @@ class Fight:
         win = False
         if self.player.health > 0:
             win = True
+        if self.flee:
+            win = "flee"
         return win
+    
+    def print(self):
+        clear()
+        #print player info
+        print("\033[1mYou:\033[0m")
+        healthText = f'Health: {self.player.health}/100'
+        manaText = f'Mana: {self.player.mana}/100'
+        whiteSpace = " " * (61 - len(healthText) - len(manaText))
+        print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
+        healthBar = bar(self.player.health, 100)
+        manaBar = bar(self.player.mana, 100, reversed=True)
+        whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
+        print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
+        print(separator)
+        #print enemy info
+        print(f"\033[1m{self.enemy.name}:\033[0m")
+        healthText = f'Health: {self.enemy.health}/100'
+        print(f'\033[31m{healthText}\033[0m')
+        healthBar = bar(self.enemy.health, 100)
+        print(f'\033[31m{healthBar}\033[0m')
+        print(separator)
