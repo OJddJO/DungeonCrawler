@@ -1,4 +1,6 @@
 from classes.Item import Weapon
+import os
+import json
 
 class Player:
     def __init__(self, role = "warrior", weapon = None, armor = None, level = 1, exp = 0, health = 100, mana = 100):
@@ -11,13 +13,36 @@ class Player:
         self.role = role # warrior, mage, archer
         self.weapon = weapon
         self.armor = armor
+        self.inventory = Inventory()
+
+    def loadData(self):
+        if os.path.exists("save/stats.json"):
+            with open("save/stats.json", "r") as f:
+                data = json.load(f)
+                self.health = data["health"]
+                self.mana = data["mana"]
+                self.exp = data["exp"]
+                self.level = data["level"]
+                self.role = data["role"]
+                self.weapon = data["weapon"]
+                self.armor = data["armor"]
 
 
 class Inventory:
     def __init__(self):
-        self.items = [[None, 0] * 20] # (item, quantity)
-        self.gear = [None * 20] # max 20 gear
+        self.items = [[None, 0]] * 20 # (item, quantity)
+        self.gear = [None] * 20 # max 20 gear
         self.gold = 0
+
+    def loadData(self):
+        if os.path.exists("save/inventory.json"):
+            with open("save/inventory.json", "r") as f:
+                data = json.load(f)
+                self.items = data["items"]
+                self.gear = data["gear"]
+                self.gold = data["gold"]
+        else:
+            return False
 
     def addItem(self, item, quantity = 1):
         if item in [element[0] for element in self.items]:

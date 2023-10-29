@@ -98,8 +98,25 @@ class MainMenu(Menu):
             case 0:
                 Game().run()
             case 1:
-                if os.path.exists("save"):
-                    pass
+                try:
+                    if os.path.exists("save"):
+                        Game(new=False).run()
+                    else:
+                        print(separator)
+                        print("No save file found")
+                        print("Press \033[1m˽\033[0m to continue")
+                        wait = True
+                        while wait:
+                            if keyPress('space'):
+                                wait = False
+                except:
+                    print(separator)
+                    print("An error occurred while loading the save file")
+                    print("Press \033[1m˽\033[0m to continue")
+                    wait = True
+                    while wait:
+                        if keyPress('space'):
+                            wait = False
             case 2:
                 OptionMenu().run()
             case 3:
@@ -167,6 +184,10 @@ class Game:
     def __init__(self, new = True): #new = True if the player start a new game
         if new:
             self.player = Player()
+        else:
+            self.player = Player()
+            self.player.loadData()
+            self.player.inventory.loadData()
         self.lobby = Lobby(self.player)
         self.currentRoom = self.lobby #base room is the lobby
 
@@ -201,12 +222,12 @@ class Game:
                 money =  element.gold
                 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED TO ADD TO INVENTORY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 color = {
-                    1: "\033[1;37m Common",
-                    2: "\033[1;36m Uncommon",
-                    3: "\033[1;34m Rare",
-                    4: "\033[1;35m Epic",
-                    5: "\033[1;33m Legendary",
-                    6: "\033[1;31m Mythic"
+                    1: "\033[1;37mCommon",
+                    2: "\033[1;36mUncommon",
+                    3: "\033[1;34mRare",
+                    4: "\033[1;35mEpic",
+                    5: "\033[1;33mLegendary",
+                    6: "\033[1;31mMythic"
                 }
                 print(f"You found '{color[item.rarity]} {item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
@@ -230,7 +251,7 @@ class Game:
                     print("You win")
                     print("You gain", element.exp, "exp")
                     self.player.exp += element.exp
-                    if self.player.exp >= (self.player.level*10)**2:
+                    if self.player.exp >= 5**(self.player.level*2)*10:
                         self.player.exp = 0
                         self.player.level += 1
                         print("You level up")
@@ -445,6 +466,13 @@ class Fight:
     
     def print(self):
         clear()
+        #print enemy info
+        print(f"\033[1m{self.enemy.name}:\033[0m")
+        healthText = f'Health: {self.enemy.health}/100'
+        print(f'\033[31m{healthText}\033[0m')
+        healthBar = bar(self.enemy.health, 100)
+        print(f'\033[31m{healthBar}\033[0m')
+        self.enemy.render()
         #print player info
         print("\033[1mYou:\033[0m")
         healthText = f'Health: {self.player.health}/100'
@@ -455,11 +483,4 @@ class Fight:
         manaBar = bar(self.player.mana, 100, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
-        print(separator)
-        #print enemy info
-        print(f"\033[1m{self.enemy.name}:\033[0m")
-        healthText = f'Health: {self.enemy.health}/100'
-        print(f'\033[31m{healthText}\033[0m')
-        healthBar = bar(self.enemy.health, 100)
-        print(f'\033[31m{healthBar}\033[0m')
         print(separator)

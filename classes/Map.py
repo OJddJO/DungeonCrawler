@@ -115,6 +115,7 @@ class Room(Maze):
 
     def placeEnemies(self):
         allowedPath = self.get3Walls()
+        enemyType = ["bat", "ghost", "imp", "mushroom", "spider"]
         random.shuffle(allowedPath)
         nbEnemies = random.randint(5, 10) * self.difficulty
         if nbEnemies < len(self.treasurePos):
@@ -125,19 +126,19 @@ class Room(Maze):
         direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
         for dir in direction:
             if self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] == ".":
-                self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] = Enemy("Portal Guardian", self.difficulty, (self.portalCoord[0] + dir[0], self.portalCoord[1] + dir[1]))
+                self.map[self.portalCoord[0] + dir[0]][self.portalCoord[1] + dir[1]] = Enemy("Portal Guardian", random.choice(enemyType), self.difficulty, (self.portalCoord[0] + dir[0], self.portalCoord[1] + dir[1]))
         for pos in self.treasurePos:
             direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
             for dir in direction:
                 if self.map[pos[0] + dir[0]][pos[1] + dir[1]] == ".":
-                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Treasure Guardian", self.difficulty, (pos[0] + dir[0], pos[1] + dir[1]))
+                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Treasure Guardian", random.choice(enemyType), self.difficulty, (pos[0] + dir[0], pos[1] + dir[1]))
         for i in range(nbEnemies-1):
             direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
             pos = random.choice(allowedPath)
             enemyPlaced = False
             for dir in direction:
                 if self.map[pos[0] + dir[0]][pos[1] + dir[1]] == ".":
-                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Enemy", self.difficulty, (pos[0] + dir[0], pos[1] + dir[1]))
+                    self.map[pos[0] + dir[0]][pos[1] + dir[1]] = Enemy("Enemy", random.choice(enemyType), self.difficulty, (pos[0] + dir[0], pos[1] + dir[1]))
                     enemyPlaced = True
             if not enemyPlaced:
                 i -= 1
