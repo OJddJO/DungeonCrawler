@@ -99,7 +99,7 @@ class Room(Maze):
     def placePlayer(self):
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
-        self.map[coord[0]][coord[1]] = self.player #place player to render the room, it will be replaced by the game player to get all data about the player
+        self.map[coord[0]][coord[1]] = self.player
 
     def placeTreasure(self):
         self.treasurePos = []
@@ -169,7 +169,7 @@ class Lobby(Room):
 
     def placePlayer(self):
         #place player in the middle of the lobby
-        self.map[10][30] = Player() #place player to render the room, it will be replaced by the game player to get all data about the player
+        self.map[10][30] = self.player
 
     def placePortal(self):
         #place portal on the top middle of the lobby

@@ -2,11 +2,12 @@ import keyboard
 import os
 import json
 import random
+from datetime import datetime
 from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
 from classes.Enemy import Enemy
-from classes.Item import Treasure
+from classes.Item import Treasure, Weapon, Armor
 
 os.makedirs("save", exist_ok=True)
 if os.path.exists("save/keybind.json"):
@@ -39,6 +40,13 @@ def bar(current, maximum, reversed = False, length = 20): #print a bar with curr
         bar = bar[::-1]
     bar = f'[{bar}]'
     return bar
+
+def spaceToContinue():
+    print("Press \033[1m˽\033[0m to continue")
+    wait = True
+    while wait:
+        if keyPress('space'):
+            wait = False
 
 separator = "─" * 61
 
@@ -90,13 +98,26 @@ class Menu:
 class MainMenu(Menu):
     def __init__(self):
         title = open("ascii/title", "r").read()
-        options = ("Play", "Continue", "Options", "Exit")
+        options = ("Play", "Continue", "Options", "How to play", "Exit")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
         match select:
             case 0:
-                Game().run()
+                if os.path.exists("save/stats.json"):
+                    print(separator)
+                    print("\033[1;31mWARNING\033[0m: You will overwrite your save file")
+                    print("\033[1mAre you sure you want to start a new game ?\033[0m")
+                    print("1. Yes    2. No")
+                    getInput = True
+                    while getInput:
+                        if keyPress('1'):
+                            getInput = False
+                            Game().run()
+                        elif keyPress('2'):
+                            getInput = False
+                else:
+                    Game().run()
             case 1:
                 try:
                     if os.path.exists("save"):
@@ -104,23 +125,55 @@ class MainMenu(Menu):
                     else:
                         print(separator)
                         print("No save file found")
-                        print("Press \033[1m˽\033[0m to continue")
-                        wait = True
-                        while wait:
-                            if keyPress('space'):
-                                wait = False
-                except:
+                        spaceToContinue()
+                except Exception as e:
                     print(separator)
                     print("An error occurred while loading the save file")
-                    print("Press \033[1m˽\033[0m to continue")
-                    wait = True
-                    while wait:
-                        if keyPress('space'):
-                            wait = False
+                    print(e)
+                    spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
+                HelpMenu().run()
+            case 4:
                 exit()
+
+
+class HelpMenu(Menu):
+    def __init__(self):
+        title = open("ascii/help", "r").read()
+        options = ("Map", "Save", "Back")
+        super().__init__(title, options, self.onSpace)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                text = """There are different object on the map:
+-   \033[1;32m@\033[0m : This is you. You can move using the arrows or the keys you defined.
+-   \033[30m.\033[0m : This is a path. The player can move on the path.
+-   \033[47m \033[0m : This is a wall. The player can't move on the wall.
+-   \033[1;33mO\033[0m : This is a portal. If the player is around it, he can interact with it.
+-   \033[1;31mM\033[0m : This is an enemy. If the player is around him, he can fight with him.
+-   \033[1;34m$\033[0m : This is a treasure. If the player is around it, he can pick it up."""
+                self.renderText(text)
+            case 1:
+                text = """To save in the game, just exit the game and it will save automatically.
+You can exit the game using the menu that appears when you press the ESC key."""
+                self.renderText(text)
+            case 2:
+                self.runVar = False
+
+    def renderText(self, text):
+        print(separator)
+        lines = text.split("\n")
+        for line in lines:
+            if len(line) > 61:
+                print(line[:61])
+                print(line[61:])
+            else:
+                print(line)
+        print(separator)
+        spaceToContinue()
 
 
 class OptionMenu(Menu):
@@ -179,14 +232,57 @@ class KeybindMenu(Menu):
         self.redifineOptionsName()
 
 
+class PauseMenu(Menu):
+    def __init__(self, game):
+        title = open("ascii/pause", "r").read()
+        options = ("Resume", "Save", "Options", "Main Menu", "Exit")
+        super().__init__(title, options, self.onSpace)
+        self.game = game
+    
+    def onSpace(self, select):
+        match select:
+            case 0:
+                self.runVar = False
+            case 1:
+                self.game.save()
+                print(separator)
+                print("Game saved")
+                spaceToContinue()
+                self.runVar = False
+            case 2:
+                OptionMenu().run()
+            case 3:
+                self.game.save()
+                MainMenu().run()
+            case 4:
+                print(separator)
+                print("\033[1;31mWARNING\033[0m: Be sure to save your game before exiting")
+                print("\033[1mAre you sure you want to exit ?\033[0m")
+                print("1. Yes    2. No")
+                getInput = True
+                while getInput:
+                    if keyPress('1'):
+                        getInput = False
+                        exit()
+                    elif keyPress('2'):
+                        getInput = False
+
+
 class Game:
     separator = "─" * 61
     def __init__(self, new = True): #new = True if the player start a new game
         if new:
             self.player = Player()
+            self.save()
         else:
             self.player = Player()
             self.player.loadData()
+            #time verification
+            statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
+            inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
+            savedTime = json.load(open("save/stats.json", "r"))["date"]
+            if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
+                raise Exception("Save file corrupted/modified")
             self.player.inventory.loadData()
         self.lobby = Lobby(self.player)
         self.currentRoom = self.lobby #base room is the lobby
@@ -219,8 +315,12 @@ class Game:
                         self.lobby.dungeon.floor += 1
             elif type(element) == Treasure: #if there is a treasure open it
                 item = element.randomLoot()
-                money =  element.gold
-                # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED TO ADD TO INVENTORY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                money = element.gold
+                if type(item) in (Weapon, Armor):
+                    self.player.inventory.addGear(item)
+                else:
+                    self.player.inventory.addItem(item)
+                self.player.inventory.addGold(money)
                 color = {
                     1: "\033[1;37mCommon",
                     2: "\033[1;36mUncommon",
@@ -231,11 +331,8 @@ class Game:
                 }
                 print(f"You found '{color[item.rarity]} {item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
-                print("Press \033[1m˽\033[0m to continue")
-                wait = True
-                while wait:
-                    if keyPress('space'):
-                        wait = False
+                self.save()
+                spaceToContinue()
             elif type(element) == Enemy: #if there is an enemy fight it
                 fight = Fight(self.player, element)
                 runFight = True
@@ -248,25 +345,26 @@ class Game:
                     print("\033[3mInfo:\033[0m You flee the fight")
                 elif win == True:
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
-                    print("You win")
-                    print("You gain", element.exp, "exp")
+                    print("\033[3mInfo:\033[0m You win the fight")
+                    print(f"      You gain {element.exp} exp")
                     self.player.exp += element.exp
                     if self.player.exp >= 5**(self.player.level*2)*10:
                         self.player.exp = 0
                         self.player.level += 1
-                        print("You level up")
-                        print("You are now level", self.player.level)
+                        print("      You level up")
+                        print("      You are now level", self.player.level)
                 else:
                     self.currentRoom = self.lobby
                     self.player.health = 100
                     self.lobby.dungeon.makeDungeon(self.player.level)
                     self.lobby.placePortal()
                     print("\033[3mInfo:\033[0m You died, you will be teleported back to the \033[32mlobby\033[0m")
-                print("      Press \033[1m˽\033[0m to continue")
-                wait = True
-                while wait:
-                    if keyPress('space'):
-                        wait = False
+                    print("      You lose all your exp and level")
+                    self.player.exp = 0
+                    self.player.level = 1
+                self.save()
+                print(separator)
+                spaceToContinue()
         self.printRoom()
 
     def interactionInfo(self): #print info about the interaction with the element around the player
@@ -290,22 +388,23 @@ class Game:
 
     def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
-        if direction == 'up':
-            if self.currentRoom.map[coord[0] - 1][coord[1]] == '.':
-                self.currentRoom.map[coord[0]][coord[1]] = '.'
-                self.currentRoom.map[coord[0] - 1][coord[1]] = self.player
-        elif direction == 'down':
-            if self.currentRoom.map[coord[0] + 1][coord[1]] == '.':
-                self.currentRoom.map[coord[0]][coord[1]] = '.'
-                self.currentRoom.map[coord[0] + 1][coord[1]] = self.player
-        elif direction == 'left':
-            if self.currentRoom.map[coord[0]][coord[1] - 1] == '.':
-                self.currentRoom.map[coord[0]][coord[1]] = '.'
-                self.currentRoom.map[coord[0]][coord[1] - 1] = self.player
-        elif direction == 'right':
-            if self.currentRoom.map[coord[0]][coord[1] + 1] == '.':
-                self.currentRoom.map[coord[0]][coord[1]] = '.'
-                self.currentRoom.map[coord[0]][coord[1] + 1] = self.player
+        match direction:
+            case'up':
+                if self.currentRoom.map[coord[0] - 1][coord[1]] == '.':
+                    self.currentRoom.map[coord[0]][coord[1]] = '.'
+                    self.currentRoom.map[coord[0] - 1][coord[1]] = self.player
+            case 'down':
+                if self.currentRoom.map[coord[0] + 1][coord[1]] == '.':
+                    self.currentRoom.map[coord[0]][coord[1]] = '.'
+                    self.currentRoom.map[coord[0] + 1][coord[1]] = self.player
+            case 'left':
+                if self.currentRoom.map[coord[0]][coord[1] - 1] == '.':
+                    self.currentRoom.map[coord[0]][coord[1]] = '.'
+                    self.currentRoom.map[coord[0]][coord[1] - 1] = self.player
+            case 'right':
+                if self.currentRoom.map[coord[0]][coord[1] + 1] == '.':
+                    self.currentRoom.map[coord[0]][coord[1]] = '.'
+                    self.currentRoom.map[coord[0]][coord[1] + 1] = self.player
 
         # while keyboard.is_pressed(direction): #wait for the key to be released
         #     pass
@@ -341,7 +440,6 @@ class Game:
         manaBar = bar(self.player.mana, 100, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
-        print(separator)
         expText = f'Exp: {self.player.exp}/{(self.player.level*10)**2}'
         levelText = f'Level: {self.player.level}'
         whiteSpace = " " * (61 - len(expText) - len(levelText))
@@ -351,6 +449,20 @@ class Game:
         print(separator)
 
         self.interactionInfo()
+
+    def save(self):
+        with open("save/stats.json", "w") as f:
+            json.dump({
+                "health": self.player.health,
+                "mana": self.player.mana,
+                "exp": self.player.exp,
+                "level": self.player.level,
+                "role": self.player.role,
+                "weapon": self.player.weapon.__dict__(),
+                "armor": self.player.armor.__dict__(),
+                "date": datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+            }, f)
+        self.player.inventory.save()
 
     def run(self):
         run = True
@@ -369,6 +481,8 @@ class Game:
                 self.playerMove('right')
             if keyPress('space'):
                 self.playerInteraction()
+            if keyPress('esc'):
+                PauseMenu(self).run()
 
 
 class Fight:
@@ -393,8 +507,8 @@ class Fight:
         randomAction = random.randint(1, 2)
         if randomAction == 1:
             print(f"{self.enemy.name} attacks you !")
-            baseAtk = self.enemy.weapon.baseDamage
-            atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5)
+            baseAtk = self.enemy.weapon.onUse()
+            atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5) - self.player.armor.onUse()
             self.player.health -= atk
             print("He deals", atk, "damage")
         elif randomAction == 2:
@@ -403,11 +517,7 @@ class Fight:
         # elif randomAction == 3:
         #     print(f"{self.enemy.name} uses an item")
         #     pass
-        print("Press \033[1m˽\033[0m to continue")
-        wait = True
-        while wait:
-            if keyPress('space'):
-                wait = False
+        spaceToContinue()
 
     def playerTurn(self):
         #player choose an action
@@ -416,39 +526,25 @@ class Fight:
         print("1. Attack    2. Skill    3. Item    4. Run")
         getInput = True
         while getInput:
-            if keyPress('1'):
-                key = '1'
+            if keyPress('1'): #attack
+                baseAtk = self.player.weapon.onUse()
+                atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5) - self.enemy.armor.onUse()
+                self.enemy.health -= atk
+                print("You deal", atk, "damage")
                 getInput = False
-            elif keyPress('2'):
-                key = '2'
+            elif keyPress('2'): #skill
                 getInput = False
-            elif keyPress('3'):
-                key = '3'
+            elif keyPress('3'): #item
                 getInput = False
-            elif keyPress('4'):
-                key = '4'
+            elif keyPress('4'): #run
+                print("You try to flee")
+                flee = random.randint(1, 2)
+                if flee == 1:
+                    print("You successfully flee")
+                    self.flee = True
+                else:
+                    print("You failed to flee")
                 getInput = False
-        #attack
-        if key == '1':
-            baseAtk = self.player.weapon.baseDamage
-            atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5)
-            self.enemy.health -= atk
-            print("You deal", atk, "damage")
-        #skill
-        elif key == '2':
-            pass
-        #item
-        elif key == '3':
-            pass
-        #run
-        elif key == '4':
-            print("You try to flee")
-            flee = random.randint(1, 2)
-            if flee == 1:
-                print("You successfully flee")
-                self.flee = True
-            else:
-                print("You failed to flee")
 
     def endFight(self):
         if self.enemy.health <= 0 or self.player.health <= 0:

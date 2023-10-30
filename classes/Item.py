@@ -19,17 +19,37 @@ class Weapon(Item):
     def onUse(self):
         return self.trueDamage
 
+    def __dict__(self):
+        return {
+            "type": "weapon",
+            "name": self.name,
+            "description": self.description,
+            "level": self.level,
+            "damage": self.baseDamage,
+            "rarity": self.rarity,
+            "mana": self.mana
+        }
+
 
 class Armor(Item):
     def __init__(self, name, description, level, armor, rarity):
         super().__init__(name, description)
         self.baseArmor = armor
-        self.trueArmor = armor
         self.level = level
         self.rarity = rarity
 
     def onUse(self):
-        return self.trueArmor
+        return self.baseArmor
+    
+    def __dict__(self):
+        return {
+            "type": "armor",
+            "name": self.name,
+            "description": self.description,
+            "level": self.level,
+            "armor": self.baseArmor,
+            "rarity": self.rarity
+        }
 
 
 class Treasure:
@@ -41,22 +61,6 @@ class Treasure:
 
     def randomLoot(self):
         #give random loot depending on the role and the level
-        if self.role not in ["warrior", "mage", "archer"]:
-            raise KeyError("Invalid role")
-        else:
-            if self.role == "warrior":
-                weapon = "swords"
-                armor = "chestplates"
-            elif self.role == "mage":
-                weapon = "staves"
-                armor = "robes"
-            elif self.role == "archer":
-                weapon = "bows"
-                armor = "tunics"
-        with open("data/weapon.json", "r") as f:
-            weaponData = json.load(f)
-        with open("data/armor.json", "r") as f:
-            armorData = json.load(f)
         lootTable = [randomWeapon(self.role, self.level), randomArmor(self.role, self.level)]
         return random.choice(lootTable)
 
