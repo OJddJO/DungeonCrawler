@@ -563,7 +563,7 @@ class Fight:
     def print(self):
         clear()
         #print enemy info
-        print(f"\033[1m{self.enemy.name}:\033[0m")
+        print(f"\033[1m{self.enemy.name} - {self.enemy.type}:\033[0m")
         healthText = f'Health: {self.enemy.health}/100'
         print(f'\033[31m{healthText}\033[0m')
         healthBar = bar(self.enemy.health, 100)

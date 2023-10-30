@@ -115,7 +115,7 @@ class Room(Maze):
 
     def placeEnemies(self):
         allowedPath = self.get3Walls()
-        enemyType = ["bat", "ghost", "imp", "mushroom", "spider"]
+        enemyType = ["bat", "demon", "ghost", "imp", "mushroom", "spider"]
         random.shuffle(allowedPath)
         nbEnemies = random.randint(5, 10) * self.difficulty
         if nbEnemies < len(self.treasurePos):
