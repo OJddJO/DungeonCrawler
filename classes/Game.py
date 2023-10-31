@@ -70,7 +70,7 @@ class Menu:
         clear()
         print('\033[1m' + self.title + '\033[0m')
         print(separator)
-        #selected option will in green
+        #selected option will be in green
         for i, option in enumerate(self.option):
             if i == self.select:
                 print(f"\033[1;32m> {option}\033[0m")
@@ -106,7 +106,7 @@ class Menu:
 class MainMenu(Menu):
     def __init__(self):
         title = open("ascii/title", "r").read()
-        options = ("Play", "Continue", "Options", "How to play", "Exit")
+        options = ("New Game", "Continue", "Options", "How to play", "Exit")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
@@ -122,7 +122,7 @@ class MainMenu(Menu):
                         if keyPress('1'):
                             getInput = False
                             RoleMenu().run()
-                        elif keyPress('2'):
+                        else:
                             getInput = False
                 else:
                     RoleMenu.run()
@@ -173,32 +173,41 @@ class RoleMenu(Menu):
 class HelpMenu(Menu):
     def __init__(self):
         title = open("ascii/help", "r").read()
-        options = ("Map", "Save", "Back")
+        options = ("How to play", "Map", "Save", "Back")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
         match select:
             case 0:
-                text = """There are different object on the map:
--   \033[1;32m@\033[0m : This is you. You can move using the arrows or the keys you defined.
--   \033[30m.\033[0m : This is a path. The player can move on the path.
--   \033[47m \033[0m : This is a wall. The player can't move on the wall.
--   \033[1;33mO\033[0m : This is a portal. If the player is around it, he can interact with it.
--   \033[1;31mM\033[0m : This is an enemy. If the player is around him, he can fight with him.
--   \033[1;34m$\033[0m : This is a treasure. If the player is around it, he can pick it up."""
+                text = """The goal of the game is to go through the dungeon and defeat enemies in the dungeon to get stronger.
+You can move using the arrows or the keys you defined.
+You can interact with the elements around you using the spacebar.
+You can open the menu using the ESC key.
+When your health reaches 0 or below, you die and you will be teleported back to the lobby. You will have a death penalty.
+You can use skills using your mana which regenerate every action you do during a fight."""
                 self.renderText(text)
             case 1:
-                text = """To save in the game, just exit the game and it will save automatically.
-You can exit the game using the menu that appears when you press the ESC key."""
+                text = """There are different object on the map:
+-   @ : This is you. You can move using the arrows or the keys you defined.
+-     : This is a path. The player can move on the path.
+-   O : This is a portal. If the player is around it, he can interact with it to teleport.
+-   C : This is a chest. If the player is around it, he can interact with it to see what's in his inventory.   
+-   M : This is an enemy. If the player is around him, he can fight with him.
+-   $ : This is a treasure. If the player is around it, he can pick it up."""
                 self.renderText(text)
             case 2:
+                text = """To save the game, just press ESC and there is an option to save your progression.
+You can exit the game using the menu that appears when you press the ESC key."""
+                self.renderText(text)
+            case 3:
                 self.runVar = False
 
     def renderText(self, text):
         print(separator)
         lines = text.split("\n")
         for line in lines:
-            if len(line) > 61:
+            lenght = len(line)
+            if lenght > 61:
                 print(line[:61])
                 print(line[61:])
             else:
@@ -326,7 +335,7 @@ class ItemInventoryUI(Menu):
             if item[0] != None:
                 self.option.append(f"{item[0].name} x{item[1]}")
             else:
-                self.option.append("Empty")
+                self.option.append("\033[30mEmpty\033[0m")
         self.option.append("Back")
 
     def onSpace(self, select):
@@ -375,7 +384,7 @@ class GearInventoryUI(Menu):
             if gear != None:
                 self.option.append(f"{color[gear.rarity]} {gear.name}\033[0m")
             else:
-                self.option.append("Empty")
+                self.option.append("\033[30mEmpty\033[0m")
         self.option.append("Back")
 
     def onSpace(self, select):
@@ -396,19 +405,46 @@ class GearUI(Menu):
         super().__init__(title, options, self.onSpace)
 
     def printMenu(self):
+        def diffColor(diff):
+            if diff < 0:
+                return f"\033[31m{diff}\033[0m"
+            else:
+                return f"\033[32m+{diff}\033[0m"
         clear()
         print('\033[1m' + self.title + '\033[0m')
         print(separator)
-        print(f"Level: {self.gear.level}")
-        print(f"Rarity: {color[self.gear.rarity]}\033[0m")
-        print(f"Description: {self.gear.description}")
-        if type(self.gear) == Weapon:
-            print(f"Damage: {self.gear.baseDamage}")
-            print(f"Mana: {self.gear.mana}")
-        elif type(self.gear) == Armor:
-            print(f"Armor: {self.gear.baseArmor}")
+        part = type(self.gear)
+        if part == Weapon:
+            equiped = self.player.weapon
+            damageDiff = diffColor(self.gear.baseDamage - equiped.baseDamage)
+        elif part == Armor:
+            equiped = self.player.armor
+            armorDiff = diffColor(self.gear.baseArmor - equiped.baseArmor)
+        levelDiff = diffColor(self.gear.level - equiped.level)
+        rarityDiff = diffColor(self.gear.rarity - equiped.rarity)
+        manaDiff = diffColor(self.gear.mana - equiped.mana)
+
+        print(f"Description: {self.gear.description}") # current gear
+        print(f"Level: {self.gear.level} {levelDiff}")
+        print(f"Rarity: {color[self.gear.rarity]}\033[0m {rarityDiff}")
+        if part == Weapon:
+            print(f"Damage: {self.gear.baseDamage} {damageDiff}")
+        elif part == Armor:
+            print(f"Armor: {self.gear.baseArmor} {armorDiff}")
+        print(f"Mana: {self.gear.mana} {manaDiff}")
+
+        print(separator) # equiped gear
+        print(f"\033[1mEquiped:\033[0m {color[equiped.rarity]} {equiped.name}\033[0m")
+        print(f"Level: {equiped.level}")
+        print(f"Rarity: {color[equiped.rarity]}\033[0m")
+        if part == Weapon:
+            print(f"Damage: {equiped.baseDamage}")
+        elif part == Armor:
+            print(f"Armor: {equiped.baseArmor}")
+        print(f"Mana: {equiped.mana}")
+
+        #selected option will be in green
         print(separator)
-        #selected option will in green
         for i, option in enumerate(self.option):
             if i == self.select:
                 print(f"\033[1;32m> {option}\033[0m")
@@ -428,6 +464,8 @@ class GearUI(Menu):
                     self.player.armor = self.gear
                     self.inventory.removeGear(self.gear)
                     self.inventory.addGear(playerArmor)
+                #change player mana
+                self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
                 print(separator)
                 print("Gear equipped")
                 spaceToContinue()
@@ -455,6 +493,7 @@ class Game:
             if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
                 raise Exception("Save file corrupted/modified")
             self.player.inventory.loadData()
+            self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
         self.lobby = Lobby(self.player)
         self.currentRoom = self.lobby #base room is the lobby
 
@@ -602,11 +641,11 @@ class Game:
         print(separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
-        manaText = f'Mana: {self.player.mana}/100'
+        manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
         print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
         healthBar = bar(self.player.health, 100)
-        manaBar = bar(self.player.mana, 100, reversed=True)
+        manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
         expText = f'Exp: {self.player.exp}/{(self.player.level*10)**2}'
@@ -678,6 +717,7 @@ class Fight:
             print(f"{self.enemy.name} attacks you !")
             baseAtk = self.enemy.weapon.onUse()
             atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5) - self.player.armor.onUse()
+            if atk < 0: atk = 0
             self.player.health -= atk
             print("He deals", atk, "damage")
         elif randomAction == 2:
@@ -698,6 +738,7 @@ class Fight:
             if keyPress('1'): #attack
                 baseAtk = self.player.weapon.onUse()
                 atk = baseAtk + random.randint(-1//(baseAtk // 5), 1//(baseAtk // 5)) - self.enemy.armor.onUse()
+                if atk < 0: atk = 0
                 self.enemy.health -= atk
                 print("You deal", atk, "damage")
                 getInput = False
@@ -714,6 +755,10 @@ class Fight:
                 else:
                     print("You failed to flee")
                 getInput = False
+        if self.player.mana < self.player.maxMana:
+            self.player.mana += self.player.maxMana // 10
+            if self.player.mana > self.player.maxMana:
+                self.player.mana = self.player.maxMana
 
     def endFight(self):
         if self.enemy.health <= 0 or self.player.health <= 0:
@@ -741,11 +786,11 @@ class Fight:
         #print player info
         print("\033[1mYou:\033[0m")
         healthText = f'Health: {self.player.health}/100'
-        manaText = f'Mana: {self.player.mana}/100'
+        manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
         print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
         healthBar = bar(self.player.health, 100)
-        manaBar = bar(self.player.mana, 100, reversed=True)
+        manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
         print(separator)

@@ -13,8 +13,8 @@ class Dungeon:
     def addRoom(self, room):
         self.rooms.append(room)
 
-    def makeDungeon(self, difficulty, nbRoom = random.randint(2, 5)):
-        nbRoom *= difficulty
+    def makeDungeon(self, difficulty):
+        nbRoom = random.randint(1, 3) * difficulty
         self.addRoom(Room(player=self.player, difficulty=difficulty, nextRoom=None))
         for i in range(nbRoom-1):
             self.addRoom(Room(player=self.player, difficulty=difficulty, nextRoom=self.rooms[-1]))

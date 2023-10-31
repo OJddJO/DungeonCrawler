@@ -31,11 +31,12 @@ class Weapon(Item):
 
 
 class Armor(Item):
-    def __init__(self, name, description, level, armor, rarity):
+    def __init__(self, name, description, level, armor, rarity, mana):
         super().__init__(name, description)
         self.baseArmor = armor
         self.level = level
         self.rarity = rarity
+        self.mana = mana
 
     def onUse(self):
         return self.baseArmor
@@ -47,7 +48,8 @@ class Armor(Item):
             "description": self.description,
             "level": self.level,
             "armor": self.baseArmor,
-            "rarity": self.rarity
+            "rarity": self.rarity,
+            "mana": self.mana
         }
 
 
@@ -75,7 +77,7 @@ def randomWeapon(role, level):
         elif role == "mage":
             key = "staves"
             damageMultiplier = 0.5 #relies on skill
-            manaMultiplier = 1.5
+            manaMultiplier = 2
         elif role == "archer":
             key = "bows"
             damageMultiplier = 1.5 #relies on true damage
@@ -104,13 +106,16 @@ def randomArmor(role, level):
     else:
         if role == "warrior":
             key = "chestplates"
-            armorMultiplier = 1.5 #polyvalent
+            armorMultiplier = 1.5 #tanky
+            manaMultiplier = 0.5
         elif role == "mage":
             key = "robes"
             armorMultiplier = 0.5 #relies on skill
+            manaMultiplier = 2
         elif role == "archer":
             key = "tunics"
-            armorMultiplier = 1
+            armorMultiplier = 1 #polyvalent
+            manaMultiplier = 1
     with open("data/armor.json", "r") as f:
         data = json.load(f)
 
@@ -118,11 +123,15 @@ def randomArmor(role, level):
     rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
-    baseArmor = int(random.randint(1, 10)*(level/2)*armorMultiplier)
+    baseArmor = int(random.randint(1, 10)*level*armorMultiplier)
     modifier = int(baseArmor*rarity*0.5)
     baseArmor += modifier
 
-    return Armor(armor["name"], armor["description"], level, baseArmor, rarity)
+    mana = int(random.randint(10, 20)*manaMultiplier)
+    modifier = int(mana*rarity)
+    mana += modifier
+
+    return Armor(armor["name"], armor["description"], level, baseArmor, rarity, mana)
 
 
 if __name__ == '__main__':
