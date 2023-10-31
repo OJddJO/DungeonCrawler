@@ -49,6 +49,14 @@ def spaceToContinue():
             wait = False
 
 separator = "─" * 61
+color = {
+    1: "\033[1;37mCommon",
+    2: "\033[1;36mUncommon",
+    3: "\033[1;34mRare",
+    4: "\033[1;35mEpic",
+    5: "\033[1;33mLegendary",
+    6: "\033[1;31mMythic"
+}
 
 class Menu:
     def __init__(self, title, option, onSpace):
@@ -113,11 +121,11 @@ class MainMenu(Menu):
                     while getInput:
                         if keyPress('1'):
                             getInput = False
-                            Game().run()
+                            RoleMenu().run()
                         elif keyPress('2'):
                             getInput = False
                 else:
-                    Game().run()
+                    RoleMenu.run()
             case 1:
                 try:
                     if os.path.exists("save"):
@@ -137,6 +145,29 @@ class MainMenu(Menu):
                 HelpMenu().run()
             case 4:
                 exit()
+
+
+class RoleMenu(Menu):
+    def __init__(self):
+        title = open("ascii/role", "r").read()
+        options = ("Warrior", "Mage", "Archer", "Random", "Back")
+        super().__init__(title, options, self.onSpace)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                self.runVar = False
+                Game(new = True, role="warrior").run()
+            case 1:
+                self.runVar = False
+                Game(new = True, role="mage").run()
+            case 2:
+                self.runVar = False
+                Game(new = True, role="archer").run()
+            case 3:
+                self.select = random.randint(0, 2)
+            case 4:
+                self.runVar = False
 
 
 class HelpMenu(Menu):
@@ -235,7 +266,7 @@ class KeybindMenu(Menu):
 class PauseMenu(Menu):
     def __init__(self, game):
         title = open("ascii/pause", "r").read()
-        options = ("Resume", "Save", "Options", "Main Menu", "Exit")
+        options = ("Resume", "Save", "Options", "Exit")
         super().__init__(title, options, self.onSpace)
         self.game = game
     
@@ -248,13 +279,9 @@ class PauseMenu(Menu):
                 print(separator)
                 print("Game saved")
                 spaceToContinue()
-                self.runVar = False
             case 2:
                 OptionMenu().run()
             case 3:
-                self.game.save()
-                MainMenu().run()
-            case 4:
                 print(separator)
                 print("\033[1;31mWARNING\033[0m: Be sure to save your game before exiting")
                 print("\033[1mAre you sure you want to exit ?\033[0m")
@@ -267,12 +294,156 @@ class PauseMenu(Menu):
                     elif keyPress('2'):
                         getInput = False
 
+#INVENTORY
+class InventoryUI(Menu): 
+    def __init__(self, inventory, player):
+        self.inventory = inventory
+        self.player = player
+        title = open('ascii/inventory', 'r').read()
+        options = ["Items", "Gear", "Back"]
+        super().__init__(title, options, self.onSpace)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                ItemInventoryUI(self.inventory).run()
+            case 1:
+                GearInventoryUI(self.inventory, self.player).run()
+            case 2:
+                self.runVar = False
+
+
+class ItemInventoryUI(Menu):
+    def __init__(self, inventory):
+        self.inventory = inventory
+        title = open('ascii/inventory', 'r').read()
+        self.rewriteOptions()
+        super().__init__(title, self.option, self.onSpace)
+
+    def rewriteOptions(self):
+        self.option = []
+        for item in self.inventory.items:
+            if item[0] != None:
+                self.option.append(f"{item[0].name} x{item[1]}")
+            else:
+                self.option.append("Empty")
+        self.option.append("Back")
+
+    def onSpace(self, select):
+        if select == len(self.option) - 1:
+            self.runVar = False
+        elif self.inventory.items[select][0] != None:
+            item = self.inventory.items[select][0]
+            ItemUI(self.inventory, item).run()
+
+
+class ItemUI(Menu):
+    def __init__(self, inventory, item, player):
+        self.inventory = inventory
+        self.item = item
+        self.player = player
+        title = f"{open('ascii/inventory', 'r').read()}\n{item[0].name} x{item[1]}"
+        options = ["Use", "Throw", "Throw All", "Back"]
+        super().__init__(title, options, self.onSpace)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                self.item.onUse(self.player)
+                self.runVar = False
+            case 1:
+                self.inventory.removeItem(self.item)
+                self.runVar = False
+            case 2:
+                self.inventory.removeItem(self.item, self.item.quantity)
+                self.runVar = False
+            case 3:
+                self.runVar = False
+
+
+class GearInventoryUI(Menu):
+    def __init__(self, inventory, player):
+        self.inventory = inventory
+        self.player = player
+        title = open('ascii/inventory', 'r').read()
+        self.rewriteOptions()
+        super().__init__(title, self.option, self.onSpace)
+
+    def rewriteOptions(self):
+        self.option = []
+        for gear in self.inventory.gear:
+            if gear != None:
+                self.option.append(f"{color[gear.rarity]} {gear.name}\033[0m")
+            else:
+                self.option.append("Empty")
+        self.option.append("Back")
+
+    def onSpace(self, select):
+        if select == len(self.option) - 1:
+            self.runVar = False
+        elif self.inventory.gear[select] != None:
+            gear = self.inventory.gear[select]
+            GearUI(self.inventory, gear, self.player).run()
+            self.rewriteOptions()
+
+class GearUI(Menu):
+    def __init__(self, inventory, gear, player):
+        self.inventory = inventory
+        self.gear = gear
+        self.player = player
+        title = f"{open('ascii/inventory', 'r').read()}\n{color[self.gear.rarity]} {self.gear.name}\033[0m"
+        options = ["Equip", "Throw", "Back"]
+        super().__init__(title, options, self.onSpace)
+
+    def printMenu(self):
+        clear()
+        print('\033[1m' + self.title + '\033[0m')
+        print(separator)
+        print(f"Level: {self.gear.level}")
+        print(f"Rarity: {color[self.gear.rarity]}\033[0m")
+        print(f"Description: {self.gear.description}")
+        if type(self.gear) == Weapon:
+            print(f"Damage: {self.gear.baseDamage}")
+            print(f"Mana: {self.gear.mana}")
+        elif type(self.gear) == Armor:
+            print(f"Armor: {self.gear.baseArmor}")
+        print(separator)
+        #selected option will in green
+        for i, option in enumerate(self.option):
+            if i == self.select:
+                print(f"\033[1;32m> {option}\033[0m")
+            else:
+                print(option)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                playerWeapon = self.player.weapon
+                playerArmor = self.player.armor
+                if type(self.gear) == Weapon:
+                    self.player.weapon = self.gear
+                    self.inventory.removeGear(self.gear)
+                    self.inventory.addGear(playerWeapon)
+                elif type(self.gear) == Armor:
+                    self.player.armor = self.gear
+                    self.inventory.removeGear(self.gear)
+                    self.inventory.addGear(playerArmor)
+                print(separator)
+                print("Gear equipped")
+                spaceToContinue()
+                self.runVar = False
+            case 1:
+                self.inventory.removeGear(self.gear)
+                self.runVar = False
+            case 2:
+                self.runVar = False
+
 
 class Game:
     separator = "─" * 61
-    def __init__(self, new = True): #new = True if the player start a new game
+    def __init__(self, new = True, role = None): #new = True if the player start a new game
         if new:
-            self.player = Player()
+            self.player = Player(role)
             self.save()
         else:
             self.player = Player()
@@ -321,14 +492,6 @@ class Game:
                 else:
                     self.player.inventory.addItem(item)
                 self.player.inventory.addGold(money)
-                color = {
-                    1: "\033[1;37mCommon",
-                    2: "\033[1;36mUncommon",
-                    3: "\033[1;34mRare",
-                    4: "\033[1;35mEpic",
-                    5: "\033[1;33mLegendary",
-                    6: "\033[1;31mMythic"
-                }
                 print(f"You found '{color[item.rarity]} {item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                 self.save()
@@ -365,6 +528,9 @@ class Game:
                 self.save()
                 print(separator)
                 spaceToContinue()
+            elif element == "C": #if there is a chest open it
+                InventoryUI(self.player.inventory, self.player).run()
+                self.save()
         self.printRoom()
 
     def interactionInfo(self): #print info about the interaction with the element around the player
@@ -384,6 +550,9 @@ class Game:
                 print(separator)
             elif type(element) == Treasure:
                 print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to open the \033[33mtreasure\033[0m")
+                print(separator)
+            elif element == "C":
+                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to see your \033[33minventory\033[0m")
                 print(separator)
 
     def playerMove(self, direction): #player movement handler
@@ -528,7 +697,7 @@ class Fight:
         while getInput:
             if keyPress('1'): #attack
                 baseAtk = self.player.weapon.onUse()
-                atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5) - self.enemy.armor.onUse()
+                atk = baseAtk + random.randint(-1//(baseAtk // 5), 1//(baseAtk // 5)) - self.enemy.armor.onUse()
                 self.enemy.health -= atk
                 print("You deal", atk, "damage")
                 getInput = False

@@ -1,12 +1,11 @@
-from classes.Item import Weapon, Armor
 import os
 import json
+from classes.Item import Weapon, Armor
 
+baseWeapon = Weapon("Starter Stick", "A simple stick to start your adventure", 1, 10, 1, 0)
+baseArmor = Armor("Starter Armor", "A simple armor to start your adventure", 1, 5, 1)
 class Player:
-    def __init__(self, role = "warrior", weapon = None, armor = None, level = 1, exp = 0, health = 100, mana = 100):
-        if weapon == None:
-            weapon = Weapon("Starter Stick", "A simple stick to start your adventure", 1, 10, 1, 0)
-            armor = Armor("Starter Armor", "A simple armor to start your adventure", 1, 5, 1)
+    def __init__(self, role = None, weapon = baseWeapon, armor = baseArmor, level = 1, exp = 0, health = 100, mana = 100):
         self.health = health
         self.mana = mana
         self.exp = exp
@@ -19,16 +18,16 @@ class Player:
         self.debuff = []
 
     def loadData(self):
-        if os.path.exists("save/stats.json"):
-            with open("save/stats.json", "r") as f:
+        if os.path.exists('save/stats.json'):
+            with open('save/stats.json', 'r') as f:
                 data = json.load(f)
-                self.health = data["health"]
-                self.mana = data["mana"]
-                self.exp = data["exp"]
-                self.level = data["level"]
-                self.role = data["role"]
-                self.weapon = Weapon(data["weapon"]["name"], data["weapon"]["description"], data["weapon"]["level"], data["weapon"]["damage"], data["weapon"]["rarity"], data["weapon"]["mana"])
-                self.armor = Armor(data["armor"]["name"], data["armor"]["description"], data["armor"]["level"], data["armor"]["armor"], data["armor"]["rarity"])
+                self.health = data['health']
+                self.mana = data['mana']
+                self.exp = data['exp']
+                self.level = data['level']
+                self.role = data['role']
+                self.weapon = Weapon(data['weapon']['name'], data['weapon']['description'], data['weapon']['level'], data['weapon']['damage'], data['weapon']['rarity'], data['weapon']['mana'])
+                self.armor = Armor(data['armor']['name'], data['armor']['description'], data['armor']['level'], data['armor']['armor'], data['armor']['rarity'])
 
 
 class Inventory:
@@ -38,18 +37,19 @@ class Inventory:
         self.gold = 0
 
     def loadData(self):
-        if os.path.exists("save/inventory.json"):
-            with open("save/inventory.json", "r") as f:
+        if os.path.exists('save/inventory.json'):
+            with open('save/inventory.json', 'r') as f:
                 data = json.load(f)
-                self.gold = data["gold"]
-                for element in data["gear"]:
+                self.gold = data['gold']
+                self.gear = []
+                for element in data['gear']: # GEAR
                     if element == None:
                         self.gear.append(None)
-                    else:
-                        if element["type"] == "weapon":
-                            self.gear.append(Weapon(element["name"], element["description"], element["level"], element["damage"], element["rarity"], element["mana"]))
-                        elif element["type"] == "armor":
-                            self.gear.append(Armor(element["name"], element["description"], element["level"], element["armor"], element["rarity"]))
+                    elif element['type'] == "weapon":
+                        self.gear.append(Weapon(element['name'], element['description'], element['level'], element['damage'], element['rarity'], element['mana']))
+                    elif element['type'] == "armor":
+                        self.gear.append(Armor(element['name'], element['description'], element['level'], element['armor'], element['rarity']))
+                # ITEM
         else:
             return False
     
@@ -60,16 +60,18 @@ class Inventory:
             "gear": [],
             "gold": self.gold
         }
-        for element in self.gear:
+        for element in self.gear: # GEAR
             if element == None:
-                data["gear"].append(None)
+                data['gear'].append(None)
             else:
-                data["gear"].append(element.__dict__())
-        json.dump(data, open("save/inventory.json", "w"), indent=4)
+                data['gear'].append(element.__dict__())
+        # ITEM
+        json.dump(data, open('save/inventory.json', 'w'), indent=4)
 
     def addItem(self, item, quantity = 1):
         if item in [element[0] for element in self.items]:
-            self.items[item][1] += quantity
+            i = zip(*self.items)[0].index(item)
+            self.items[i][1] += quantity
             return True
         elif [None, 0] in self.items:
             self.items[self.items.index([None, 0])] = [item, quantity]
@@ -79,9 +81,10 @@ class Inventory:
         
     def removeItem(self, item, quantity = 1):
         if item in [element[0] for element in self.items]:
-            self.items[item][1] -= quantity
-            if self.items[item][1] <= 0:
-                self.items[item] = [None, 0]
+            i = zip(*self.items)[0].index(item)
+            self.items[i][1] -= quantity
+            if self.items[i][1] <= 0:
+                self.items[i] = [None, 0]
             return item
         else:
             return False

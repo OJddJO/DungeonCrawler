@@ -38,7 +38,8 @@ class Room(Maze):
         mist = False #testing
         colorDict = {
             '#': '\033[47m \033[0m',
-            '.': '\033[30m.\033[0m',
+            '.': ' ',
+            'C': '\033[1;35mC\033[0m',
             Player: '\033[1;32m@\033[0m',
             Portal: '\033[1;33mO\033[0m',
             Enemy: '\033[1;31mM\033[0m',
@@ -159,6 +160,7 @@ class Lobby(Room):
         self.dungeon = Dungeon(self.player) #init dungeon in lobby for changing rooms
         self.dungeon.makeDungeon(self.player.level) # dungeon will be reset when the player goes back to the lobby
         self.placePortal()
+        self.placeChest()
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
@@ -174,6 +176,10 @@ class Lobby(Room):
     def placePortal(self):
         #place portal on the top middle of the lobby
         self.map[1][30] = Portal(self, self.dungeon.rooms[0])
+
+    def placeChest(self):
+        self.map[19][30] = "C"
+
 
 class Portal:
     def __init__(self, room1, room2):
