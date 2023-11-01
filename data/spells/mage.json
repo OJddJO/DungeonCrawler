@@ -144,13 +144,13 @@
                         "name": "Atomic Burst",
                         "symbol": "爆",
                         "type": "damage",
-                        "cost": 250,
+                        "cost": 300,
                         "damage": 50,
                         "scale": 0.5,
                         "description": "Unleash a sudden burst of atomic energy, causing a localized explosion that damages all enemies within its radius.",
                         "unlock": {
-                            "level": 20,
-                            "cost": 5000
+                            "level": 35,
+                            "cost": 8000
                         },
                         "next": {
                             "Atom Split": {
@@ -237,12 +237,12 @@
                                 "symbol": "雹",
                                 "type": "damage",
                                 "cost": 250,
-                                "damage": 30,
+                                "damage": 40,
                                 "scale": 0.4,
                                 "description": "Call forth a downpour of icicles from the sky, dealing massive frost damage to a single target.",
                                 "unlock": {
-                                    "level": 20,
-                                    "cost": 5000
+                                    "level": 30,
+                                    "cost": 7500
                                 },
                                 "next":{}
                             }

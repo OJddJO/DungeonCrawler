@@ -1,0 +1,83 @@
+{
+    "Cleave": {
+        "name": "Cleave",
+        "symbol": "劈",
+        "type": "damage",
+        "cost": "30",
+        "damage": "10",
+        "scale": "0",
+        "description": "Swing your weapon in a wide arc, striking multiple nearby enemies with a single blow.",
+        "unlock": {
+            "level": 1,
+            "cost": 0
+        },
+        "next": {
+            "Mighty Strike": {
+                "name": "Mighty Strike",
+                "symbol": "强",
+                "type": "damage",
+                "cost": "40",
+                "damage": "20",
+                "scale": "0",
+                "description": "Strike a single enemy with a powerful blow.",
+                "unlock": {
+                    "level": 5,
+                    "cost": 250
+                },
+                "next": {
+                    "Whirlwind": {
+                        "name": "Whirlwind",
+                        "symbol": "旋",
+                        "type": "damage",
+                        "cost": "50",
+                        "damage": "30",
+                        "scale": "0",
+                        "description": "Spin around, striking all nearby enemies with your weapon.",
+                        "unlock": {
+                            "level": 10,
+                            "cost": 1000
+                        },
+                        "next": {
+                            
+                        }
+                    }
+                }
+            },
+            "Berserk": {
+                "name": "Berserk",
+                "symbol": "狂",
+                "type": "buff",
+                "cost": "50",
+                "heal": "0",
+                "scale": "0",
+                "buff": ["berserk"],
+                "duration": "2",
+                "description": "Enter a berserk rage, increasing your damage for a short time.",
+                "unlock": {
+                    "level": 5,
+                    "cost": 250
+                },
+                "next": {
+                    "Rage": {
+                        "name": "Rage",
+                        "symbol": "怒",
+                        "type": "buff",
+                        "cost": "150",
+                        "heal": "0",
+                        "scale": "0",
+                        "buff": ["berserk"],
+                        "duration": "7",
+                        "description": "Enter a state of rage, significantly increasing your attack damage for a limited time.",
+                        "unlock": {
+                            "level": 35,
+                            "cost": 1000
+                        },
+                        "next": {
+                            
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
