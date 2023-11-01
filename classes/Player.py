@@ -1,18 +1,22 @@
 import os
 import json
 from classes.Item import Weapon, Armor
+from datetime import datetime
 
 baseWeapon = Weapon("Starter Stick", "A simple stick to start your adventure", 1, 10, 1, 0)
 baseArmor = Armor("Starter Hide", "A simple armor to start your adventure", 1, 5, 1, 0)
 class Player:
-    def __init__(self, role = None, weapon = baseWeapon, armor = baseArmor, level = 1, exp = 0, health = 100, mana = 100):
+    def __init__(self, role = None, weapon = baseWeapon, armor = baseArmor, level = 1, exp = 0, gold = 0, health = 100, mana = 100, spells = []):
+        self.name = "You"
         self.health = health
         self.exp = exp
+        self.gold = gold
         self.level = level
         self.role = role # warrior, mage, archer
         self.weapon = weapon
         self.armor = armor
         self.mana = mana
+        self.spells = spells
         self.maxMana = 100 + self.armor.mana + self.weapon.mana
         self.inventory = Inventory()
         self.buff = []
@@ -26,28 +30,43 @@ class Player:
                     self.health = data['health']
                     self.mana = data['mana']
                     self.exp = data['exp']
+                    self.gold = data['gold']
                     self.level = data['level']
                     self.role = data['role']
+                    self.spells = data['spells']
                     self.weapon = Weapon(data['weapon']['name'], data['weapon']['description'], data['weapon']['level'], data['weapon']['damage'], data['weapon']['rarity'], data['weapon']['mana'])
                     self.armor = Armor(data['armor']['name'], data['armor']['description'], data['armor']['level'], data['armor']['armor'], data['armor']['rarity'], data['armor']['mana'])
             else:
                 raise Exception("No save file found")
         except:
             raise Exception("Save file corrupted")
+        
+    def save(self):
+        with open("save/stats.json", "w") as f:
+            json.dump({
+                "health": self.health,
+                "mana": self.mana,
+                "exp": self.exp,
+                "gold": self.gold,
+                "level": self.level,
+                "role": self.role,
+                "weapon": self.weapon.__dict__(),
+                "armor": self.armor.__dict__(),
+                "spells": self.spells,
+                "date": datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+            }, f)
 
 
 class Inventory:
     def __init__(self):
         self.items = [[None, 0]] * 20 # (item, quantity)
         self.gear = [None] * 20 # max 20 gear
-        self.gold = 0
 
     def loadData(self):
         try:
             if os.path.exists('save/inventory.json'):
                 with open('save/inventory.json', 'r') as f:
                     data = json.load(f)
-                    self.gold = data['gold']
                     self.gear = []
                     for element in data['gear']: # GEAR
                         if element == None:
@@ -66,8 +85,7 @@ class Inventory:
         #decompose each item and gear to json to save
         data = {
             "items": [],
-            "gear": [],
-            "gold": self.gold
+            "gear": []
         }
         for element in self.gear: # GEAR
             if element == None:
@@ -86,6 +104,7 @@ class Inventory:
             self.items[self.items.index([None, 0])] = [item, quantity]
             return True
         else:
+            print("Item inventory full. You didn't pick up the item.")
             return False
         
     def removeItem(self, item, quantity = 1):
@@ -104,22 +123,13 @@ class Inventory:
             self.gear[self.gear.index(None)] = gear
             return gear
         else:
+            print("Gear inventory full. You didn't pick up the gear.")
             return False
         
     def removeGear(self, gear):
         if gear in self.gear:
             self.gear[self.gear.index(gear)] = None
             return gear
-        else:
-            return False
-        
-    def addGold(self, gold):
-        self.gold += gold
-
-    def removeGold(self, gold):
-        if self.gold >= gold:
-            self.gold -= gold
-            return gold
         else:
             return False
 
@@ -134,6 +144,3 @@ class Inventory:
             return self.gear[gear]
         else:
             return False
-        
-    def getGold(self):
-        return self.gold

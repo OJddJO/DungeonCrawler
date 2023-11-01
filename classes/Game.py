@@ -8,6 +8,7 @@ from classes.Map import Lobby, Portal
 from classes.Player import Player
 from classes.Enemy import Enemy
 from classes.Item import Treasure, Weapon, Armor
+from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
 
 os.makedirs("save", exist_ok=True)
 if os.path.exists("save/keybind.json"):
@@ -122,7 +123,7 @@ class MainMenu(Menu):
                         if keyPress('1'):
                             getInput = False
                             RoleMenu().run()
-                        else:
+                        elif keyPress('2'):
                             getInput = False
                 else:
                     RoleMenu().run()
@@ -477,6 +478,338 @@ class GearUI(Menu):
                 self.runVar = False
 
 
+#SPELL
+class SpellTree:
+    def __init__(self, role, player, inFight = False, enemy = None):
+        self.title = open("ascii/spell", "r").read()
+        self.player = player
+        self.current = self.initTree(role)
+        self.selected = 0
+        self.path = [self.current]
+        self.spells = [self.current.spell] + [branch.spell for branch in self.current.branches]
+        self.inFight = inFight
+        self.casted = False
+        self.enemy = enemy
+
+    def changeTree(self, tree):
+        self.path.append(tree)
+        self.current = tree
+        self.spells = [self.current.spell] + [branch.spell for branch in self.current.branches]
+        self.selected = 0
+        self.render()
+
+    def goBack(self):
+        self.path.pop()
+        self.current = self.path[-1]
+        self.spells = [self.current.spell] + [branch.spell for branch in self.current.branches]
+        self.selected = 0
+        self.render()
+
+    def navigate(self):
+        getInput = True
+        while getInput:
+            if keyPress("left"):
+                self.selected -= 1
+                if self.selected < 0:
+                    self.selected = len(self.spells)-1
+                getInput = False
+            elif keyPress("right"):
+                self.selected += 1
+                if self.selected > len(self.spells)-1:
+                    self.selected = 0
+                getInput = False
+            elif keyPress("space"):
+                if self.inFight:
+                    choiceUI = CastSpellUI(self, self.player, self.enemy, self.spells[self.selected])
+                    choiceUI.run()
+                    if choiceUI.casted:
+                        self.casted = True
+                        self.runVar = False
+                else:
+                    SpellUI(self.player, self.spells[self.selected], self).run()
+                getInput = False
+            elif keyPress("escape"):
+                if len(self.path) == 1:
+                    self.runVar = False
+                else:
+                    self.goBack()
+                getInput = False
+
+    def render(self):
+        clear()
+        print(self.title)
+        print(separator)
+        def offset(x): return ' ' * x
+        def sliceSpell(spell, selected = False):
+            symbol = spell.symbol
+            line1 = f"╔═╩═╗"
+            if selected:
+                line2 = f"║\033[30;107m{symbol}\033[0m ║"
+            else:
+                line2 = f"║{symbol} ║"
+            line3 = f"╚═╦═╝"
+            return line1, line2, line3
+
+        selectedList = [False] * (len(self.current.branches)+1)  # +1 for the current spell
+        selectedList[self.selected] = True # to set the selected spell in the tree
+
+        print(f'{offset(30)}║')
+        spellSlice = sliceSpell(self.current.spell, selectedList[0])
+        print(offset(28) + spellSlice[0])
+        print(offset(28) + spellSlice[1])
+        print(offset(28) + spellSlice[2])
+        if len(self.current.branches) == 1:
+            print(f'{offset(30)}║')
+            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
+            print(offset(28) + spell1[0])
+            print(offset(28) + spell1[1])
+            print(offset(28) + spell1[2])
+            print(f'{offset(30)}║')
+        elif len(self.current.branches) == 2:
+            print(f'{offset(15)}╔══════════════╩══════════════╗')
+            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
+            spell2 = sliceSpell(self.current.branches[1].spell, selectedList[2])
+            print(offset(13) + spell1[0] + offset(25) + spell2[0])
+            print(offset(13) + spell1[1] + offset(25) + spell2[1])
+            print(offset(13) + spell1[2] + offset(25) + spell2[2])
+            print(f'{offset(15)}║{offset(29)}║')
+        elif len(self.current.branches) == 3:
+            print(f'{offset(10)}╔═══════════════════╬═══════════════════╗')
+            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
+            spell2 = sliceSpell(self.current.branches[1].spell, selectedList[2])
+            spell3 = sliceSpell(self.current.branches[2].spell, selectedList[3])
+            print(offset(8) + spell1[0] + offset(15) + spell2[0] + offset(15) + spell3[0])
+            print(offset(8) + spell1[1] + offset(15) + spell2[1] + offset(15) + spell3[1])
+            print(offset(8) + spell1[2] + offset(15) + spell2[2] + offset(15) + spell3[2])
+            print(f'{offset(10)}║{offset(19)}║{offset(19)}║')
+        elif len(self.current.branches) == 4:
+            print(f'{offset(14)}╔═══════╦═══════╩═══════╦═══════╗')
+            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
+            spell2 = sliceSpell(self.current.branches[1].spell, selectedList[2])
+            spell3 = sliceSpell(self.current.branches[2].spell, selectedList[3])
+            spell4 = sliceSpell(self.current.branches[3].spell, selectedList[4])
+            print(offset(12) + spell1[0] + offset(3) + spell2[0] + offset(11) + spell3[0] + offset(3) + spell4[0])
+            print(offset(12) + spell1[1] + offset(3) + spell2[1] + offset(11) + spell3[1] + offset(3) + spell4[1])
+            print(offset(12) + spell1[2] + offset(3) + spell2[2] + offset(11) + spell3[2] + offset(3) + spell4[2])
+            print(f'{offset(14)}║{offset(7)}║{offset(15)}║{offset(7)}║')
+        print(separator)
+        print("Navigate with \033[1m◄ ►\033[0m and press \033[1m˽\033[0m to select. ESC to go back")
+
+
+    def initTree(self, role):
+        if role == "mage":
+            data = json.load(open("data/spells/mage.json", "r", encoding="utf-8"))
+        firstKey = list(data.keys())[0]
+
+        def createTree(key, data):
+            spellData = data[key]
+            if spellData['type'] == "damage":
+                spell = DamageSpell(spellData['name'], spellData['symbol'], spellData['cost'], spellData['damage'], spellData['scale'], spellData['description'], spellData['unlock'])
+            elif spellData['type'] == "heal":
+                spell = HealSpell(spellData['name'], spellData['symbol'], spellData['cost'], spellData['heal'], spellData['scale'], spellData['description'], spellData['unlock'])
+            elif spellData['type'] == "buff":
+                spell = BuffSpell(spellData['name'], spellData['symbol'], spellData['cost'], spellData['heal'], spellData['scale'], spellData['buff'], spellData['duration'], spellData['description'], spellData['unlock'])
+            elif spellData['type'] == "debuff":
+                spell = DebuffSpell(spellData['name'], spellData['symbol'], spellData['cost'], spellData['damage'], spellData['scale'], spellData['debuff'], spellData['duration'], spellData['description'], spellData['unlock'])
+            branches = []
+            for nextKey in data[key]['next']:
+                branches.append(createTree(nextKey, data[key]['next']))
+            return Tree(spell, branches)
+
+        return createTree(firstKey, data)
+
+    def run(self):
+        self.runVar = True
+        while self.runVar:
+            self.render()
+            self.navigate()
+
+
+class SpellUI(Menu):
+    def __init__(self, player, spell, tree):
+        title = open("ascii/spell", "r").read()
+        options = ("Information", "Unlock", "Go to this spell", "Back")
+        super().__init__(title, options, self.onSpace)
+        self.player = player
+        self.spell = spell
+        self.spellTree = tree
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                print(separator)
+                print(self.spell.symbol, self.spell.name)
+                print(self.spell.description)
+                print(separator)
+                if self.spell.name in self.player.spells:
+                    print("\033[3;92mThis spell is unlocked\033[0m")
+                elif self.spell.unlock["level"] <= self.player.level:
+                    print("\033[3;96mThis spell can be unlocked\033[0m")
+                    print("Level required:", self.spell.unlock["level"])
+                    print("Cost:", self.spell.unlock["cost"])
+                else:
+                    print("\033[3;31mThis spell can't be unlocked yet\033[0m")
+                    print("Level required:", self.spell.unlock["level"])
+                print(separator)
+                print("Mana Cost:", self.spell.cost)
+                if type(self.spell) == DamageSpell:
+                    print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
+                elif type(self.spell) == HealSpell:
+                    print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
+                elif type(self.spell) == BuffSpell:
+                    print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
+                    print("Buff:", self.spell.buff)
+                    print("Duration:", self.spell.duration)
+                elif type(self.spell) == DebuffSpell:
+                    print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
+                    print("Debuff:", self.spell.debuff)
+                    print("Duration:", self.spell.duration)
+                print(separator)
+                spaceToContinue()
+            case 1:
+                if self.spell.name in self.player.spells:
+                    print(separator)
+                    print("\033[3mThis spell is already unlocked\033[0m")
+                    spaceToContinue()
+                elif self.spell.unlock["level"] <= self.player.level:
+                    if self.player.gold >= self.spell.unlock["cost"]:
+                        self.player.gold -= self.spell.unlock["cost"]
+                        self.player.spells.append(self.spell.name)
+                        print(separator)
+                        print("Spell unlocked !")
+                        spaceToContinue()
+                    else:
+                        print(separator)
+                        print("\033[3;31mYou don't have enough gold\033[0m")
+                        spaceToContinue()
+                else:
+                    print(separator)
+                    print("\033[3;31mThis spell can't be unlocked yet\033[0m")
+                    spaceToContinue()
+            case 2:
+                if self.spellTree.selected == 0:
+                    print(separator)
+                    print("\033[3;31mYou are already on this spell\033[0m")
+                    spaceToContinue()
+                elif len(self.spellTree.current.branches[self.spellTree.selected-1].branches) == 0:
+                    print(separator)
+                    print("\033[3;31mThis spell doesn't unlock any other spell\033[0m")
+                    spaceToContinue()
+                else:
+                    if self.spell.name not in self.player.spells:
+                        print(separator)
+                        print("\033[3;31mYou didn't unlock this spell yet\033[0m")
+                        spaceToContinue()
+                    else:
+                        self.spellTree.changeTree(self.spellTree.current.branches[self.spellTree.selected-1])
+                        self.runVar = False
+            case 3:
+                self.runVar = False
+
+
+class CastSpellUI(Menu):
+    def __init__(self, spellTree, player, enemy, spell):
+        title = open("ascii/spell", "r").read()
+        options = ("Cast", "Go to this spell", "Back")
+        super().__init__(title, options, self.onSpace)
+        self.spellTree = spellTree
+        self.player = player
+        self.enemy = enemy
+        self.spell = spell
+        self.casted = False
+
+    def printMenu(self):
+        clear()
+        print('\033[1m' + self.title + '\033[0m')
+        print(separator)
+        print(f"Mana: {self.player.mana}/{self.player.maxMana}")
+        print(separator)
+        print(self.spell.symbol, self.spell.name)
+        print(self.spell.description)
+        print(separator)
+        if self.spell.name in self.player.spells:
+            print("\033[3;92mThis spell is unlocked\033[0m")
+        elif self.spell.unlock["level"] <= self.player.level:
+            print("\033[3;96mThis spell can be unlocked\033[0m")
+            print("Level required:", self.spell.unlock["level"])
+            print("Cost:", self.spell.unlock["cost"])
+        else:
+            print("\033[3;31mThis spell can't be unlocked yet\033[0m")
+            print("Level required:", self.spell.unlock["level"])
+        print(separator)
+        print("Mana Cost:", self.spell.cost)
+        if type(self.spell) == DamageSpell:
+            print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
+        elif type(self.spell) == HealSpell:
+            print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
+        elif type(self.spell) == BuffSpell:
+            print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
+            print("Buff:", self.spell.buff)
+            print("Duration:", self.spell.duration)
+        elif type(self.spell) == DebuffSpell:
+            print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
+            print("Debuff:", self.spell.debuff)
+            print("Duration:", self.spell.duration)
+        print(separator)
+        #selected option will be in green
+        for i, option in enumerate(self.option):
+            if i == self.select:
+                print(f"\033[1;32m> {option}\033[0m")
+            else:
+                print(option)
+
+    def getTarget(self):
+        if type(self.spell) == DamageSpell:
+            return self.enemy
+        elif type(self.spell) == HealSpell:
+            return self.player
+        elif type(self.spell) == BuffSpell:
+            return self.player
+        elif type(self.spell) == DebuffSpell:
+            return self.enemy
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                if self.spell.name not in self.player.spells:
+                    print(separator)
+                    print("\033[3;31mThis spell is not unlocked\033[0m")
+                    spaceToContinue()
+                elif self.spell.cost > self.player.mana:
+                    print(separator)
+                    print("\033[3;31mYou don't have enough mana\033[0m")
+                    spaceToContinue()
+                elif self.spell.unlock["level"] > self.player.level:
+                    print(separator)
+                    print("\033[3;31mYour level is to low to use this spell\033[0m")
+                    spaceToContinue()
+                elif self.spell.name in self.player.spells:
+                    text = self.spell.onUse(self.player, self.getTarget())
+                    print(separator)
+                    print(text)
+                    self.casted = True
+                self.runVar = False
+            case 1:
+                if self.spellTree.selected == 0:
+                    print(separator)
+                    print("\033[3;31mYou are already on this spell\033[0m")
+                    spaceToContinue()
+                elif len(self.spellTree.current.branches[self.spellTree.selected-1].branches) == 0:
+                    print(separator)
+                    print("\033[3;31mThis spell doesn't unlock any other spell\033[0m")
+                    spaceToContinue()
+                else:
+                    if self.spell.name not in self.player.spells:
+                        print(separator)
+                        print("\033[3;31mYou didn't unlock this spell yet\033[0m")
+                        spaceToContinue()
+                    else:
+                        self.spellTree.changeTree(self.spellTree.current.branches[self.spellTree.selected-1])
+                        self.runVar = False
+            case 2:
+                self.runVar = False
+
+
 class Game:
     separator = "─" * 61
     def __init__(self, new = True, role = None): #new = True if the player start a new game
@@ -487,11 +820,11 @@ class Game:
             self.player = Player()
             self.player.loadData()
             #time verification
-            statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
-            inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
-            savedTime = json.load(open("save/stats.json", "r"))["date"]
-            if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
-                raise Exception("Save file corrupted/modified")
+            # statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
+            # inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
+            # savedTime = json.load(open("save/stats.json", "r"))["date"]
+            # if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
+            #     raise Exception("Save file corrupted/modified")
             self.player.inventory.loadData()
             self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
         self.lobby = Lobby(self.player)
@@ -530,7 +863,7 @@ class Game:
                     self.player.inventory.addGear(item)
                 else:
                     self.player.inventory.addItem(item)
-                self.player.inventory.addGold(money)
+                self.player.gold += money
                 print(f"You found '{color[item.rarity]} {item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                 self.save()
@@ -548,13 +881,17 @@ class Game:
                 elif win == True:
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                     print("\033[3mInfo:\033[0m You win the fight")
-                    print(f"      You gain {element.exp} exp")
+                    print(f"      You gain \033[1;33m{element.exp} exp\033[0m and \033[1;33m{element.gold} gold\033[0m")
                     self.player.exp += element.exp
-                    if self.player.exp >= 5**(self.player.level*2)*10:
+                    self.player.gold += element.gold
+                    if self.player.exp >= (self.player.level*5)**2:
                         self.player.exp = 0
-                        self.player.level += 1
-                        print("      You level up")
-                        print("      You are now level", self.player.level)
+                        if self.player.level < 50:
+                            self.player.level += 1
+                            print("      You level up")
+                            print("      You are now level", self.player.level)
+                        elif self.player.level == 50:
+                            print("      You are now level max, you can't level up anymore")
                 else:
                     self.currentRoom = self.lobby
                     self.player.health = 100
@@ -569,6 +906,9 @@ class Game:
                 spaceToContinue()
             elif element == "C": #if there is a chest open it
                 InventoryUI(self.player.inventory, self.player).run()
+                self.save()
+            elif element == "G": #if there is a grimoire use it to see the spell tree
+                SpellTree(self.player.role, self.player).run()
                 self.save()
         self.printRoom()
 
@@ -593,6 +933,9 @@ class Game:
             elif element == "C":
                 print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to see your \033[33minventory\033[0m")
                 print(separator)
+            elif element == "G":
+                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to see your \033[33mspell tree\033[0m")
+                print(separator)
 
     def playerMove(self, direction): #player movement handler
         coord = self.currentRoom.getPlayerCoord()
@@ -613,10 +956,8 @@ class Game:
                 if self.currentRoom.map[coord[0]][coord[1] + 1] == '.':
                     self.currentRoom.map[coord[0]][coord[1]] = '.'
                     self.currentRoom.map[coord[0]][coord[1] + 1] = self.player
-
         # while keyboard.is_pressed(direction): #wait for the key to be released
         #     pass
-
         sleep(0.1) #delay to avoid multiple key press
         self.printRoom()
 
@@ -630,14 +971,14 @@ class Game:
         else:
             print("\033[1;35mDungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1, "\033[0m")
         print(separator)
+        print("\033[1;33mGold:\033[0m", self.player.gold)
+        print(separator)
         if self.currentRoom == self.lobby:
             mist = False
         else:
             mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
-
         print(self.currentRoom)
-
         print(separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
@@ -648,28 +989,17 @@ class Game:
         manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
-        expText = f'Exp: {self.player.exp}/{(self.player.level*10)**2}'
+        expText = f'Exp: {self.player.exp}/{(self.player.level*5)**2}'
         levelText = f'Level: {self.player.level}'
         whiteSpace = " " * (61 - len(expText) - len(levelText))
         print(f'\033[33m{expText}\033[0m{whiteSpace}\033[33m{levelText}\033[0m')
         expBar = bar(self.player.exp, (self.player.level*10)**2, length=59)
         print(f'\033[33m{expBar}\033[0m')
         print(separator)
-
         self.interactionInfo()
 
     def save(self):
-        with open("save/stats.json", "w") as f:
-            json.dump({
-                "health": self.player.health,
-                "mana": self.player.mana,
-                "exp": self.player.exp,
-                "level": self.player.level,
-                "role": self.player.role,
-                "weapon": self.player.weapon.__dict__(),
-                "armor": self.player.armor.__dict__(),
-                "date": datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-            }, f)
+        self.player.save()
         self.player.inventory.save()
 
     def run(self):
@@ -697,6 +1027,7 @@ class Fight:
     def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
+        self.enemySpellData = json.load(open("data/spells/enemy.json", "r", encoding="utf-8"))
         self.flee = False
 
     def turn(self):
@@ -709,9 +1040,36 @@ class Fight:
         if self.flee:
             return True
         return self.endFight()
+    
+    def enemySpell(self):
+        def evalSpell(spell):
+            if self.enemySpellData[spell]["type"] == "damage":
+                return DamageSpell(self.enemySpellData[spell]["name"], self.enemySpellData[spell]["symbol"], self.enemySpellData[spell]["cost"], self.enemySpellData[spell]["damage"], self.enemySpellData[spell]["scale"], self.enemySpellData[spell]["description"], self.enemySpellData[spell]["unlock"])
+            elif self.enemySpellData[spell]["type"] == "heal":
+                return HealSpell(self.enemySpellData[spell]["name"], self.enemySpellData[spell]["symbol"], self.enemySpellData[spell]["cost"], self.enemySpellData[spell]["heal"], self.enemySpellData[spell]["scale"], self.enemySpellData[spell]["description"], self.enemySpellData[spell]["unlock"])
+            elif self.enemySpellData[spell]["type"] == "buff":
+                return BuffSpell(self.enemySpellData[spell]["name"], self.enemySpellData[spell]["symbol"], self.enemySpellData[spell]["cost"], self.enemySpellData[spell]["heal"], self.enemySpellData[spell]["scale"], self.enemySpellData[spell]["buff"], self.enemySpellData[spell]["duration"], self.enemySpellData[spell]["description"], self.enemySpellData[spell]["unlock"])
+            elif self.enemySpellData[spell]["type"] == "debuff":
+                return DebuffSpell(self.enemySpellData[spell]["name"], self.enemySpellData[spell]["symbol"], self.enemySpellData[spell]["cost"], self.enemySpellData[spell]["damage"], self.enemySpellData[spell]["scale"], self.enemySpellData[spell]["debuff"], self.enemySpellData[spell]["duration"], self.enemySpellData[spell]["description"], self.enemySpellData[spell]["unlock"])
+        #randomly choose a spell of the enemy level
+        spellList = [evalSpell(element) for element in self.enemy.spells if self.enemySpellData[element]["unlock"]["level"] <= self.enemy.level]
+        spell = random.choice(spellList)
+        #cast the spell
+        if spell.cost <= self.enemy.mana:
+            if type(spell) == DamageSpell:
+                text = spell.onUse(self.enemy, self.player)
+            elif type(spell) == HealSpell:
+                text = spell.onUse(self.enemy, self.enemy)
+            elif type(spell) == BuffSpell:
+                text = spell.onUse(self.enemy, self.enemy)
+            elif type(spell) == DebuffSpell:
+                text = spell.onUse(self.enemy, self.player)
+            print(text)
+        else:
+            print(f"{self.enemy.name} has exhausted all his mana and can't cast any spell")
 
     def enemyTurn(self):
-        print(f"{self.enemy.name}'s turn")
+        print(f"\033[1m{self.enemy.name}'s turn\033[0m")
         randomAction = random.randint(1, 2)
         if randomAction == 1:
             print(f"{self.enemy.name} attacks you !")
@@ -721,8 +1079,8 @@ class Fight:
             self.player.health -= atk
             print("He deals", atk, "damage")
         elif randomAction == 2:
-            print(f"{self.enemy.name} uses a skill")
-            pass
+            print(f"{self.enemy.name} uses a spell")
+            self.enemySpell()
         # elif randomAction == 3:
         #     print(f"{self.enemy.name} uses an item")
         #     pass
@@ -732,7 +1090,7 @@ class Fight:
         #player choose an action
         #attack skill item
         print("Choose an action:")
-        print("1. Attack    2. Skill    3. Item    4. Run")
+        print("1. Attack    2. Spell    3. Item    4. Run")
         getInput = True
         while getInput:
             if keyPress('1'): #attack
@@ -743,7 +1101,18 @@ class Fight:
                 print("You deal", atk, "damage")
                 getInput = False
             elif keyPress('2'): #skill
-                getInput = False
+                if len(self.player.spells) == 0:
+                    print("You don't have any spell")
+                    spaceToContinue()
+                    self.print()
+                    self.playerTurn()
+                else:
+                    spell = SpellTree(self.player.role, self.player, inFight=True, enemy=self.enemy)
+                    spell.run()
+                    if not spell.casted:
+                        self.print()
+                        self.playerTurn()
+                    getInput = False
             elif keyPress('3'): #item
                 getInput = False
             elif keyPress('4'): #run
@@ -756,7 +1125,7 @@ class Fight:
                     print("You failed to flee")
                 getInput = False
         if self.player.mana < self.player.maxMana:
-            self.player.mana += self.player.maxMana // 10
+            self.player.mana += self.player.maxMana // 20
             if self.player.mana > self.player.maxMana:
                 self.player.mana = self.player.maxMana
 

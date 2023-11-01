@@ -41,10 +41,12 @@
                             "Solar Flare": {
                                 "name": "Solar Flare",
                                 "symbol": "日",
-                                "type": "damage",
+                                "type": "debuff",
                                 "cost": 150,
                                 "damage": 30,
                                 "scale": 0.4,
+                                "debuff": ["burn"],
+                                "duration": 5,
                                 "description": "Summon a searing burst of solar energy, causing intense fire damage to a single target.",
                                 "unlock": {
                                     "level": 10,
@@ -135,6 +137,35 @@
                                         "next": {}
                                     }
                                 }
+                            }
+                        }
+                    },
+                    "Atomic Burst":{
+                        "name": "Atomic Burst",
+                        "symbol": "爆",
+                        "type": "damage",
+                        "cost": 250,
+                        "damage": 50,
+                        "scale": 0.5,
+                        "description": "Unleash a sudden burst of atomic energy, causing a localized explosion that damages all enemies within its radius.",
+                        "unlock": {
+                            "level": 20,
+                            "cost": 5000
+                        },
+                        "next": {
+                            "Atom Split": {
+                                "name": "Atom Split",
+                                "symbol": "裂",
+                                "type": "damage",
+                                "cost": 500,
+                                "damage": 100,
+                                "scale": 0.5,
+                                "description": "Manipulate atomic bonds within a target, causing them to rupture and release a burst of atomic energy, dealing massive damage",
+                                "unlock": {
+                                    "level": 50,
+                                    "cost": 12500
+                                },
+                                "next": {}
                             }
                         }
                     }

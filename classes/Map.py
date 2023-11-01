@@ -40,6 +40,7 @@ class Room(Maze):
             '#': '\033[47m \033[0m',
             '.': ' ',
             'C': '\033[1;35mC\033[0m',
+            'G': '\033[1;95mG\033[0m',
             Player: '\033[1;32m@\033[0m',
             Portal: '\033[1;33mO\033[0m',
             Enemy: '\033[1;31mM\033[0m',
@@ -161,6 +162,7 @@ class Lobby(Room):
         self.dungeon.makeDungeon(self.player.level) # dungeon will be reset when the player goes back to the lobby
         self.placePortal()
         self.placeChest()
+        self.placeGrimoire()
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
@@ -179,6 +181,9 @@ class Lobby(Room):
 
     def placeChest(self):
         self.map[19][30] = "C"
+
+    def placeGrimoire(self):
+        self.map[10][15] = "G"
 
 
 class Portal:
