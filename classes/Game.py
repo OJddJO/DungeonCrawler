@@ -158,13 +158,13 @@ class RoleMenu(Menu):
         match select:
             case 0:
                 self.runVar = False
-                Game(new = True, role="warrior").run()
+                # Game(new = True, role="warrior").run()
             case 1:
                 self.runVar = False
                 Game(new = True, role="mage").run()
             case 2:
                 self.runVar = False
-                Game(new = True, role="archer").run()
+                # Game(new = True, role="archer").run()
             case 3:
                 self.select = random.randint(0, 2)
             case 4:
