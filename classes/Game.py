@@ -125,7 +125,7 @@ class MainMenu(Menu):
                         else:
                             getInput = False
                 else:
-                    RoleMenu.run()
+                    RoleMenu().run()
             case 1:
                 try:
                     if os.path.exists("save"):

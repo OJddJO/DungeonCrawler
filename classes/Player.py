@@ -78,9 +78,9 @@ class Inventory:
         json.dump(data, open('save/inventory.json', 'w'), indent=4)
 
     def addItem(self, item, quantity = 1):
-        if item in [element[0] for element in self.items]:
-            i = zip(*self.items)[0].index(item)
-            self.items[i][1] += quantity
+        existingItem = [element[0] for element in self.items]
+        if item in existingItem:
+            self.items[existingItem.index(item)][1] += quantity
             return True
         elif [None, 0] in self.items:
             self.items[self.items.index([None, 0])] = [item, quantity]
@@ -89,8 +89,9 @@ class Inventory:
             return False
         
     def removeItem(self, item, quantity = 1):
-        if item in [element[0] for element in self.items]:
-            i = zip(*self.items)[0].index(item)
+        existingItem = [element[0] for element in self.items]
+        if item in existingItem:
+            i = existingItem.index(item)
             self.items[i][1] -= quantity
             if self.items[i][1] <= 0:
                 self.items[i] = [None, 0]
