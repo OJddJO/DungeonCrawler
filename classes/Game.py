@@ -544,7 +544,7 @@ class SpellTree:
             symbol = spell.symbol
             line1 = f"╔═╩═╗"
             if selected:
-                line2 = f"║\033[30;107m{symbol}\033[0m ║"
+                line2 = f"║\033[30;107m{symbol} \033[0m║"
             else:
                 line2 = f"║{symbol} ║"
             line3 = f"╚═╦═╝"
