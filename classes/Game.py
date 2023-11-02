@@ -444,6 +444,8 @@ class ItemUI(Menu):
                 self.title = f"{open('ascii/inventory', 'r').read()}\n{self.item.name} x{self.quantity}"
                 print(separator)
                 print("\033[32mYou\033[0m used", self.item.name)
+                print("\033[32mYou\033[0m now have\033[33m", self.quantity, "\033[0mleft")
+                print("\033[32mYou\033[0m have\033[31m", self.player.health, "/ 100 health\033[0m", "and\033[36m", self.player.mana, "/", self.player.maxMana, "mana\033[0m")
                 if not self.inFight:
                     spaceToContinue()
                 else:
