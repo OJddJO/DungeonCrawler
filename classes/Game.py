@@ -1229,6 +1229,7 @@ class Fight:
                             spell = SpellTree(self.player.role, self.player, inFight=True, enemy=self.enemy)
                             spell.run()
                             if not spell.casted:
+                                self.print()
                                 self.playerTurn()
                         getInput = False
                 elif keyPress('3'): #item
