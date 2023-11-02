@@ -2,10 +2,12 @@
     "Fireball": {
         "name": "Fireball",
         "symbol": "火",
-        "type": "damage",
+        "type": "debuff",
         "cost": 25,
         "damage": 5,
         "scale": 0.1,
+        "debuff": ["burn"],
+        "duration": 2,
         "description": "Hurl a fiery projectile at your target, causing a burst of flames and burning damage upon impact.",
         "unlock": {
             "level": 1,

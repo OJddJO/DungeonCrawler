@@ -1,15 +1,87 @@
 import json
 import random
 
+color = {
+    1: "\033[1;37m",
+    2: "\033[1;36m",
+    3: "\033[1;34m",
+    4: "\033[1;35m",
+    5: "\033[1;33m",
+    6: "\033[1;31m"
+}
+rarities = {
+    1: "Common",
+    2: "Uncommon",
+    3: "Rare",
+    4: "Epic",
+    5: "Legendary",
+    6: "Mythic"
+}
+
 class Item:
-    def __init__(self, name, description):
+    def __init__(self, name, description, rarity, value):
         self.name = name
         self.description = description
+        self.rarity = rarity
+        self.value = value
+    
+    def __str__(self):
+        text = f"{color[self.rarity]}{self.name}\033[0m\n"
+        text += f"{self.description}\n"
+        text += f"Rarity: {color[self.rarity]+rarities[self.rarity]}\033[0m\n"
+        text += f"Value: {self.value}"
+        return text
 
 
-class Weapon(Item):
+class HealItem(Item):
+    def __init__(self, name, description, health, mana, rarity, value):
+        super().__init__(name, description, rarity, value)
+        self.health = health
+        self.mana = mana
+
+    def onUse(self, user):
+        #remove 1 qty
+        text = ""
+        user.health += self.health
+        user.mana += self.mana
+        if user.health > 100:
+            user.health = 100
+            text += f"{user.name} used {self.name} and healed {self.health} health\n"
+        if user.mana > user.maxMana:
+            user.mana = user.maxMana
+            text += f"{user.name} used {self.name} and healed {self.mana} mana\n"
+        #remove last \n
+        text = text[:-1]
+        return text
+
+
+class BuffItem(Item):
+    def __init__(self, name, description, health, mana, buff, duration, rarity, value):
+        super().__init__(name, description, rarity, value)
+        self.health = health
+        self.mana = mana
+        self.buff = buff
+        self.duration = duration
+
+    def onUse(self, user):
+        text = ""
+        user.health += self.health
+        user.mana += self.mana
+        if user.health > 100:
+            user.health = 100
+            text += f"{user.name} used {self.name} and healed {self.health} health\n"
+        if user.mana > user.maxMana:
+            user.mana = user.maxMana
+            text += f"{user.name} used {self.name} and healed {self.mana} mana\n"
+        user.buffs.append(self.buff)
+        text += f"{user.name} used {self.name} and got {self.buff.name} for {self.duration} turns"
+        return text
+
+
+class Weapon:
     def __init__(self, name, description, level, damage, rarity, mana):
-        super().__init__(name, description)
+        self.name = name
+        self.description = description
         self.baseDamage = damage
         self.level = level
         self.rarity = rarity
@@ -30,9 +102,10 @@ class Weapon(Item):
         }
 
 
-class Armor(Item):
+class Armor:
     def __init__(self, name, description, level, armor, rarity, mana):
-        super().__init__(name, description)
+        self.name = name
+        self.description = description
         self.baseArmor = armor
         self.level = level
         self.rarity = rarity
@@ -89,12 +162,12 @@ def randomWeapon(role, level):
     rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
-    baseDamage = int(random.randint(5, 15)*level*damageMultiplier)
-    modifier = int(baseDamage*rarity*0.5)
+    baseDamage = int(random.randint(5, 15)*damageMultiplier+level)
+    modifier = int(baseDamage*rarity*0.1)
     baseDamage += modifier
 
-    mana = int(random.randint(0, 10)*manaMultiplier)
-    modifier = int(mana*rarity)
+    mana = int(random.randint(0, 10)*manaMultiplier*level//2)
+    modifier = int(mana*rarity*0.1)
     mana += modifier
 
     return Weapon(weapon["name"], weapon["description"], level, baseDamage, rarity, mana)
@@ -123,17 +196,12 @@ def randomArmor(role, level):
     rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
-    baseArmor = int(random.randint(1, 10)*level*armorMultiplier)
-    modifier = int(baseArmor*rarity*0.5)
+    baseArmor = int(random.randint(1, 15)*armorMultiplier+level)
+    modifier = int(baseArmor*rarity*0.1)
     baseArmor += modifier
 
-    mana = int(random.randint(10, 20)*manaMultiplier)
-    modifier = int(mana*rarity)
+    mana = int(random.randint(10, 20)*manaMultiplier*level//2)
+    modifier = int(mana*rarity*0.1)
     mana += modifier
 
     return Armor(armor["name"], armor["description"], level, baseArmor, rarity, mana)
-
-
-if __name__ == '__main__':
-    weapon = randomWeapon("warrior", 1)
-    print(f"{weapon.name} - {weapon.description} - {weapon.baseDamage} - {weapon.mana} - {weapon.rarity}")

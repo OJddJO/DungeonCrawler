@@ -15,7 +15,7 @@ class DamageSpell(Spell):
 
     def onUse(self, user, target):
         user.mana -= self.cost
-        dmg = int(self.damage+(user.mana*self.scale)-target.armor.onUse()//5)
+        dmg = int(self.damage+(user.mana*self.scale)-target.armor.onUse())
         if dmg < 0:
             dmg = 0
         target.health -= dmg
@@ -118,7 +118,7 @@ class DebuffSpell(Spell):
                 target.debuff.append([debuff, self.duration])
             text += f"{target.name} gained {debuff} for {self.duration} turns\n"
         if self.damage > 0:
-            dmg = int(self.damage+(user.mana*self.scale)-target.armor.onUse()//5)
+            dmg = int(self.damage+(user.mana*self.scale)-target.armor.onUse())
             if dmg < 0:
                 dmg = 0
             target.health -= dmg

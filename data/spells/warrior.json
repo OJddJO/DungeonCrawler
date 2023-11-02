@@ -50,7 +50,7 @@
                 "cost": "50",
                 "heal": "0",
                 "scale": "0",
-                "buff": ["berserk"],
+                "buff": ["strength"],
                 "duration": "2",
                 "description": "Enter a berserk rage, increasing your damage for a short time.",
                 "unlock": {
@@ -65,7 +65,7 @@
                         "cost": "150",
                         "heal": "0",
                         "scale": "0",
-                        "buff": ["berserk"],
+                        "buff": ["strength"],
                         "duration": "7",
                         "description": "Enter a state of rage, significantly increasing your attack damage for a limited time.",
                         "unlock": {

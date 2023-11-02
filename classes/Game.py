@@ -7,7 +7,7 @@ from time import sleep
 from classes.Map import Lobby, Portal
 from classes.Player import Player
 from classes.Enemy import Enemy
-from classes.Item import Treasure, Weapon, Armor
+from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
 
 os.makedirs("save", exist_ok=True)
@@ -304,6 +304,66 @@ class PauseMenu(Menu):
                     elif keyPress('2'):
                         getInput = False
 
+#SHOP
+class Shop(Menu):
+    def __init__(self, player):
+        self.player = player
+        title = open("ascii/shop", "r").read()
+        self.createOptions()
+        super().__init__(title, self.options, self.onSpace)
+
+    def createOptions(self):
+        self.options = []
+        items = json.load(open("data/items.json", "r"))
+        for key in items:
+            self.options.append(items[key]["name"])
+        self.options.append("Back")
+
+    def onSpace(self, select):
+        if select == len(self.options) - 1:
+            self.runVar = False
+        else:
+            item = json.load(open("data/items.json", "r"))[self.options[select]]
+            ItemShop(item, self.player).run()
+
+
+class ItemShop(Menu):
+    def __init__(self, data, player):
+        self.player = player
+        self.data = data
+        if self.data['type'] == "heal":
+            self.item = HealItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['rarity'], self.data['value'])
+        elif self.data['type'] == "buff":
+            self.item = BuffItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['buff'], self.data['duration'], self.data['rarity'], self.data['value'])
+        title = open("ascii/shop", "r").read()
+        option = ["Information", "Buy", "Back"]
+        super().__init__(title, option, self.onSpace)
+
+    def onSpace(self, select):
+        match select:
+            case 0:
+                print(separator)
+                print(self.item)
+                spaceToContinue()
+            case 1:
+                if self.player.gold >= self.item.value:
+                    self.player.gold -= self.item.value
+                    self.player.inventory.addItem(self.item)
+                    print(separator)
+                    print(f"You bought {self.item.name}")
+                    i = self.player.inventory.getExistingItem().index(self.item.name)
+                    qty = self.player.inventory.items[i][1]
+                    print(f"You now have \033[33m{qty}\033[0mx {self.item.name}")
+                    print(f"You have \033[33m{self.player.gold}\033[0m gold left")
+                    spaceToContinue()
+                else:
+                    print(separator)
+                    print("You don't have enough gold")
+                    print(f"You need \033[33m{self.item.value - self.player.gold}\033[0m more gold")
+                    spaceToContinue()
+            case 2:
+                self.runVar = False
+
 #INVENTORY
 class InventoryUI(Menu): 
     def __init__(self, inventory, player):
@@ -316,7 +376,7 @@ class InventoryUI(Menu):
     def onSpace(self, select):
         match select:
             case 0:
-                ItemInventoryUI(self.inventory).run()
+                ItemInventoryUI(self.inventory, self.player).run()
             case 1:
                 GearInventoryUI(self.inventory, self.player).run()
             case 2:
@@ -324,8 +384,9 @@ class InventoryUI(Menu):
 
 
 class ItemInventoryUI(Menu):
-    def __init__(self, inventory):
+    def __init__(self, inventory, player):
         self.inventory = inventory
+        self.player = player
         title = open('ascii/inventory', 'r').read()
         self.rewriteOptions()
         super().__init__(title, self.option, self.onSpace)
@@ -343,31 +404,38 @@ class ItemInventoryUI(Menu):
         if select == len(self.option) - 1:
             self.runVar = False
         elif self.inventory.items[select][0] != None:
-            item = self.inventory.items[select][0]
-            ItemUI(self.inventory, item).run()
+            item = self.inventory.items[select]
+            ItemUI(self.inventory, item, self.player).run()
+            self.rewriteOptions()
 
 
 class ItemUI(Menu):
     def __init__(self, inventory, item, player):
         self.inventory = inventory
-        self.item = item
+        self.item = item[0]
+        self.quantity = item[1]
         self.player = player
         title = f"{open('ascii/inventory', 'r').read()}\n{item[0].name} x{item[1]}"
-        options = ["Use", "Throw", "Throw All", "Back"]
+        options = ["Information", "Use", "Throw", "Throw All", "Back"]
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
         match select:
             case 0:
-                self.item.onUse(self.player)
-                self.runVar = False
+                print(separator)
+                print(self.item)
+                spaceToContinue()
             case 1:
+                self.item.onUse(self.player)
                 self.inventory.removeItem(self.item)
                 self.runVar = False
             case 2:
-                self.inventory.removeItem(self.item, self.item.quantity)
+                self.inventory.removeItem(self.item)
                 self.runVar = False
             case 3:
+                self.inventory.removeItem(self.item, self.quantity)
+                self.runVar = False
+            case 4:
                 self.runVar = False
 
 
@@ -395,6 +463,7 @@ class GearInventoryUI(Menu):
             gear = self.inventory.gear[select]
             GearUI(self.inventory, gear, self.player).run()
             self.rewriteOptions()
+
 
 class GearUI(Menu):
     def __init__(self, inventory, gear, player):
@@ -540,58 +609,54 @@ class SpellTree:
         print(self.title)
         print(separator)
         def offset(x): return ' ' * x
-        def sliceSpell(spell, selected = False):
-            symbol = spell.symbol
-            line1 = f"╔═╩═╗"
+        def sliceSpell(branch, selected = False):
+            symbol = branch.spell.symbol
+            line1 = "╔═╩═╗"
             if selected:
                 line2 = f"║\033[30;107m{symbol} \033[0m║"
             else:
                 line2 = f"║{symbol} ║"
-            line3 = f"╚═╦═╝"
-            return line1, line2, line3
+            if len(branch.branches) == 0:
+                line3 = "╚═══╝"
+                line4 = "     "
+            else:
+                line3 = "╚═╦═╝"
+                line4 = "  ║  "
+            return line1, line2, line3, line4
 
         selectedList = [False] * (len(self.current.branches)+1)  # +1 for the current spell
         selectedList[self.selected] = True # to set the selected spell in the tree
 
         print(f'{offset(30)}║')
-        spellSlice = sliceSpell(self.current.spell, selectedList[0])
-        print(offset(28) + spellSlice[0])
-        print(offset(28) + spellSlice[1])
-        print(offset(28) + spellSlice[2])
+        spellSlice = sliceSpell(self.current, selectedList[0])
+        for i in range(4):
+            print(offset(28) + spellSlice[i])
         if len(self.current.branches) == 1:
             print(f'{offset(30)}║')
-            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
-            print(offset(28) + spell1[0])
-            print(offset(28) + spell1[1])
-            print(offset(28) + spell1[2])
-            print(f'{offset(30)}║')
+            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
+            for i in range(4):
+                print(offset(28) + spell1[i])
         elif len(self.current.branches) == 2:
             print(f'{offset(15)}╔══════════════╩══════════════╗')
-            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
-            spell2 = sliceSpell(self.current.branches[1].spell, selectedList[2])
-            print(offset(13) + spell1[0] + offset(25) + spell2[0])
-            print(offset(13) + spell1[1] + offset(25) + spell2[1])
-            print(offset(13) + spell1[2] + offset(25) + spell2[2])
-            print(f'{offset(15)}║{offset(29)}║')
+            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
+            spell2 = sliceSpell(self.current.branches[1], selectedList[2])
+            for i in range(4):
+                print(offset(13) + spell1[i] + offset(25) + spell2[i])
         elif len(self.current.branches) == 3:
             print(f'{offset(10)}╔═══════════════════╬═══════════════════╗')
-            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
-            spell2 = sliceSpell(self.current.branches[1].spell, selectedList[2])
-            spell3 = sliceSpell(self.current.branches[2].spell, selectedList[3])
-            print(offset(8) + spell1[0] + offset(15) + spell2[0] + offset(15) + spell3[0])
-            print(offset(8) + spell1[1] + offset(15) + spell2[1] + offset(15) + spell3[1])
-            print(offset(8) + spell1[2] + offset(15) + spell2[2] + offset(15) + spell3[2])
-            print(f'{offset(10)}║{offset(19)}║{offset(19)}║')
+            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
+            spell2 = sliceSpell(self.current.branches[1], selectedList[2])
+            spell3 = sliceSpell(self.current.branches[2], selectedList[3])
+            for i in range(4):
+                print(offset(8) + spell1[i] + offset(15) + spell2[i] + offset(15) + spell3[i])
         elif len(self.current.branches) == 4:
             print(f'{offset(14)}╔═══════╦═══════╩═══════╦═══════╗')
-            spell1 = sliceSpell(self.current.branches[0].spell, selectedList[1])
-            spell2 = sliceSpell(self.current.branches[1].spell, selectedList[2])
-            spell3 = sliceSpell(self.current.branches[2].spell, selectedList[3])
-            spell4 = sliceSpell(self.current.branches[3].spell, selectedList[4])
-            print(offset(12) + spell1[0] + offset(3) + spell2[0] + offset(11) + spell3[0] + offset(3) + spell4[0])
-            print(offset(12) + spell1[1] + offset(3) + spell2[1] + offset(11) + spell3[1] + offset(3) + spell4[1])
-            print(offset(12) + spell1[2] + offset(3) + spell2[2] + offset(11) + spell3[2] + offset(3) + spell4[2])
-            print(f'{offset(14)}║{offset(7)}║{offset(15)}║{offset(7)}║')
+            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
+            spell2 = sliceSpell(self.current.branches[1], selectedList[2])
+            spell3 = sliceSpell(self.current.branches[2], selectedList[3])
+            spell4 = sliceSpell(self.current.branches[3], selectedList[4])
+            for i in range(4):
+                print(offset(12) + spell1[i] + offset(3) + spell2[i] + offset(11) + spell3[i] + offset(3) + spell4[i])
         print(separator)
         print("Navigate with \033[1m◄ ►\033[0m and press \033[1m˽\033[0m to select. ESC to go back")
 
@@ -910,6 +975,9 @@ class Game:
             elif element == "G": #if there is a grimoire use it to see the spell tree
                 SpellTree(self.player.role, self.player).run()
                 self.save()
+            elif element == "S":
+                Shop(self.player).run()
+                self.save()
         self.printRoom()
 
     def interactionInfo(self): #print info about the interaction with the element around the player
@@ -935,6 +1003,9 @@ class Game:
                 print(separator)
             elif element == "G":
                 print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to see your \033[33mspell tree\033[0m")
+                print(separator)
+            elif element == "S":
+                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to check the \033[33mshop\033[0m")
                 print(separator)
 
     def playerMove(self, direction): #player movement handler
@@ -1027,6 +1098,7 @@ class Fight:
     def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
+        self.resetBuffDebuff()
         self.enemySpellData = json.load(open("data/spells/enemy.json", "r", encoding="utf-8"))
         self.flee = False
 
@@ -1039,6 +1111,32 @@ class Fight:
             self.enemyTurn()
         if self.flee:
             return True
+        
+        # revive buff (player only)
+        if self.haveBuff("revive", self.player):
+            self.player.health = 100
+            self.player.debuff = []
+            for i, element in enumerate(self.player.buff):
+                if element[0] == "revive":
+                    self.player.buff.pop(i)
+            print(f"\033[3;92m{self.player.name}\033[0m is revived !")
+            spaceToContinue()
+
+        #burn effect
+        b = False
+        if self.haveDebuff("burn", self.player):
+            self.player.health -= 5
+            print(f"\033[3;31m{self.player.name}\033[0m is burning and lose \033[1;31m5 health\033[0m")
+            b = True
+        if self.haveDebuff("burn", self.enemy):
+            self.enemy.health -= 5
+            print(f"\033[3;31m{self.enemy.name}\033[0m is burning and loses \033[1;31m5 health\033[0m")
+            b = True
+        if b:
+            spaceToContinue()
+
+        self.removeBuffDebuff(self.player)
+        self.removeBuffDebuff(self.enemy)
         return self.endFight()
     
     def enemySpell(self):
@@ -1066,68 +1164,126 @@ class Fight:
                 text = spell.onUse(self.enemy, self.player)
             print(text)
         else:
-            print(f"{self.enemy.name} has exhausted all his mana and can't cast any spell")
+            print(f"\033[31m{self.enemy.name}\033[0m has exhausted all his mana and can't cast any spell")
 
     def enemyTurn(self):
-        print(f"\033[1m{self.enemy.name}'s turn\033[0m")
-        randomAction = random.randint(1, 2)
-        if randomAction == 1:
-            print(f"{self.enemy.name} attacks you !")
-            baseAtk = self.enemy.weapon.onUse()
-            atk = baseAtk + random.randint(-baseAtk // 5, baseAtk // 5) - self.player.armor.onUse()
-            if atk < 0: atk = 0
-            self.player.health -= atk
-            print("He deals", atk, "damage")
-        elif randomAction == 2:
-            print(f"{self.enemy.name} uses a spell")
-            self.enemySpell()
-        # elif randomAction == 3:
-        #     print(f"{self.enemy.name} uses an item")
-        #     pass
+        if self.haveDebuff("stun", self.enemy):
+            print(f"\033[31m{self.enemy.name}\033[0m is stunned and can't do anything")
+        else:
+            print(f"\033[1;31m{self.enemy.name}'s turn\033[0m")
+            randomAction = random.randint(1, 2)
+            match randomAction:
+                case 1:
+                    self.evalDamage(self.enemy, self.player)
+                case 2:
+                    print(f"\033[31m{self.enemy.name}\033[0m uses a spell")
+                    if self.haveBuff("invulnerable", self.player):
+                        print("\033[32mYou\033[0m are invulnerable !")
+                        print(f"\033[31m{self.enemy.name}\033[0m's spell has no effect on \033[32mYou\033[0m")
+                    else:
+                        self.enemySpell()
         spaceToContinue()
 
     def playerTurn(self):
-        #player choose an action
-        #attack skill item
-        print("Choose an action:")
-        print("1. Attack    2. Spell    3. Item    4. Run")
-        getInput = True
-        while getInput:
-            if keyPress('1'): #attack
-                baseAtk = self.player.weapon.onUse()
-                atk = baseAtk + random.randint(-1//(baseAtk // 5), 1//(baseAtk // 5)) - self.enemy.armor.onUse()
-                if atk < 0: atk = 0
-                self.enemy.health -= atk
-                print("You deal", atk, "damage")
-                getInput = False
-            elif keyPress('2'): #skill
-                if len(self.player.spells) == 0:
-                    print("You don't have any spell")
-                    spaceToContinue()
-                    self.print()
-                    self.playerTurn()
-                else:
-                    spell = SpellTree(self.player.role, self.player, inFight=True, enemy=self.enemy)
-                    spell.run()
-                    if not spell.casted:
+        if self.haveDebuff("stun", self.player):
+            print("\033[32mYou\033[0m are stunned and can't do anything")
+        else:
+            #player choose an action
+            #attack skill item
+            print("Choose an action:")
+            print("1. Attack    2. Spell    3. Item    4. Run")
+            getInput = True
+            while getInput:
+                if keyPress('1'): #attack
+                    self.evalDamage(self.player, self.enemy)
+                    getInput = False
+                elif keyPress('2'): #skill
+                    if len(self.player.spells) == 0:
+                        print("\033[32mYou\033[0m don't have any spell")
+                        spaceToContinue()
                         self.print()
                         self.playerTurn()
+                    else:
+                        if self.haveBuff("invulnerable", self.enemy):
+                            print(f"\033[31m{self.enemy.name}\033[0m is invulnerable !")
+                            print("\033[32mYou\033[0mr spell has no effect on him")
+                        else:
+                            spell = SpellTree(self.player.role, self.player, inFight=True, enemy=self.enemy)
+                            spell.run()
+                            if not spell.casted:
+                                self.print()
+                                self.playerTurn()
+                            getInput = False
+                elif keyPress('3'): #item
                     getInput = False
-            elif keyPress('3'): #item
-                getInput = False
-            elif keyPress('4'): #run
-                print("You try to flee")
-                flee = random.randint(1, 2)
-                if flee == 1:
-                    print("You successfully flee")
-                    self.flee = True
-                else:
-                    print("You failed to flee")
-                getInput = False
+                elif keyPress('4'): #run
+                    print("\033[32mYou\033[0m try to flee")
+                    flee = random.randint(1, 2)
+                    if flee == 1:
+                        print("\033[32mYou\033[0m successfully flee")
+                        self.flee = True
+                    else:
+                        print("\033[32mYou\033[0m failed to flee")
+                    getInput = False
         if self.player.mana < self.player.maxMana:
             self.player.mana += self.player.maxMana // 20
             if self.player.mana > self.player.maxMana:
                 self.player.mana = self.player.maxMana
+        if self.haveBuff("purify", self.player):
+            self.player.debuff = []
+
+    def evalDamage(self, user, target):
+        if self.haveBuff("invulnerable", target):
+            if user == self.player:
+                print(f"\033[31m{target.name}\033[0m is invulnerable !")
+                print("Your attack has no effect on him")
+            else:
+                print("\033[32mYou\033[0m are invulnerable !")
+                print(f"\033[31m{user.name}\033[0m's attack has no effect on \033[32mYou\033[0m")
+        else:
+            baseAtk = user.weapon.onUse()
+            atk = baseAtk + random.randint(-1//(baseAtk // 5), 1//(baseAtk // 5))
+            if self.haveBuff("strength", user):
+                atk += atk // 2 #atk * 1.5
+            if self.haveBuff("shield", target):
+                atk -= atk // 2
+            if not self.haveDebuff("break", target):
+                atk -= target.armor.onUse()
+            if atk < 0: atk = 0
+            target.health -= atk
+            if user == self.player:
+                print(f"\033[32mYou\033[0m deal {atk} damage to \033[31m{target.name}\033[0m")
+            else:
+                print(f"\033[31m{user.name}\033[0m attacks \033[32mYou\033[0m !")
+                print(f"\033[31m{user.name}\033[0m deals {atk} damage to \033[32mYou\033[0m")
+
+    def haveBuff(self, buff, target):
+        buffsList = [element[0] for element in target.buff]
+        if buff in buffsList:
+            return True
+        return False
+    
+    def haveDebuff(self, debuff, target):
+        debuffsList = [element[0] for element in target.debuff]
+        if debuff in debuffsList:
+            return True
+        return False
+    
+    def removeBuffDebuff(self, target):
+        for i, element in enumerate(target.buff):
+            target.buff[i][1] -= 1
+            if element[1] <= 0:
+                target.buff.pop(i)
+        for i, element in enumerate(target.debuff):
+            target.debuff[i][1] -= 1
+            if element[1] <= 0:
+                target.debuff.pop(i)
+
+    def resetBuffDebuff(self):
+        self.player.buff = []
+        self.player.debuff = []
+        self.enemy.buff = []
+        self.enemy.debuff = []
 
     def endFight(self):
         if self.enemy.health <= 0 or self.player.health <= 0:
@@ -1142,18 +1298,22 @@ class Fight:
         if self.flee:
             win = "flee"
         return win
-    
+
     def print(self):
         clear()
         #print enemy info
-        print(f"\033[1m{self.enemy.name} - {self.enemy.type}:\033[0m")
+        print(f"\033[1;31m{self.enemy.name} - {self.enemy.type}:\033[0m")
         healthText = f'Health: {self.enemy.health}/100'
         print(f'\033[31m{healthText}\033[0m')
         healthBar = bar(self.enemy.health, 100)
         print(f'\033[31m{healthBar}\033[0m')
+        # buffList = [element[0] for element in self.enemy.buff]
+        print(f"\033[32mBuff:\033[0m {self.enemy.buff}")
+        # debuffList = [element[0] for element in self.enemy.debuff]
+        print(f"\033[31mDebuff:\033[0m {self.enemy.debuff}")
         self.enemy.render()
         #print player info
-        print("\033[1mYou:\033[0m")
+        print("\033[1;32mYou\033[0m:")
         healthText = f'Health: {self.player.health}/100'
         manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
         whiteSpace = " " * (61 - len(healthText) - len(manaText))
@@ -1162,4 +1322,8 @@ class Fight:
         manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
         whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
         print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
+        # buffList = [element[0] for element in self.player.buff]
+        print(f"\033[32mBuff:\033[0m {self.player.buff}")
+        # debuffList = [element[0] for element in self.player.debuff]
+        print(f"\033[31mDebuff:\033[0m {self.player.debuff}")
         print(separator)

@@ -41,6 +41,7 @@ class Room(Maze):
             '.': ' ',
             'C': '\033[1;35mC\033[0m',
             'G': '\033[1;95mG\033[0m',
+            'S': '\033[1;36mS\033[0m',
             Player: '\033[1;32m@\033[0m',
             Portal: '\033[1;33mO\033[0m',
             Enemy: '\033[1;31mM\033[0m',
@@ -163,6 +164,7 @@ class Lobby(Room):
         self.placePortal()
         self.placeChest()
         self.placeGrimoire()
+        self.placeShop()
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
@@ -184,6 +186,9 @@ class Lobby(Room):
 
     def placeGrimoire(self):
         self.map[10][15] = "G"
+
+    def placeShop(self):
+        self.map[10][45] = "S"
 
 
 class Portal:
