@@ -7,6 +7,14 @@ class Spell:
         self.scale = scale
         self.unlock = unlock
 
+
+def haveDebuff(debuff, target):
+        debuffsList = [element[0] for element in target.debuff]
+        if debuff in debuffsList:
+            return True
+        return False
+
+
 class DamageSpell(Spell):
     def __init__(self, name, symbol, cost, damage, scale, description, unlock):
         super().__init__(name, symbol, cost, scale, description, unlock)
@@ -15,7 +23,11 @@ class DamageSpell(Spell):
 
     def onUse(self, user, target):
         user.mana -= self.cost
-        dmg = int(self.damage+(user.mana*self.scale)-target.armor.onUse())
+        dmg = int(self.damage+(user.mana*self.scale))
+        if haveDebuff("break", target):
+            dmg -= target.armor.onUse()//2
+        else:
+            dmg -= target.armor.onUse()
         if dmg < 0:
             dmg = 0
         target.health -= dmg
@@ -118,7 +130,11 @@ class DebuffSpell(Spell):
                 target.debuff.append([debuff, self.duration])
             text += f"{target.name} gained {debuff} for {self.duration} turns\n"
         if self.damage > 0:
-            dmg = int(self.damage+(user.mana*self.scale)-target.armor.onUse())
+            dmg = int(self.damage+(user.mana*self.scale))
+            if haveDebuff("break", target):
+                dmg -= target.armor.onUse()//2
+            else:
+                dmg -= target.armor.onUse()
             if dmg < 0:
                 dmg = 0
             target.health -= dmg

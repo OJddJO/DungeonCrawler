@@ -6,10 +6,10 @@ class Enemy:
         self.name = name
         self.type = type
         self.health = 100
-        self.mana = 100*level
+        self.mana = 100 + 20*(level-20)
         self.spells = ["Fireball", "Supernova", "Flamestrike", "Gravity Well", "Gravity Crush", "Atomic Burst", "Frost Nova", "Ice Lance", "Avalanche", "Magic Missile", "Heal"]
         self.weapon = randomWeapon("warrior", level)
-        self.armor = randomArmor("warrior", level-1)
+        self.armor = randomArmor("mage", level-1)
         self.exp = random.randint(1, 5)*level
         self.gold = random.randint(1, 10)*level
         self.level = level

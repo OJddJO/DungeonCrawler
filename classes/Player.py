@@ -6,7 +6,7 @@ from datetime import datetime
 baseWeapon = Weapon("Starter Stick", "A simple stick to start your adventure", 1, 10, 1, 0)
 baseArmor = Armor("Starter Hide", "A simple armor to start your adventure", 1, 5, 1, 0)
 class Player:
-    def __init__(self, role = None, weapon = baseWeapon, armor = baseArmor, level = 1, exp = 0, gold = 0, health = 100, mana = 100, spells = []):
+    def __init__(self, role = None, weapon = baseWeapon, armor = baseArmor, level = 1, exp = 0, gold = 500, health = 100, mana = 100, spells = []):
         self.name = "You"
         self.health = health
         self.exp = exp
@@ -108,7 +108,7 @@ class Inventory:
                 data['items'].append([element[0].name, element[1]])
         json.dump(data, open('save/inventory.json', 'w'))
 
-    def getExistingItem(self):
+    def getExistingItems(self):
         existingItem = []
         for element in self.items:
             if element[0] != None:
@@ -118,7 +118,7 @@ class Inventory:
         return existingItem
 
     def addItem(self, item, quantity = 1):
-        existingItem = self.getExistingItem()
+        existingItem = self.getExistingItems()
         if item.name in existingItem:
             self.items[existingItem.index(item.name)][1] += quantity
             return True
@@ -130,7 +130,7 @@ class Inventory:
             return False
         
     def removeItem(self, item, quantity = 1):
-        existingItem = self.getExistingItem()
+        existingItem = self.getExistingItems()
         if item.name in existingItem:
             i = existingItem.index(item.name)
             self.items[i][1] -= quantity

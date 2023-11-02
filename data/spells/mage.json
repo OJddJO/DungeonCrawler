@@ -256,7 +256,7 @@
                 "name": "Magic Missile",
                 "symbol": "魔",
                 "type": "damage",
-                "cost": 90,
+                "cost": 100,
                 "damage": 40,
                 "scale": 0.01,
                 "description": "Unleash a homing projectile that never misses its target, dealing moderate arcane damage.",

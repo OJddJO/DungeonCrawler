@@ -351,7 +351,7 @@ class ItemShop(Menu):
                     self.player.inventory.addItem(self.item)
                     print(separator)
                     print(f"You bought {self.item.name}")
-                    i = self.player.inventory.getExistingItem().index(self.item.name)
+                    i = self.player.inventory.getExistingItems().index(self.item.name)
                     qty = self.player.inventory.items[i][1]
                     print(f"You now have \033[33m{qty}\033[0mx {self.item.name}")
                     print(f"You have \033[33m{self.player.gold}\033[0m gold left")
@@ -384,9 +384,11 @@ class InventoryUI(Menu):
 
 
 class ItemInventoryUI(Menu):
-    def __init__(self, inventory, player):
+    def __init__(self, inventory, player, inFight = False):
         self.inventory = inventory
         self.player = player
+        self.inFight = inFight
+        if self.inFight: self.used = False
         title = open('ascii/inventory', 'r').read()
         self.rewriteOptions()
         super().__init__(title, self.option, self.onSpace)
@@ -405,18 +407,27 @@ class ItemInventoryUI(Menu):
             self.runVar = False
         elif self.inventory.items[select][0] != None:
             item = self.inventory.items[select]
-            ItemUI(self.inventory, item, self.player).run()
-            self.rewriteOptions()
+            ui = ItemUI(self.inventory, item, self.player, self.inFight)
+            ui.run()
+            if self.inFight:
+                self.used = ui.used
+                if self.used:
+                    self.runVar = False
+            else:
+                self.rewriteOptions()
 
 
 class ItemUI(Menu):
-    def __init__(self, inventory, item, player):
+    def __init__(self, inventory, item, player, inFight = False):
         self.inventory = inventory
         self.item = item[0]
         self.quantity = item[1]
         self.player = player
+        self.inFight = inFight
+        if self.inFight:
+            self.used = False
         title = f"{open('ascii/inventory', 'r').read()}\n{item[0].name} x{item[1]}"
-        options = ["Information", "Use", "Throw", "Throw All", "Back"]
+        options = ["Information", "Use", "Throw One", "Throw All", "Back"]
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
@@ -428,13 +439,18 @@ class ItemUI(Menu):
             case 1:
                 self.item.onUse(self.player)
                 self.inventory.removeItem(self.item)
-                self.runVar = False
+                self.title = f"{open('ascii/inventory', 'r').read()}\n{self.item.name} x{self.quantity}"
+                print(separator)
+                print("\033[32mYou\033[0m used", self.item.name)
+                if not self.inFight:
+                    spaceToContinue()
+                else:
+                    self.runVar = False
+                    self.used = True
             case 2:
                 self.inventory.removeItem(self.item)
-                self.runVar = False
             case 3:
                 self.inventory.removeItem(self.item, self.quantity)
-                self.runVar = False
             case 4:
                 self.runVar = False
 
@@ -1126,7 +1142,7 @@ class Fight:
         b = False
         if self.haveDebuff("burn", self.player):
             self.player.health -= 5
-            print(f"\033[3;31m{self.player.name}\033[0m is burning and lose \033[1;31m5 health\033[0m")
+            print(f"\033[3;31m{self.player.name}\033[0m are burning and lose \033[1;31m5 health\033[0m")
             b = True
         if self.haveDebuff("burn", self.enemy):
             self.enemy.health -= 5
@@ -1211,10 +1227,26 @@ class Fight:
                             spell = SpellTree(self.player.role, self.player, inFight=True, enemy=self.enemy)
                             spell.run()
                             if not spell.casted:
-                                self.print()
                                 self.playerTurn()
-                            getInput = False
+                        getInput = False
                 elif keyPress('3'): #item
+                    invItems = self.player.inventory.getExistingItems()
+                    empty = True
+                    for item in invItems:
+                        if item != None:
+                            empty = False
+                            break
+                    if empty:
+                        print("\033[32mYou\033[0m don't have any item")
+                        spaceToContinue()
+                        self.print()
+                        self.playerTurn()
+                    else:
+                        item = ItemInventoryUI(self.player.inventory, self.player, inFight=True)
+                        item.run()
+                        if not item.used:
+                            self.print()
+                            self.playerTurn()
                     getInput = False
                 elif keyPress('4'): #run
                     print("\033[32mYou\033[0m try to flee")
@@ -1247,7 +1279,9 @@ class Fight:
                 atk += atk // 2 #atk * 1.5
             if self.haveBuff("shield", target):
                 atk -= atk // 2
-            if not self.haveDebuff("break", target):
+            if self.haveDebuff("break", target):
+                atk -= target.armor.onUse() // 2
+            else:
                 atk -= target.armor.onUse()
             if atk < 0: atk = 0
             target.health -= atk
@@ -1262,13 +1296,13 @@ class Fight:
         if buff in buffsList:
             return True
         return False
-    
+
     def haveDebuff(self, debuff, target):
         debuffsList = [element[0] for element in target.debuff]
         if debuff in debuffsList:
             return True
         return False
-    
+
     def removeBuffDebuff(self, target):
         for i, element in enumerate(target.buff):
             target.buff[i][1] -= 1
