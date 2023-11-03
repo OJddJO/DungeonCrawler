@@ -1131,16 +1131,6 @@ class Fight:
             self.enemyTurn()
         if self.flee:
             return True
-        
-        # revive buff (player only)
-        if self.haveBuff("revive", self.player):
-            self.player.health = 100
-            self.player.debuff = []
-            for i, element in enumerate(self.player.buff):
-                if element[0] == "revive":
-                    self.player.buff.pop(i)
-            print(f"\033[3;92m{self.player.name}\033[0m is revived !")
-            spaceToContinue()
 
         #burn effect
         b = False
@@ -1154,6 +1144,21 @@ class Fight:
             b = True
         if b:
             spaceToContinue()
+        
+        # revive buff (player only)
+        if self.haveBuff("revive", self.player) and self.player.health <= 0:
+            self.player.health = 100
+            self.player.debuff = []
+            for i, element in enumerate(self.player.buff):
+                if element[0] == "revive":
+                    self.player.buff.pop(i)
+            print(f"\033[3;92m{self.player.name}\033[0m is revived !")
+            spaceToContinue()
+
+        #purify effect (player only)
+        if self.haveBuff("purify", self.player):
+            self.player.debuff = []
+            print(f"\033[3;92m{self.player.name}\033[0m are purified ! All debuffs are removed")
 
         self.removeBuffDebuff(self.player)
         self.removeBuffDebuff(self.enemy)
@@ -1262,6 +1267,9 @@ class Fight:
                     else:
                         print("\033[32mYou\033[0m failed to flee")
                     getInput = False
+                else:
+                    self.print()
+                    self.playerTurn()
         if self.player.mana < self.player.maxMana:
             self.player.mana += self.player.maxMana // 20
             if self.player.mana > self.player.maxMana:
@@ -1310,13 +1318,18 @@ class Fight:
 
     def removeBuffDebuff(self, target):
         for i, element in enumerate(target.buff):
-            target.buff[i][1] -= 1
-            if element[1] <= 0:
+            if element[0] == "purify":
                 target.buff.pop(i)
+            else:
+                target.buff[i][1] -= 1
+                if element[1] <= 0:
+                    target.buff.pop(i)
+                    i -= 1
         for i, element in enumerate(target.debuff):
             target.debuff[i][1] -= 1
             if element[1] <= 0:
                 target.debuff.pop(i)
+                i -= 1
 
     def resetBuffDebuff(self):
         self.player.buff = []
