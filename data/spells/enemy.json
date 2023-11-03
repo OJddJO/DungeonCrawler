@@ -33,7 +33,7 @@
         "type": "damage",
         "cost": 75,
         "damage": 30,
-        "scale": 0.3,
+        "scale": 0.03,
         "description": "Call down a pillar of fire, dealing massive damage to all enemies in the area.",
         "unlock": {
             "level": 5,
