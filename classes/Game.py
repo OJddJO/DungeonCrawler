@@ -1267,9 +1267,6 @@ class Fight:
                     else:
                         print("\033[32mYou\033[0m failed to flee")
                     getInput = False
-                else:
-                    self.print()
-                    self.playerTurn()
         if self.player.mana < self.player.maxMana:
             self.player.mana += self.player.maxMana // 20
             if self.player.mana > self.player.maxMana:
