@@ -35,7 +35,7 @@ class Room(Maze):
         self.render = self.colorMap()
 
     def colorMap(self, mist = True): #color the map for printing
-        mist = False #testing
+        # mist = False #testing
         colorDict = {
             '#': '\033[47m \033[0m',
             '.': ' ',
