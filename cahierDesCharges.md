@@ -20,7 +20,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 3. Fonctionnalités Additionnelles
 
--   Artisanat et Alchimie : Création d'objets à partir de matériaux et de recettes.
+-   Artisanat et Alchimie *: Création d'objets à partir de matériaux et de recettes.
 -   Évolutivité : Augmentation de la difficulté avec le niveau du personnage.
 -   Système de Quêtes *: Intégration d'objectifs facultatifs dans le donjon.
 -   Événements Aléatoires *: Introduction d'événements aléatoires pour pimenter le gameplay.
@@ -31,7 +31,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 4. Exigences Techniques
 
--   Plateforme : Compatible avec les systèmes d'exploitation Windows et Linux. (Le projet est fait sur Windows donc est nativement supporté par Windows) (A voir)
+-   Plateforme : Compatible avec les systèmes d'exploitation Windows et peut-être Linux. (Le projet est fait sur Windows donc est nativement supporté par Windows) (A voir)
 -   Langage de Programmation : Python
 -   Interface Utilisateur : Création d'une interface utilisateur basée sur le terminal.
 -   Graphismes et Son : Intégration de graphismes ASCII, pas de son.

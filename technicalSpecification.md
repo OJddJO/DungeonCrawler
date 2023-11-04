@@ -19,7 +19,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 3. Additional Features
 
--   Crafting and Alchemy: Crafting items from materials and recipes.
+-   Crafting and Alchemy *: Crafting items from materials and recipes.
 -   Scalability: Increasing difficulty with character level.
 -   Quest System *: Integration of optional objectives in the dungeon.
 -   Random Events *: Introduction of random events to spice up gameplay.
@@ -29,7 +29,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 4. Technical Requirements
 
--   Platform: Compatible with Windows and Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
+-   Platform: Compatible with Windows and maybe Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
 -   Programming Language: Python
 -   User Interface: Terminal-based user interface.
 -   Graphics and Sound: Integration of ASCII graphics, no sound.
