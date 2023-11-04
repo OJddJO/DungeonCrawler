@@ -128,18 +128,18 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                try:
+                # try:
                     if os.path.exists("save"):
                         Game(new=False).run()
                     else:
                         print(separator)
                         print("No save file found")
                         spaceToContinue()
-                except Exception as e:
-                    print(separator)
-                    print("An error occurred while loading the save file")
-                    print(e)
-                    spaceToContinue()
+                # except Exception as e:
+                #     print(separator)
+                #     print("An error occurred while loading the save file")
+                #     print(e)
+                #     spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -439,13 +439,19 @@ class ItemUI(Menu):
                 print(self.item)
                 spaceToContinue()
             case 1:
-                self.item.onUse(self.player)
-                self.inventory.removeItem(self.item)
-                self.title = f"{open('ascii/inventory', 'r').read()}\n{self.item.name} x{self.quantity}"
-                print(separator)
-                print("\033[32mYou\033[0m used", self.item.name)
-                print("\033[32mYou\033[0m now have\033[33m", self.quantity-1, "\033[0mleft")
-                print("\033[32mYou\033[0m have\033[31m", self.player.health, "/ 100 health\033[0m", "and\033[36m", self.player.mana, "/", self.player.maxMana, "mana\033[0m")
+                use = True
+                if not self.inFight and type(self.item) == BuffItem:
+                    print(separator)
+                    print("Can't use this item outside of a fight")
+                    use = False
+                if use:
+                    self.item.onUse(self.player)
+                    self.inventory.removeItem(self.item)
+                    self.title = f"{open('ascii/inventory', 'r').read()}\n{self.item.name} x{self.quantity}"
+                    print(separator)
+                    print("\033[32mYou\033[0m used", self.item.name)
+                    print("\033[32mYou\033[0m now have\033[33m", self.quantity-1, "\033[0mleft")
+                    print("\033[32mYou\033[0m have\033[31m", self.player.health, "/ 100 health\033[0m", "and\033[36m", self.player.mana, "/", self.player.maxMana, "mana\033[0m")
                 if not self.inFight:
                     spaceToContinue()
                 else:
@@ -905,11 +911,11 @@ class Game:
             self.player = Player()
             self.player.loadData()
             #time verification
-            # statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
-            # inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
-            # savedTime = json.load(open("save/stats.json", "r"))["date"]
-            # if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
-            #     raise Exception("Save file corrupted/modified")
+            statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
+            inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
+            savedTime = json.load(open("save/stats.json", "r"))["date"]
+            if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
+                raise Exception("Save file corrupted/modified")
             self.player.inventory.loadData()
             self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
         self.lobby = Lobby(self.player)
@@ -963,6 +969,21 @@ class Game:
                 win = fight.endMessage()
                 if win == "flee":
                     print("\033[3mInfo:\033[0m You flee the fight")
+                elif win == "skip":
+                    self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
+                    print("\033[3mInfo:\033[0m You skip the fight")
+                elif win == "floorSkip":
+                    print("\033[3mInfo:\033[0m You skip the fight and the floor")
+                    if self.currentRoom.portal.room2 == None: #if there is no next room -> last room of the dungeon, go back to lobby
+                        #go to lobby
+                        self.currentRoom = self.lobby
+                        self.player.health = 100 #reset player health
+                        #regenerate dungeon that is initialized in the lobby
+                        self.lobby.dungeon.makeDungeon(self.player.level)
+                        self.lobby.placePortal() #replace portal in lobby to link to the new dungeon
+                    else: #if there is a next room -> go to next room
+                        self.currentRoom = self.currentRoom.portal.room2
+                        self.lobby.dungeon.floor += 1
                 elif win == True:
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                     print("\033[3mInfo:\033[0m You win the fight")
@@ -1121,11 +1142,29 @@ class Fight:
         self.resetBuffDebuff()
         self.enemySpellData = json.load(open("data/spells/enemy.json", "r", encoding="utf-8"))
         self.flee = False
+        self.skip = False
+        self.floorSkip = False
 
     def turn(self):
         #player turn
         if self.player.health > 0:
             self.playerTurn()
+        #skip potion
+        if self.haveBuff("skip", self.player):
+            for i, element in enumerate(self.player.buff):
+                if element[0] == "skip":
+                    self.player.buff.pop(i)
+            self.skip = True
+            return True
+        
+        #floorSkip potion
+        if self.haveBuff("floorSkip", self.player):
+            for i, element in enumerate(self.player.buff):
+                if element[0] == "floorSkip":
+                    self.player.buff.pop(i)
+            self.floorSkip = True
+            return True
+
         #enemy turn
         if self.enemy.health > 0:
             self.enemyTurn()
@@ -1346,6 +1385,10 @@ class Fight:
             win = True
         if self.flee:
             win = "flee"
+        elif self.skip:
+            win = "skip"
+        elif self.floorSkip:
+            win = "floorSkip"
         return win
 
     def print(self):

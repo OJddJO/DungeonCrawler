@@ -138,7 +138,7 @@
         "health": 0,
         "mana": 0,
         "buff": ["floorSkip"],
-        "duration": 0,
+        "duration": 1,
         "value": 750,
         "rarity": 4
     },
@@ -149,7 +149,7 @@
         "health": 0,
         "mana": 0,
         "buff": ["skip"],
-        "duration": 0,
+        "duration": 1,
         "value": 1000,
         "rarity": 5
     }

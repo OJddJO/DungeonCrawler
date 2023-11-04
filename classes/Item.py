@@ -73,8 +73,13 @@ class BuffItem(Item):
         if user.mana > user.maxMana:
             user.mana = user.maxMana
             text += f"{user.name} used {self.name} and healed {self.mana} mana\n"
-        user.buffs.append(self.buff)
-        text += f"{user.name} used {self.name} and got {self.buff.name} for {self.duration} turns"
+        for buff in self.buff:
+            existingBuff = [element[0] for element in user.buff]
+            if buff in existingBuff:
+                user.buff[existingBuff.index(buff)][1] += self.duration
+            else:
+                user.buff.append([buff, self.duration])
+        text += f"{user.name} used {self.name} and got {self.buff} for {self.duration} turns"
         return text
 
 
