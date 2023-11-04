@@ -2,6 +2,7 @@ import keyboard
 import os
 import json
 import random
+from sys import exit
 from datetime import datetime
 from time import sleep
 from classes.Map import Lobby, Portal
@@ -9,6 +10,8 @@ from classes.Player import Player
 from classes.Enemy import Enemy
 from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
+
+keyboard.press("f11")
 
 os.makedirs("save", exist_ok=True)
 if os.path.exists("save/keybind.json"):
@@ -401,7 +404,7 @@ class ItemInventoryUI(Menu):
             if item[0] != None:
                 self.option.append(f"{item[0].name} x{item[1]}")
             else:
-                self.option.append("\033[30mEmpty\033[0m")
+                self.option.append("\033[90mEmpty\033[0m")
         self.option.append("Back")
 
     def onSpace(self, select):
@@ -479,7 +482,7 @@ class GearInventoryUI(Menu):
             if gear != None:
                 self.option.append(f"{color[gear.rarity]} {gear.name}\033[0m")
             else:
-                self.option.append("\033[30mEmpty\033[0m")
+                self.option.append("\033[90mEmpty\033[0m")
         self.option.append("Back")
 
     def onSpace(self, select):

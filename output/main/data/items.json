@@ -1,0 +1,156 @@
+{
+    "Minor Healing Potion": {
+        "name": "Minor Healing Potion",
+        "description": "Heals 10HP",
+        "type": "heal",
+        "health": 10,
+        "mana": 0,
+        "value": 10,
+        "rarity": 1
+    },
+    "Standard Healing Potion": {
+        "name": "Standard Healing Potion",
+        "description": "Heals 20HP",
+        "type": "heal",
+        "health": 20,
+        "mana": 0,
+        "value": 25,
+        "rarity": 2
+    },
+    "Greater Healing Potion": {
+        "name": "Greater Healing Potion",
+        "description": "Heals 50HP",
+        "type": "heal",
+        "health": 50,
+        "mana": 0,
+        "value": 100,
+        "rarity": 3
+    },
+    "Elixir of Renewal": {
+        "name": "Elixir of Renewal",
+        "description": "Heals 75HP",
+        "type": "heal",
+        "health": 75,
+        "mana": 0,
+        "value": 250,
+        "rarity": 4
+    },
+    "Elixir of Rejuvenation": {
+        "name": "Elixir of Rejuvenation",
+        "description": "Heals 100HP",
+        "type": "heal",
+        "health": 100,
+        "mana": 0,
+        "value": 500,
+        "rarity": 5
+    },
+    "Novice Mana Elixir": {
+        "name": "Novice Mana Elixir",
+        "description": "Restores 50MP",
+        "type": "heal",
+        "health": 0,
+        "mana": 50,
+        "value": 10,
+        "rarity": 1
+    },
+    "Standard Arcane Draught": {
+        "name": "Standard Mana Elixir",
+        "description": "Restores 150MP",
+        "type": "heal",
+        "health": 0,
+        "mana": 150,
+        "value": 25,
+        "rarity": 2
+    },
+    "Greater Ether Infusion": {
+        "name": "Greater Mana Elixir",
+        "description": "Restores 300MP",
+        "type": "heal",
+        "health": 0,
+        "mana": 300,
+        "value": 100,
+        "rarity": 3
+    },
+    "Elixir of Mystic Resurgence": {
+        "name": "Elixir of Mystic Resurgence",
+        "description": "Restores 750MP",
+        "type": "heal",
+        "health": 0,
+        "mana": 750,
+        "value": 250,
+        "rarity": 4
+    },
+    "Ethereal Potion": {
+        "name": "Ethereal Potion",
+        "description": "Restores 1000MP",
+        "type": "heal",
+        "health": 0,
+        "mana": 1000,
+        "value": 500,
+        "rarity": 5
+    },
+    "Aetherial Revival Elixir": {
+        "name": "Aetherial Revival Elixir",
+        "description": "Heals 100HP and 500MP",
+        "type": "heal",
+        "health": 100,
+        "mana": 500,
+        "value": 1500,
+        "rarity": 6
+    },
+    "Holy Water": {
+        "name": "Holy Water",
+        "description": "Heals 25HP and removes all debuffs",
+        "type": "buff",
+        "health": 25,
+        "mana": 0,
+        "buff": ["purify"],
+        "duration": 0,
+        "value": 100,
+        "rarity": 3
+    },
+    "Greater Holy Water": {
+        "name": "Greater Holy Water",
+        "description": "Heals 50HP and removes all debuffs",
+        "type": "buff",
+        "health": 50,
+        "mana": 0,
+        "buff": ["purify"],
+        "duration": 0,
+        "value": 250,
+        "rarity": 4
+    },
+    "Potion of Strength": {
+        "name": "Potion of Strength",
+        "description": "Increases the damage of your attack by 50% for 3 turns",
+        "type": "buff",
+        "health": 0,
+        "mana": 0,
+        "buff": ["strength"],
+        "duration": 3,
+        "value": 100,
+        "rarity": 3
+    },
+    "Potion of Floor-Skip": {
+        "name": "Potion of Floor-Skip",
+        "description": "Instantly skip a floor without receiving rewards",
+        "type": "buff",
+        "health": 0,
+        "mana": 0,
+        "buff": ["floorSkip"],
+        "duration": 1,
+        "value": 750,
+        "rarity": 4
+    },
+    "Potion of Instant-Skip": {
+        "name": "Potion of Instant-Skip",
+        "description": "Instantly skip a fight without receiving rewards",
+        "type": "buff",
+        "health": 0,
+        "mana": 0,
+        "buff": ["skip"],
+        "duration": 1,
+        "value": 1000,
+        "rarity": 5
+    }
+}
