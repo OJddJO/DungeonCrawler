@@ -167,7 +167,7 @@ class RoleMenu(Menu):
                 Game(new = True, role="mage").run()
             case 2:
                 self.runVar = False
-                # Game(new = True, role="archer").run()
+                Game(new = True, role="archer").run()
             case 3:
                 self.select = random.randint(0, 2)
             case 4:
@@ -695,6 +695,8 @@ class SpellTree:
             data = json.load(open("data/spells/mage.json", "r", encoding="utf-8"))
         elif role == "warrior":
             data = json.load(open("data/spells/warrior.json", "r", encoding="utf-8"))
+        elif role == "archer":
+            data = json.load(open("data/spells/archer.json", "r", encoding="utf-8"))
         firstKey = list(data.keys())[0]
 
         def createTree(key, data):
@@ -1199,6 +1201,11 @@ class Fight:
         #player turn
         if self.player.health > 0:
             self.playerTurn()
+        #purify effect (player only)
+        if self.haveBuff("purify", self.player):
+            self.player.debuff = []
+            print(f"\033[3;92m{self.player.name}\033[0m are purified ! All debuffs are removed")
+            spaceToContinue()
         #skip potion
         if self.haveBuff("skip", self.player):
             for i, element in enumerate(self.player.buff):
@@ -1206,7 +1213,6 @@ class Fight:
                     self.player.buff.pop(i)
             self.skip = True
             return True
-        
         #floorSkip potion
         if self.haveBuff("floorSkip", self.player):
             for i, element in enumerate(self.player.buff):
@@ -1220,6 +1226,19 @@ class Fight:
             self.enemyTurn()
         if self.flee:
             return True
+        
+        #poison effect
+        p = False
+        if self.haveDebuff("poison", self.player):
+            self.player.health -= 5
+            print(f"\033[3;31m{self.player.name}\033[0m are poisoned and lose \033[1;31m5 health\033[0m")
+            p = True
+        if self.haveDebuff("poison", self.enemy):
+            self.enemy.health -= 5
+            print(f"\033[3;31m{self.enemy.name}\033[0m is poisoned and loses \033[1;31m5 health\033[0m")
+            p = True
+        if p:
+            spaceToContinue()
 
         #burn effect
         b = False
@@ -1243,11 +1262,6 @@ class Fight:
                     self.player.buff.pop(i)
             print(f"\033[3;92m{self.player.name}\033[0m is revived !")
             spaceToContinue()
-
-        #purify effect (player only)
-        if self.haveBuff("purify", self.player):
-            self.player.debuff = []
-            print(f"\033[3;92m{self.player.name}\033[0m are purified ! All debuffs are removed")
 
         self.removeBuffDebuff(self.player)
         self.removeBuffDebuff(self.enemy)
