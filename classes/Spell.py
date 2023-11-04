@@ -8,6 +8,12 @@ class Spell:
         self.unlock = unlock
 
 
+def haveBuff(buff, target):
+    buffsList = [element[0] for element in target.buff]
+    if buff in buffsList:
+        return True
+    return False
+
 def haveDebuff(debuff, target):
         debuffsList = [element[0] for element in target.debuff]
         if debuff in debuffsList:
@@ -30,8 +36,14 @@ class DamageSpell(Spell):
             dmg -= target.armor.onUse()
         if dmg < 0:
             dmg = 0
+        text = f"{user.name} used {self.name} on {target.name} for {dmg} damage"
+        if haveBuff("vampirism", user):
+            user.health += dmg // 4
+            if user.health > 100:
+                user.health = 100
+            text += f"\n\033[32mYou\033[0m gain \033[1;31m{dmg // 4} health\033[0m from \033[31m{target.name}\033[0m's blood"
         target.health -= dmg
-        return f"{user.name} used {self.name} on {target.name} for {dmg} damage"
+        return text
     
     def __dict__(self):
         return {
@@ -139,6 +151,13 @@ class DebuffSpell(Spell):
                 dmg = 0
             target.health -= dmg
             text += f"{target.name} took {dmg} damage"
+            
+            if haveBuff("vampirism", user):
+                user.health += dmg // 4
+                if user.health > 100:
+                    user.health = 100
+                text += f"\n\033[32mYou\033[0m gain \033[1;31m{dmg // 4} health\033[0m from \033[31m{target.name}\033[0m's blood"
+
         return text    
     
     def __dict__(self):

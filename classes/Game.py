@@ -128,18 +128,18 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                # try:
+                try:
                     if os.path.exists("save"):
                         Game(new=False).run()
                     else:
                         print(separator)
                         print("No save file found")
                         spaceToContinue()
-                # except Exception as e:
-                #     print(separator)
-                #     print("An error occurred while loading the save file")
-                #     print(e)
-                #     spaceToContinue()
+                except Exception as e:
+                    print(separator)
+                    print("An error occurred while loading the save file")
+                    print(e)
+                    spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -158,7 +158,7 @@ class RoleMenu(Menu):
         match select:
             case 0:
                 self.runVar = False
-                # Game(new = True, role="warrior").run()
+                Game(new = True, role="warrior").run()
             case 1:
                 self.runVar = False
                 Game(new = True, role="mage").run()
@@ -690,6 +690,8 @@ class SpellTree:
     def initTree(self, role):
         if role == "mage":
             data = json.load(open("data/spells/mage.json", "r", encoding="utf-8"))
+        elif role == "warrior":
+            data = json.load(open("data/spells/warrior.json", "r", encoding="utf-8"))
         firstKey = list(data.keys())[0]
 
         def createTree(key, data):
@@ -862,6 +864,8 @@ class CastSpellUI(Menu):
     def onSpace(self, select):
         match select:
             case 0:
+                pactRequired = ["Infernal Blade", "Infernal Shield", "Abyssal Regeneration"]
+                demonizedRequired = ["Demonic Blade", "Demon's Mark"]
                 if self.spell.name not in self.player.spells:
                     print(separator)
                     print("\033[3;31mThis spell is not unlocked\033[0m")
@@ -873,6 +877,14 @@ class CastSpellUI(Menu):
                 elif self.spell.unlock["level"] > self.player.level:
                     print(separator)
                     print("\033[3;31mYour level is to low to use this spell\033[0m")
+                    spaceToContinue()
+                elif self.spell.name in pactRequired and not Fight.haveBuff("pact", self.player):
+                    print(separator)
+                    print("\033[3;31mYou need to make a pact with a demon to use  this spell\033[0m")
+                    spaceToContinue()
+                elif self.spell.name in demonizedRequired and not Fight.haveBuff("demonized", self.player):
+                    print(separator)
+                    print("\033[3;31mYou need in your demon form to use this spell\033[0m")
                     spaceToContinue()
                 elif self.spell.name in self.player.spells:
                     text = self.spell.onUse(self.player, self.getTarget())
@@ -1145,6 +1157,41 @@ class Fight:
         self.skip = False
         self.floorSkip = False
 
+    @staticmethod
+    def haveBuff(buff, target):
+        buffsList = [element[0] for element in target.buff]
+        if buff in buffsList:
+            return True
+        return False
+
+    @staticmethod
+    def haveDebuff(debuff, target):
+        debuffsList = [element[0] for element in target.debuff]
+        if debuff in debuffsList:
+            return True
+        return False
+
+    def removeBuffDebuff(self, target):
+        for i, element in enumerate(target.buff):
+            if element[0] == "purify":
+                target.buff.pop(i)
+            else:
+                target.buff[i][1] -= 1
+                if element[1] <= 0:
+                    target.buff.pop(i)
+                    i -= 1
+        for i, element in enumerate(target.debuff):
+            target.debuff[i][1] -= 1
+            if element[1] <= 0:
+                target.debuff.pop(i)
+                i -= 1
+
+    def resetBuffDebuff(self):
+        self.player.buff = []
+        self.player.debuff = []
+        self.enemy.buff = []
+        self.enemy.debuff = []
+
     def turn(self):
         #player turn
         if self.player.health > 0:
@@ -1334,44 +1381,18 @@ class Fight:
                 atk -= target.armor.onUse()
             if atk < 0: atk = 0
             target.health -= atk
+
             if user == self.player:
                 print(f"\033[32mYou\033[0m deal {atk} damage to \033[31m{target.name}\033[0m")
+
+                if self.haveBuff("vampirism", user):
+                    user.health += atk // 4
+                    if user.health > 100:
+                        user.health = 100
+                    print(f"\033[32mYou\033[0m gain \033[1;31m{atk // 4} health\033[0m from \033[31m{target.name}\033[0m's blood")
             else:
                 print(f"\033[31m{user.name}\033[0m attacks \033[32mYou\033[0m !")
                 print(f"\033[31m{user.name}\033[0m deals {atk} damage to \033[32mYou\033[0m")
-
-    def haveBuff(self, buff, target):
-        buffsList = [element[0] for element in target.buff]
-        if buff in buffsList:
-            return True
-        return False
-
-    def haveDebuff(self, debuff, target):
-        debuffsList = [element[0] for element in target.debuff]
-        if debuff in debuffsList:
-            return True
-        return False
-
-    def removeBuffDebuff(self, target):
-        for i, element in enumerate(target.buff):
-            if element[0] == "purify":
-                target.buff.pop(i)
-            else:
-                target.buff[i][1] -= 1
-                if element[1] <= 0:
-                    target.buff.pop(i)
-                    i -= 1
-        for i, element in enumerate(target.debuff):
-            target.debuff[i][1] -= 1
-            if element[1] <= 0:
-                target.debuff.pop(i)
-                i -= 1
-
-    def resetBuffDebuff(self):
-        self.player.buff = []
-        self.player.debuff = []
-        self.enemy.buff = []
-        self.enemy.debuff = []
 
     def endFight(self):
         if self.enemy.health <= 0 or self.player.health <= 0:

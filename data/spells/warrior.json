@@ -3,9 +3,9 @@
         "name": "Cleave",
         "symbol": "劈",
         "type": "damage",
-        "cost": "30",
-        "damage": "10",
-        "scale": "0",
+        "cost": 20,
+        "damage": 15,
+        "scale": 0,
         "description": "Swing your weapon in a wide arc, striking multiple nearby enemies with a single blow.",
         "unlock": {
             "level": 1,
@@ -16,9 +16,9 @@
                 "name": "Mighty Strike",
                 "symbol": "强",
                 "type": "damage",
-                "cost": "40",
-                "damage": "20",
-                "scale": "0",
+                "cost": 40,
+                "damage": 20,
+                "scale": 0,
                 "description": "Strike a single enemy with a powerful blow.",
                 "unlock": {
                     "level": 5,
@@ -29,17 +29,15 @@
                         "name": "Whirlwind",
                         "symbol": "旋",
                         "type": "damage",
-                        "cost": "50",
-                        "damage": "30",
-                        "scale": "0",
+                        "cost": 50,
+                        "damage": 30,
+                        "scale": 0,
                         "description": "Spin around, striking all nearby enemies with your weapon.",
                         "unlock": {
                             "level": 10,
                             "cost": 1000
                         },
-                        "next": {
-                            
-                        }
+                        "next": {}
                     }
                 }
             },
@@ -47,11 +45,11 @@
                 "name": "Berserk",
                 "symbol": "狂",
                 "type": "buff",
-                "cost": "50",
-                "heal": "0",
-                "scale": "0",
+                "cost": 50,
+                "heal": 0,
+                "scale": 0,
                 "buff": ["strength"],
-                "duration": "2",
+                "duration": 2,
                 "description": "Enter a berserk rage, increasing your damage for a short time.",
                 "unlock": {
                     "level": 5,
@@ -62,18 +60,125 @@
                         "name": "Rage",
                         "symbol": "怒",
                         "type": "buff",
-                        "cost": "150",
-                        "heal": "0",
-                        "scale": "0",
+                        "cost": 150,
+                        "heal": 0,
+                        "scale": 0,
                         "buff": ["strength"],
-                        "duration": "7",
+                        "duration": 7,
                         "description": "Enter a state of rage, significantly increasing your attack damage for a limited time.",
+                        "unlock": {
+                            "level": 35,
+                            "cost": 8000
+                        },
+                        "next": {}
+                    },
+                    "Infernal Pact": {
+                        "name": "Infernal Pact",
+                        "symbol": "魔",
+                        "type": "buff",
+                        "cost": 150,
+                        "heal": 0,
+                        "scale": 0,
+                        "buff": ["pact", "vampirism"],
+                        "duration": 3,
+                        "description": "Forge a dark covenant with a demon, gaining access to demonic powers and abilities for a limited time.",
                         "unlock": {
                             "level": 35,
                             "cost": 1000
                         },
                         "next": {
-                            
+                            "Infernal Blade": {
+                                "name": "Infernal Blade",
+                                "symbol": "刃",
+                                "type": "damage",
+                                "cost": 250,
+                                "damage": 60,
+                                "scale": 0,
+                                "description": "Infuse your weapon with demonic energy, allowing it to deal additional dark damage and drain the life force of your enemies with each strike.",
+                                "unlock": {
+                                    "level": 35,
+                                    "cost": 8000
+                                },
+                                "next": {}
+                            },
+                            "Infernal Shield": {
+                                "name": "Demonic Shield",
+                                "symbol": "盾",
+                                "type": "buff",
+                                "cost": 250,
+                                "heal": 0,
+                                "scale": 0,
+                                "buff": ["shield"],
+                                "duration": 3,
+                                "description": "Create a protective barrier of swirling darkness, reducing incoming damage.",
+                                "unlock": {
+                                    "level": 35,
+                                    "cost": 8000
+                                },
+                                "next": {
+                                    "Abyssal Regeneration": {
+                                        "name": "Abyssal Regeneration",
+                                        "symbol": "回",
+                                        "type": "heal",
+                                        "cost": 300,
+                                        "heal": 75,
+                                        "scale": 0,
+                                        "description": "Draw upon the power of the abyss to heal your wounds.",
+                                        "unlock": {
+                                            "level": 40,
+                                            "cost": 10000
+                                        },
+                                        "next": {}
+                                    }
+                                }
+                            },
+                            "Demonic Ascencsion": {
+                                "name": "Demonic Ascension",
+                                "symbol": "升",
+                                "type": "buff",
+                                "cost": 350,
+                                "heal": 100,
+                                "scale": 0,
+                                "buff": ["demonized", "vampirism", "strength"],
+                                "duration": 5,
+                                "description": "Achieve the ultimate form of demonic mastery, gaining near-complete control over dark forces and unlocking unprecedented destructive abilities.",
+                                "unlock": {
+                                    "level": 45,
+                                    "cost": 12500
+                                },
+                                "next": {
+                                    "Demonic Blade": {
+                                        "name": "Demonic Blade",
+                                        "symbol": "刃",
+                                        "type": "damage",
+                                        "cost": 400,
+                                        "damage": 100,
+                                        "scale": 0,
+                                        "description": "Infuse your weapon with demonic energy, allowing it to deal additional dark damage and drain the life force of your enemies with each strike.",
+                                        "unlock": {
+                                            "level": 45,
+                                            "cost": 12500
+                                        },
+                                        "next": {}
+                                    },
+                                    "Demon's Mark": {
+                                        "name": "Demon's Mark",
+                                        "symbol": "印",
+                                        "type": "debuff",
+                                        "cost": 400,
+                                        "damage": 0,
+                                        "scale": 0,
+                                        "debuff": ["break"],
+                                        "duration": 3,
+                                        "description": "Brand a target with the mark of a demon, making them vulnerable to demonic attacks and abilities.",
+                                        "unlock": {
+                                            "level": 45,
+                                            "cost": 12500
+                                        },
+                                        "next": {}
+                                    }
+                                }
+                            }
                         }
                     }
                 }
