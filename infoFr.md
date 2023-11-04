@@ -4,6 +4,8 @@ Languages: [English](./README.md) | Français
 
 Cahier des charges au 22/10/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
+![poster](dc_poster.png)
+
 Jeu au tour par tour, entièrement dans le terminal (peut etre en faire un jeu avec des graphismes)
 
 **Concept** :

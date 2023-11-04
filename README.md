@@ -4,6 +4,8 @@ Languages: English | [Français](./infoFr.md)
 
 Technical Specification as of 10/22/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
+![poster](dc_poster.png)
+
 Turn based game, entirely in console
 
 **Concept:**
