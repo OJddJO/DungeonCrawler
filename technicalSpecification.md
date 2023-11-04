@@ -9,7 +9,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 2. Key Features
 
--   Procedurally Generated Dungeons: Randomly generated dungeons featuring various rooms, traps, and enemies. Dungeons are based on mazes generated using a modified Randomized Prim's algorithm. Enemies move using a pathfinding algorithm.
+-   Procedurally Generated Dungeons: Randomly generated dungeons featuring various rooms, traps, and enemies. Dungeons are based on mazes generated using a modified Randomized Prim's algorithm.
 -   Real-Time Combat: Combat system allowing players to fight a variety of monsters and bosses.
 -   Loot and Equipment: Collect loot to enhance the character's abilities.
 -   Resource Management: Management of character's health and mana (used for casting spells).

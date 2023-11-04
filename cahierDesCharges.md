@@ -10,7 +10,6 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 -   Donjons Générés de Manière Procédurale : Création aléatoire de donjons offrant une variété de salles, de pièges et d'ennemis. 
     Les donjons sont basées sur des labyrinthes générés avec une adaptation du "Randomized Prim's algorithm".
-    Les ennemis se déplaceront grâce à un algorithme de pathfinding
 -   Combat en Temps Réel : Système de combat permettant aux joueurs de combattre une variété de monstres et de boss.
 -   Butin et Équipement : Collecte de butin pour améliorer les capacités du personnage.
 -   Gestion des Ressources : Gestion de la santé et de la mana (utilisé pour lancer des sorts) du personnage.
