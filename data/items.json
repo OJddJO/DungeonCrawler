@@ -54,7 +54,7 @@
         "rarity": 1
     },
     "Standard Arcane Draught": {
-        "name": "Standard Mana Elixir",
+        "name": "Standard Arcane Draught",
         "description": "Restores 150MP",
         "type": "heal",
         "health": 0,
@@ -63,7 +63,7 @@
         "rarity": 2
     },
     "Greater Ether Infusion": {
-        "name": "Greater Mana Elixir",
+        "name": "Greater Ether Infusion",
         "description": "Restores 300MP",
         "type": "heal",
         "health": 0,

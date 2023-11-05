@@ -36,28 +36,28 @@ class Room(Maze):
 
     def colorMap(self, mist = True): #color the map for printing
         # mist = False #testing
-        colorDict = {
-            '#': '\033[47m \033[0m',
-            '.': ' ',
-            'C': '\033[1;35mC\033[0m',
-            'G': '\033[1;95mG\033[0m',
-            'S': '\033[1;36mS\033[0m',
-            Player: '\033[1;32m@\033[0m',
-            Portal: '\033[1;33mO\033[0m',
-            Enemy: '\033[1;31mM\033[0m',
-            Treasure: '\033[1;34m$\033[0m'
+        charDict = {
+            '#': '#',
+            '.': '.',
+            'C': 'C',
+            'G': 'G',
+            'S': 'S',
+            Player: '@',
+            Portal: 'O',
+            Enemy: 'M',
+            Treasure: '$'
         }
         render = []
         for i, row in enumerate(self.map):
             render.append([])
             for j, element in enumerate(row):
                 if mist:
-                    render[i].append('\033[40m \033[0m')
+                    render[i].append(' ')
                 else:
                     if type(element) == str:
-                        render[i].append(colorDict[element])
+                        render[i].append(charDict[element])
                     else:
-                        render[i].append(colorDict[type(element)])
+                        render[i].append(charDict[type(element)])
         if mist:
             coord = self.getPlayerCoord()
             #arround the player in a square of 5x5 use colorDict
@@ -66,9 +66,9 @@ class Room(Maze):
                     #test if the coord is in the map
                     if i >= 0 and i < len(self.map) and j >= 0 and j < len(self.map[0]):
                         if type(self.map[i][j]) == str:
-                            render[i][j] = colorDict[self.map[i][j]]
+                            render[i][j] = charDict[self.map[i][j]]
                         else:
-                            render[i][j] = colorDict[type(self.map[i][j])]
+                            render[i][j] = charDict[type(self.map[i][j])]
         return render
 
     def getPlayerCoord(self): #get the coord of the player in the map
