@@ -10,7 +10,6 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 -   Donjons Générés de Manière Procédurale : Création aléatoire de donjons offrant une variété de salles, de pièges et d'ennemis. 
     Les donjons sont basées sur des labyrinthes générés avec une adaptation du "Randomized Prim's algorithm".
-    Les ennemis se déplaceront grâce à un algorithme de pathfinding
 -   Combat en Temps Réel : Système de combat permettant aux joueurs de combattre une variété de monstres et de boss.
 -   Butin et Équipement : Collecte de butin pour améliorer les capacités du personnage.
 -   Gestion des Ressources : Gestion de la santé et de la mana (utilisé pour lancer des sorts) du personnage.
@@ -21,7 +20,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 3. Fonctionnalités Additionnelles
 
--   Artisanat et Alchimie : Création d'objets à partir de matériaux et de recettes.
+-   Artisanat et Alchimie *: Création d'objets à partir de matériaux et de recettes.
 -   Évolutivité : Augmentation de la difficulté avec le niveau du personnage.
 -   Système de Quêtes *: Intégration d'objectifs facultatifs dans le donjon.
 -   Événements Aléatoires *: Introduction d'événements aléatoires pour pimenter le gameplay.
@@ -32,7 +31,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 4. Exigences Techniques
 
--   Plateforme : Compatible avec les systèmes d'exploitation Windows et Linux. (Le projet est fait sur Windows donc est nativement supporté par Windows) (A voir)
+-   Plateforme : Compatible avec les systèmes d'exploitation Windows et peut-être Linux. (Le projet est fait sur Windows donc est nativement supporté par Windows) (A voir)
 -   Langage de Programmation : Python
 -   Interface Utilisateur : Création d'une interface utilisateur basée sur le terminal.
 -   Graphismes et Son : Intégration de graphismes ASCII, pas de son.

@@ -9,7 +9,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 2. Key Features
 
--   Procedurally Generated Dungeons: Randomly generated dungeons featuring various rooms, traps, and enemies. Dungeons are based on mazes generated using a modified Randomized Prim's algorithm. Enemies move using a pathfinding algorithm.
+-   Procedurally Generated Dungeons: Randomly generated dungeons featuring various rooms, traps, and enemies. Dungeons are based on mazes generated using a modified Randomized Prim's algorithm.
 -   Real-Time Combat: Combat system allowing players to fight a variety of monsters and bosses.
 -   Loot and Equipment: Collect loot to enhance the character's abilities.
 -   Resource Management: Management of character's health and mana (used for casting spells).
@@ -19,7 +19,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 3. Additional Features
 
--   Crafting and Alchemy: Crafting items from materials and recipes.
+-   Crafting and Alchemy *: Crafting items from materials and recipes.
 -   Scalability: Increasing difficulty with character level.
 -   Quest System *: Integration of optional objectives in the dungeon.
 -   Random Events *: Introduction of random events to spice up gameplay.
@@ -29,7 +29,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 4. Technical Requirements
 
--   Platform: Compatible with Windows and Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
+-   Platform: Compatible with Windows and maybe Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
 -   Programming Language: Python
 -   User Interface: Terminal-based user interface.
 -   Graphics and Sound: Integration of ASCII graphics, no sound.

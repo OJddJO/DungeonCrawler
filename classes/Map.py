@@ -13,8 +13,8 @@ class Dungeon:
     def addRoom(self, room):
         self.rooms.append(room)
 
-    def makeDungeon(self, difficulty, nbRoom = random.randint(2, 5)):
-        nbRoom *= difficulty
+    def makeDungeon(self, difficulty):
+        nbRoom = random.randint(1, 3) * difficulty
         self.addRoom(Room(player=self.player, difficulty=difficulty, nextRoom=None))
         for i in range(nbRoom-1):
             self.addRoom(Room(player=self.player, difficulty=difficulty, nextRoom=self.rooms[-1]))
@@ -35,11 +35,13 @@ class Room(Maze):
         self.render = self.colorMap()
 
     def colorMap(self, mist = True): #color the map for printing
-        mist = False #testing
+        # mist = False #testing
         colorDict = {
             '#': '\033[47m \033[0m',
             '.': ' ',
             'C': '\033[1;35mC\033[0m',
+            'G': '\033[1;95mG\033[0m',
+            'S': '\033[1;36mS\033[0m',
             Player: '\033[1;32m@\033[0m',
             Portal: '\033[1;33mO\033[0m',
             Enemy: '\033[1;31mM\033[0m',
@@ -161,6 +163,8 @@ class Lobby(Room):
         self.dungeon.makeDungeon(self.player.level) # dungeon will be reset when the player goes back to the lobby
         self.placePortal()
         self.placeChest()
+        self.placeGrimoire()
+        self.placeShop()
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
@@ -179,6 +183,12 @@ class Lobby(Room):
 
     def placeChest(self):
         self.map[19][30] = "C"
+
+    def placeGrimoire(self):
+        self.map[10][15] = "G"
+
+    def placeShop(self):
+        self.map[10][45] = "S"
 
 
 class Portal:
