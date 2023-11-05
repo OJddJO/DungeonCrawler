@@ -16,7 +16,7 @@
                 "name": "Mighty Strike",
                 "symbol": "强",
                 "type": "damage",
-                "cost": 40,
+                "cost": 50,
                 "damage": 20,
                 "scale": 0,
                 "description": "Strike a single enemy with a powerful blow.",
@@ -29,8 +29,8 @@
                         "name": "Whirlwind",
                         "symbol": "旋",
                         "type": "damage",
-                        "cost": 50,
-                        "damage": 30,
+                        "cost": 100,
+                        "damage": 40,
                         "scale": 0,
                         "description": "Spin around, striking all nearby enemies with your weapon.",
                         "unlock": {
@@ -38,6 +38,39 @@
                             "cost": 1000
                         },
                         "next": {}
+                    },
+                    "Shield Bash": {
+                        "name": "Shield Bash",
+                        "symbol": "击",
+                        "type": "debuff",
+                        "cost": 150,
+                        "damage": 50,
+                        "scale": 0,
+                        "debuff": ["stun"],
+                        "duration": 1,
+                        "description": "Bash your opponent with your shield, stunning and disorienting them, leaving them vulnerable and not able to act for a short time.",
+                        "unlock": {
+                            "level": 20,
+                            "cost": 5000
+                        },
+                        "next": {
+                            "Sundering Strike": {
+                                "name": "Sundering Strike",
+                                "symbol": "裂",
+                                "type": "debuff",
+                                "cost": 200,
+                                "damage": 50,
+                                "scale": 0,
+                                "debuff": ["break"],
+                                "duration": 2,
+                                "description": "Deliver a mighty strike that shatters your enemy's defenses, reducing their armor rating for a duration.",
+                                "unlock": {
+                                    "level": 25,
+                                    "cost": 6000
+                                },
+                                "next": {}
+                            }
+                        }
                     }
                 }
             },
@@ -64,11 +97,11 @@
                         "heal": 0,
                         "scale": 0,
                         "buff": ["strength"],
-                        "duration": 7,
+                        "duration": 4,
                         "description": "Enter a state of rage, significantly increasing your attack damage for a limited time.",
                         "unlock": {
-                            "level": 35,
-                            "cost": 8000
+                            "level": 15,
+                            "cost": 2500
                         },
                         "next": {}
                     },
