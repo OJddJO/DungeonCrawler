@@ -1405,7 +1405,6 @@ class Fight:
             print("\033[32mYou\033[0m are stunned and can't do anything")
         else:
             #player choose an action
-            #attack skill item
             print("Choose an action:")
             print("1. Attack    2. Spell    3. Item    4. Run")
             getInput = True
@@ -1429,7 +1428,7 @@ class Fight:
                             if not spell.casted:
                                 self.print()
                                 self.playerTurn()
-                        getInput = False
+                    getInput = False
                 elif keyPress('3'): #item
                     invItems = self.player.inventory.getExistingItems()
                     empty = True
