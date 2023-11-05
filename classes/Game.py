@@ -132,7 +132,7 @@ class MainMenu(Menu):
                     RoleMenu().run()
             case 1:
                 try:
-                    if os.path.exists("save"):
+                    if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         print(separator)
