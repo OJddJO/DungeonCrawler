@@ -6,7 +6,9 @@ from datetime import datetime
 baseWeapon = Weapon("Starter Stick", "A simple stick to start your adventure", 1, 10, 1, 0)
 baseArmor = Armor("Starter Hide", "A simple armor to start your adventure", 1, 5, 1, 0)
 class Player:
+    """Player class, contains all the stats of the player"""
     def __init__(self, role = None, weapon = baseWeapon, armor = baseArmor, level = 1, exp = 0, gold = 500, health = 100, mana = 100, spells = []):
+        """Constructor for the Player class, takes in role, weapon, armor, level, exp, gold, health, mana and spells"""
         self.name = "You"
         self.health = health
         self.exp = exp
@@ -23,6 +25,7 @@ class Player:
         self.debuff = []
 
     def loadData(self):
+        """Loads the data from the save file"""
         try:
             if os.path.exists('save/stats.json'):
                 with open('save/stats.json', 'r') as f:
@@ -42,6 +45,7 @@ class Player:
             raise Exception("Save file corrupted")
         
     def save(self):
+        """Saves the data to the save file"""
         with open("save/stats.json", "w") as f:
             json.dump({
                 "health": self.health,
@@ -58,11 +62,14 @@ class Player:
 
 
 class Inventory:
+    """Inventory class, contains all the items and gear of the player"""
     def __init__(self):
+        """Constructor for the Inventory class"""
         self.items = [[None, 0]] * 20 # (item, quantity)
         self.gear = [None] * 20 # max 20 gear
 
     def loadData(self):
+        """Loads the data from the save file"""
         try:
             if os.path.exists('save/inventory.json'):
                 with open('save/inventory.json', 'r') as f:
@@ -91,6 +98,7 @@ class Inventory:
             raise Exception("Save file corrupted")
     
     def save(self):
+        """Saves the data to the save file"""
         #decompose each item and gear to json to save
         data = {
             "items": [],
@@ -109,6 +117,7 @@ class Inventory:
         json.dump(data, open('save/inventory.json', 'w'))
 
     def getExistingItems(self):
+        """Returns a list of the existing items in the inventory"""
         existingItem = []
         for element in self.items:
             if element[0] != None:
@@ -118,6 +127,7 @@ class Inventory:
         return existingItem
 
     def addItem(self, item, quantity = 1):
+        """Adds an item to the inventory, returns True if successful, False if not"""
         existingItem = self.getExistingItems()
         if item.name in existingItem:
             self.items[existingItem.index(item.name)][1] += quantity
@@ -130,6 +140,7 @@ class Inventory:
             return False
         
     def removeItem(self, item, quantity = 1):
+        """Removes an item from the inventory, returns the item if successful, False if not"""
         existingItem = self.getExistingItems()
         if item.name in existingItem:
             i = existingItem.index(item.name)
@@ -141,6 +152,7 @@ class Inventory:
             return False
         
     def addGear(self, gear):
+        """Adds a gear to the inventory, returns True if successful, False if not"""
         if None in self.gear:
             self.gear[self.gear.index(None)] = gear
             return gear
@@ -149,6 +161,7 @@ class Inventory:
             return False
         
     def removeGear(self, gear):
+        """Removes a gear from the inventory, returns the gear if successful, False if not"""
         if gear in self.gear:
             self.gear[self.gear.index(gear)] = None
             return gear

@@ -1,7 +1,7 @@
 import json
 import random
 
-color = {
+color = { # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
     1: "\033[1;37m",
     2: "\033[1;36m",
     3: "\033[1;34m",
@@ -19,13 +19,16 @@ rarities = {
 }
 
 class Item:
+    """Base class for all items"""
     def __init__(self, name, description, rarity, value):
+        """Constructor for the Item class, takes in name, description, rarity and value"""
         self.name = name
         self.description = description
         self.rarity = rarity
         self.value = value
     
     def __str__(self):
+        """Returns a string representation of the info of the item"""
         text = f"{color[self.rarity]}{self.name}\033[0m\n"
         text += f"{self.description}\n"
         text += f"Rarity: {color[self.rarity]+rarities[self.rarity]}\033[0m\n"
@@ -34,12 +37,15 @@ class Item:
 
 
 class HealItem(Item):
+    """Healing item, heals the user for a certain amount of health and mana"""
     def __init__(self, name, description, health, mana, rarity, value):
+        """Constructor for the HealItem class, takes in name, description, health, mana, rarity and value"""
         super().__init__(name, description, rarity, value)
         self.health = health
         self.mana = mana
 
     def onUse(self, user):
+        """Heals the user for a certain amount of health and mana, returns a string of the action"""
         #remove 1 qty
         text = ""
         user.health += self.health
@@ -56,7 +62,9 @@ class HealItem(Item):
 
 
 class BuffItem(Item):
+    """Buff item, gives the user a buff for a certain amount of turns"""
     def __init__(self, name, description, health, mana, buff, duration, rarity, value):
+        """Constructor for the BuffItem class, takes in name, description, health, mana, buff, duration, rarity and value"""
         super().__init__(name, description, rarity, value)
         self.health = health
         self.mana = mana
@@ -64,6 +72,7 @@ class BuffItem(Item):
         self.duration = duration
 
     def onUse(self, user):
+        """Gives the user a buff for a certain amount of turns, returns a string of the action"""
         text = ""
         user.health += self.health
         user.mana += self.mana
@@ -84,7 +93,9 @@ class BuffItem(Item):
 
 
 class Weapon:
+    """Weapon item, deals damage to the enemy"""
     def __init__(self, name, description, level, damage, rarity, mana):
+        """Constructor for the Weapon class, takes in name, description, level, damage, rarity and mana"""
         self.name = name
         self.description = description
         self.baseDamage = damage
@@ -93,9 +104,11 @@ class Weapon:
         self.mana = mana
 
     def onUse(self):
+        """Returns the damage of the weapon"""
         return self.baseDamage
 
     def __dict__(self):
+        """Returns a dictionary representation of the weapon"""
         return {
             "type": "weapon",
             "name": self.name,
@@ -108,7 +121,9 @@ class Weapon:
 
 
 class Armor:
+    """Armor item, gives the user armor"""
     def __init__(self, name, description, level, armor, rarity, mana):
+        """Constructor for the Armor class, takes in name, description, level, armor, rarity and mana"""
         self.name = name
         self.description = description
         self.baseArmor = armor
@@ -117,9 +132,11 @@ class Armor:
         self.mana = mana
 
     def onUse(self):
+        """Returns the armor of the armor"""
         return self.baseArmor
     
     def __dict__(self):
+        """Returns a dictionary representation of the armor"""
         return {
             "type": "armor",
             "name": self.name,
@@ -132,6 +149,7 @@ class Armor:
 
 
 class Treasure:
+    """Treasure item, gives the user gold and a random loot"""
     def __init__(self, role, level, coord):
         self.role = role
         self.level = level
@@ -139,12 +157,14 @@ class Treasure:
         self.coord = coord
 
     def randomLoot(self):
+        """Returns a random loot from the treasure"""
         #give random loot depending on the role and the level
         lootTable = [randomWeapon(self.role, self.level), randomArmor(self.role, self.level)]
         return random.choice(lootTable)
 
 
 def randomWeapon(role, level):
+    """Returns a random weapon depending on the role and the level"""
     if role not in ["warrior", "mage", "archer"]:
         raise KeyError("Invalid role")
     else:
@@ -179,6 +199,7 @@ def randomWeapon(role, level):
 
 
 def randomArmor(role, level):
+    """Returns a random armor depending on the role and the level"""
     if role not in ["warrior", "mage", "archer"]:
         raise KeyError("Invalid role")
     else:
