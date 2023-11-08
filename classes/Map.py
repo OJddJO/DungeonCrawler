@@ -43,16 +43,16 @@ class Room(Maze):
     def colorMap(self, mist = True):
         """Returns a matrix of a colored map of the room"""
         # mist = False #testing
-        charDict = {
-            '#': '#',
-            '.': '.',
-            'C': 'C',
-            'G': 'G',
-            'S': 'S',
-            Player: '@',
-            Portal: 'O',
-            Enemy: 'M',
-            Treasure: '$'
+        colorDict = { # (char to print, color pair for curses)
+            '#': (" ", 1),
+            '.': (" ", 7),
+            'C': ("C", 2),
+            'G': ("G", 3),
+            'S': ("S", 2),
+            Player: ("@", 5),
+            Portal: ("O", 6),
+            Enemy: ("M", 4),
+            Treasure: ("$", 2)
         }
         render = []
         for i, row in enumerate(self.map):
@@ -62,9 +62,9 @@ class Room(Maze):
                     render[i].append(' ')
                 else:
                     if type(element) == str:
-                        render[i].append(charDict[element])
+                        render[i].append(colorDict[element])
                     else:
-                        render[i].append(charDict[type(element)])
+                        render[i].append(colorDict[type(element)])
         if mist:
             coord = self.getPlayerCoord()
             #arround the player in a square of 5x5 use colorDict
@@ -73,9 +73,9 @@ class Room(Maze):
                     #test if the coord is in the map
                     if i >= 0 and i < len(self.map) and j >= 0 and j < len(self.map[0]):
                         if type(self.map[i][j]) == str:
-                            render[i][j] = charDict[self.map[i][j]]
+                            render[i][j] = colorDict[self.map[i][j]]
                         else:
-                            render[i][j] = charDict[type(self.map[i][j])]
+                            render[i][j] = colorDict[type(self.map[i][j])]
         return render
 
     def getPlayerCoord(self): 
@@ -160,7 +160,7 @@ class Room(Maze):
 
     def __str__(self):
         """Returns a string representation of the room"""
-        map = []
+        map = [] #map is not self.map because we don't want to modify the original map
         for row in self.render:
             map.append(''.join(row))
         return '\n'.join(map)

@@ -10,6 +10,7 @@ from classes.Player import Player
 from classes.Enemy import Enemy
 from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
+from cursesInit import *
 
 keyboard.press("f11")
 
@@ -1182,7 +1183,9 @@ class Game:
         else:
             mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
-        print(self.currentRoom)
+        #use curses
+        
+
         print(separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
