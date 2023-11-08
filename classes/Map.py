@@ -5,15 +5,19 @@ from classes.Enemy import Enemy
 from classes.Item import Treasure
 
 class Dungeon:
+    """Dungeon class, contains a list of rooms and the player"""
     def __init__(self, player):
+        """Constructor for the Dungeon class, takes in a player"""
         self.rooms = []
         self.player = player
         self.floor = 0 #index of the current room
 
     def addRoom(self, room):
+        """Adds a room to the dungeon"""
         self.rooms.append(room)
 
     def makeDungeon(self, difficulty):
+        """Makes a dungeon depending on the difficulty"""
         nbRoom = random.randint(1, 3) * difficulty
         self.addRoom(Room(player=self.player, difficulty=difficulty, nextRoom=None))
         for i in range(nbRoom-1):
@@ -22,7 +26,9 @@ class Dungeon:
 
 
 class Room(Maze):
+    """Room class for the dungeon"""
     def __init__(self, player, difficulty, nextRoom, width = 30, height = 10):
+        """Constructor for the Room class, takes in a player, a difficulty, the next room and the width and height of the room"""
         super().__init__(width, height)
         self.player = player
         self.difficulty = difficulty
@@ -34,7 +40,8 @@ class Room(Maze):
         self.placeEnemies()
         self.render = self.colorMap()
 
-    def colorMap(self, mist = True): #color the map for printing
+    def colorMap(self, mist = True):
+        """Returns a matrix of a colored map of the room"""
         # mist = False #testing
         charDict = {
             '#': '#',
@@ -71,14 +78,15 @@ class Room(Maze):
                             render[i][j] = charDict[type(self.map[i][j])]
         return render
 
-    def getPlayerCoord(self): #get the coord of the player in the map
+    def getPlayerCoord(self): 
+        """Returns the coord of the player in the map"""
         for i, row in enumerate(self.map):
             for j, element in enumerate(row):
                 if type(element) == Player:
                     return (i, j)
                 
     def get3Walls(self):
-        #list all the path that is surrounded by 3 walls
+        """Returns a list of all the paths that is surrounded by 3 walls"""
         paths = []
         for i, row in enumerate(self.map):
             for j, element in enumerate(row):
@@ -93,6 +101,7 @@ class Room(Maze):
         return paths
 
     def placePortal(self, room):
+        """Places a portal in the room"""
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
         self.portal = Portal(self, room)
@@ -100,11 +109,13 @@ class Room(Maze):
         self.portalCoord = coord
 
     def placePlayer(self):
+        """Places the player in the room"""
         possiblePath = self.get3Walls()
         coord = random.choice(possiblePath)
         self.map[coord[0]][coord[1]] = self.player
 
     def placeTreasure(self):
+        """Places treasures in the room"""
         self.treasurePos = []
         allowedPath = self.get3Walls()
         random.shuffle(allowedPath)
@@ -117,6 +128,7 @@ class Room(Maze):
             self.treasurePos.append(pos)
 
     def placeEnemies(self):
+        """Places enemies in the room"""
         allowedPath = self.get3Walls()
         enemyType = ["bat", "demon", "ghost", "imp", "mushroom", "spider"]
         random.shuffle(allowedPath)
@@ -147,6 +159,7 @@ class Room(Maze):
                 i -= 1
 
     def __str__(self):
+        """Returns a string representation of the room"""
         map = []
         for row in self.render:
             map.append(''.join(row))
@@ -154,7 +167,9 @@ class Room(Maze):
 
 
 class Lobby(Room):
+    """Lobby class, the first room of the dungeon"""
     def __init__(self, player):
+        """Constructor for the Lobby class, takes in a player"""
         self.map = []
         self.player = player
         self.createRoom()
@@ -168,30 +183,38 @@ class Lobby(Room):
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
+        """Creates the lobby"""
         self.map.append(["#" for i in range(61)])
         for i in range(19):
             self.map.append(["#"] + ["." for i in range(59)] + ["#"])
         self.map.append(["#" for i in range(61)])
 
     def placePlayer(self):
+        """Places the player in the lobby"""
         #place player in the middle of the lobby
         self.map[10][30] = self.player
 
     def placePortal(self):
+        """Places the portal in the lobby"""
         #place portal on the top middle of the lobby
         self.map[1][30] = Portal(self, self.dungeon.rooms[0])
 
     def placeChest(self):
+        """Places the chest in the lobby"""
         self.map[19][30] = "C"
 
     def placeGrimoire(self):
+        """Places the grimoire in the lobby"""
         self.map[10][15] = "G"
 
     def placeShop(self):
+        """Places the shop in the lobby"""
         self.map[10][45] = "S"
 
 
 class Portal:
+    """Portal class, the portal that connects the rooms"""
     def __init__(self, room1, room2):
+        """Constructor for the Portal class, takes in the two rooms that the portal connects"""
         self.room1 = room1
         self.room2 = room2

@@ -13,6 +13,7 @@ from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
 
 keyboard.press("f11")
 
+#load keybind from save file
 os.makedirs("save", exist_ok=True)
 if os.path.exists("save/keybind.json"):
     with open("save/keybind.json", "r") as f:
@@ -37,7 +38,8 @@ def keyPress(key):
         return True
     return False
 
-def bar(current, maximum, reversed = False, length = 20): #print a bar with current/max
+def bar(current, maximum, reversed = False, length = 20):
+    """return a bar with current/max"""
     bar = "■" * (current // (maximum // length))
     bar += " " * (length - current // (maximum // length))
     if reversed:
@@ -46,6 +48,7 @@ def bar(current, maximum, reversed = False, length = 20): #print a bar with curr
     return bar
 
 def spaceToContinue():
+    """wait for the spacebar to be pressed and released"""
     print("Press \033[1m˽\033[0m to continue")
     wait = True
     while wait:
@@ -53,7 +56,7 @@ def spaceToContinue():
             wait = False
 
 separator = "─" * 61
-color = {
+color = { #color for rarity
     1: "\033[1;37mCommon",
     2: "\033[1;36mUncommon",
     3: "\033[1;34mRare",
@@ -63,7 +66,9 @@ color = {
 }
 
 class Menu:
+    """Menu class, used to create menus"""
     def __init__(self, title, option, onSpace):
+        """Constructor for the Menu class, takes in title, option, and onSpace"""
         self.title = title
         self.option = option
         self.select = 0
@@ -71,6 +76,7 @@ class Menu:
         self.runVar = True
 
     def printMenu(self):
+        """Prints the menu"""
         clear()
         print('\033[1m' + self.title + '\033[0m')
         print(separator)
@@ -82,6 +88,7 @@ class Menu:
                 print(option)
 
     def selectOption(self):
+        """Selects the option"""
         getInput = True
         key = None
         while getInput:
@@ -103,17 +110,21 @@ class Menu:
                 getInput = False
 
     def run(self):
+        """Runs the menu"""
         while self.runVar:
             self.printMenu()
             self.selectOption()
 
 class MainMenu(Menu):
+    """MainMenu class, used to create the main menu"""
     def __init__(self):
+        """Constructor for the MainMenu class"""
         title = open("ascii/title", "r").read()
         options = ("New Game", "Continue", "Options", "How to play", "Exit")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 if os.path.exists("save/stats.json"):
@@ -132,7 +143,7 @@ class MainMenu(Menu):
                     RoleMenu().run()
             case 1:
                 try:
-                    if os.path.exists("save"):
+                    if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         print(separator)
@@ -152,12 +163,15 @@ class MainMenu(Menu):
 
 
 class RoleMenu(Menu):
+    """RoleMenu class, used to create the role menu"""
     def __init__(self):
+        """Constructor for the RoleMenu class"""
         title = open("ascii/role", "r").read()
         options = ("Warrior", "Mage", "Archer", "Random", "Back")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 self.runVar = False
@@ -175,12 +189,15 @@ class RoleMenu(Menu):
 
 
 class HelpMenu(Menu):
+    """HelpMenu class, used to create the help menu"""
     def __init__(self):
+        """Constructor for the HelpMenu class"""
         title = open("ascii/help", "r").read()
         options = ("How to play", "Map", "Save", "Back")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 text = """The goal of the game is to go through the dungeon and defeat enemies in the dungeon to get stronger.
@@ -209,6 +226,7 @@ You can exit the game using the menu that appears when you press the ESC key."""
                 self.runVar = False
 
     def renderText(self, text):
+        """Renders the text"""
         print(separator)
         lines = text.split("\n")
         for line in lines:
@@ -223,12 +241,14 @@ You can exit the game using the menu that appears when you press the ESC key."""
 
 
 class OptionMenu(Menu):
+    """OptionMenu class, used to create the option menu"""
     def __init__(self):
         title = open("ascii/options", "r").read()
         options = ("Keybind", "Back")
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 KeybindMenu().run()
@@ -237,12 +257,14 @@ class OptionMenu(Menu):
 
 
 class KeybindMenu(Menu):
+    """KeybindMenu class, used to create the keybind menu"""
     def __init__(self):
         title = open("ascii/keybind", "r").read()
         options = [f"Up: [{keybind['up']}]", f"Down: [{keybind['down']}]", f"Left: [{keybind['left']}]", f"Right: [{keybind['right']}]", "Back"]
         super().__init__(title, options, self.onSpace)
 
     def redifineOptionsName(self):
+        """Redefines the options name"""
         global keybind
         self.option[0] = f"Up: [{keybind['up']}]"
         self.option[1] = f"Down: [{keybind['down']}]"
@@ -250,6 +272,7 @@ class KeybindMenu(Menu):
         self.option[3] = f"Right: [{keybind['right']}]"
 
     def replaceKey(self, key):
+        """Replaces the key with the input key"""
         clear()
         print("Press the key you want to replace", key, "with")
         print("Press \033[1m˽\033[0m to cancel")
@@ -261,6 +284,7 @@ class KeybindMenu(Menu):
             return inputKey
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         global keybind
         match select:
             case 0:
@@ -279,6 +303,7 @@ class KeybindMenu(Menu):
 
 
 class PauseMenu(Menu):
+    """PauseMenu class, used to create the pause menu"""
     def __init__(self, game):
         title = open("ascii/pause", "r").read()
         options = ("Resume", "Save", "Options", "Exit")
@@ -286,6 +311,7 @@ class PauseMenu(Menu):
         self.game = game
     
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 self.runVar = False
@@ -311,13 +337,16 @@ class PauseMenu(Menu):
 
 #SHOP
 class Shop(Menu):
+    """Shop class, used to create the shop"""
     def __init__(self, player):
+        """Constructor for the Shop class, takes in player"""
         self.player = player
         title = open("ascii/shop", "r").read()
         self.createOptions()
         super().__init__(title, self.options, self.onSpace)
 
     def createOptions(self):
+        """Creates the options"""
         self.options = []
         items = json.load(open("data/items.json", "r"))
         for key in items:
@@ -325,6 +354,7 @@ class Shop(Menu):
         self.options.append("Back")
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         if select == len(self.options) - 1:
             self.runVar = False
         else:
@@ -333,7 +363,9 @@ class Shop(Menu):
 
 
 class ItemShop(Menu):
+    """ItemShop class, used to create the item shop"""
     def __init__(self, data, player):
+        """Constructor for the ItemShop class, takes in data and player"""
         self.player = player
         self.data = data
         if self.data['type'] == "heal":
@@ -345,6 +377,7 @@ class ItemShop(Menu):
         super().__init__(title, option, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 print(separator)
@@ -371,7 +404,9 @@ class ItemShop(Menu):
 
 #INVENTORY
 class InventoryUI(Menu): 
+    """InventoryUI class, used to create the inventory UI"""
     def __init__(self, inventory, player):
+        """Constructor for the InventoryUI class, takes in inventory and player"""
         self.inventory = inventory
         self.player = player
         title = open('ascii/inventory', 'r').read()
@@ -379,6 +414,7 @@ class InventoryUI(Menu):
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 ItemInventoryUI(self.inventory, self.player).run()
@@ -389,7 +425,9 @@ class InventoryUI(Menu):
 
 
 class ItemInventoryUI(Menu):
+    """ItemInventoryUI class, used to create the item inventory UI"""
     def __init__(self, inventory, player, inFight = False):
+        """Constructor for the ItemInventoryUI class, takes in inventory, player, and inFight"""
         self.inventory = inventory
         self.player = player
         self.inFight = inFight
@@ -399,6 +437,7 @@ class ItemInventoryUI(Menu):
         super().__init__(title, self.option, self.onSpace)
 
     def rewriteOptions(self):
+        """Rewrites the options"""
         self.option = []
         for item in self.inventory.items:
             if item[0] != None:
@@ -408,6 +447,7 @@ class ItemInventoryUI(Menu):
         self.option.append("Back")
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         if select == len(self.option) - 1:
             self.runVar = False
         elif self.inventory.items[select][0] != None:
@@ -423,7 +463,9 @@ class ItemInventoryUI(Menu):
 
 
 class ItemUI(Menu):
+    """ItemUI class, used to create the item UI"""
     def __init__(self, inventory, item, player, inFight = False):
+        """Constructor for the ItemUI class, takes in inventory, item, player, and inFight"""
         self.inventory = inventory
         self.item = item[0]
         self.quantity = item[1]
@@ -436,6 +478,7 @@ class ItemUI(Menu):
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 print(separator)
@@ -469,7 +512,9 @@ class ItemUI(Menu):
 
 
 class GearInventoryUI(Menu):
+    """GearInventoryUI class, used to create the gear inventory UI"""
     def __init__(self, inventory, player):
+        """Constructor for the GearInventoryUI class, takes in inventory and player"""
         self.inventory = inventory
         self.player = player
         title = open('ascii/inventory', 'r').read()
@@ -477,6 +522,7 @@ class GearInventoryUI(Menu):
         super().__init__(title, self.option, self.onSpace)
 
     def rewriteOptions(self):
+        """Rewrites the options"""
         self.option = []
         for gear in self.inventory.gear:
             if gear != None:
@@ -486,6 +532,7 @@ class GearInventoryUI(Menu):
         self.option.append("Back")
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         if select == len(self.option) - 1:
             self.runVar = False
         elif self.inventory.gear[select] != None:
@@ -495,7 +542,9 @@ class GearInventoryUI(Menu):
 
 
 class GearUI(Menu):
+    """GearUI class, used to create the gear UI"""
     def __init__(self, inventory, gear, player):
+        """Constructor for the GearUI class, takes in inventory, gear, and player"""
         self.inventory = inventory
         self.gear = gear
         self.player = player
@@ -504,6 +553,7 @@ class GearUI(Menu):
         super().__init__(title, options, self.onSpace)
 
     def printMenu(self):
+        """Prints the menu with the information about the gear"""
         def diffColor(diff):
             if diff < 0:
                 return f"\033[31m{diff}\033[0m"
@@ -551,6 +601,7 @@ class GearUI(Menu):
                 print(option)
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 playerWeapon = self.player.weapon
@@ -578,7 +629,9 @@ class GearUI(Menu):
 
 #SPELL
 class SpellTree:
+    """SpellTree class, used to create the spell tree"""
     def __init__(self, role, player, inFight = False, enemy = None):
+        """Constructor for the SpellTree class, takes in role, player, inFight, and enemy"""
         self.title = open("ascii/spell", "r").read()
         self.player = player
         self.current = self.initTree(role)
@@ -590,6 +643,7 @@ class SpellTree:
         self.enemy = enemy
 
     def changeTree(self, tree):
+        """Changes the tree"""
         self.path.append(tree)
         self.current = tree
         self.spells = [self.current.spell] + [branch.spell for branch in self.current.branches]
@@ -597,6 +651,7 @@ class SpellTree:
         self.render()
 
     def goBack(self):
+        """Goes back in the tree"""
         self.path.pop()
         self.current = self.path[-1]
         self.spells = [self.current.spell] + [branch.spell for branch in self.current.branches]
@@ -604,6 +659,7 @@ class SpellTree:
         self.render()
 
     def navigate(self):
+        """Navigate in the tree"""
         getInput = True
         while getInput:
             if keyPress("left"):
@@ -634,6 +690,7 @@ class SpellTree:
                 getInput = False
 
     def render(self):
+        """Renders the tree"""
         clear()
         print(self.title)
         print(separator)
@@ -691,6 +748,7 @@ class SpellTree:
 
 
     def initTree(self, role):
+        """Initializes the tree depending on the role of the player recursively"""
         if role == "mage":
             data = json.load(open("data/spells/mage.json", "r", encoding="utf-8"))
         elif role == "warrior":
@@ -700,6 +758,7 @@ class SpellTree:
         firstKey = list(data.keys())[0]
 
         def createTree(key, data):
+            """Creates part of the tree"""
             spellData = data[key]
             if spellData['type'] == "damage":
                 spell = DamageSpell(spellData['name'], spellData['symbol'], spellData['cost'], spellData['damage'], spellData['scale'], spellData['description'], spellData['unlock'])
@@ -717,6 +776,7 @@ class SpellTree:
         return createTree(firstKey, data)
 
     def run(self):
+        """Runs the tree"""
         self.runVar = True
         while self.runVar:
             self.render()
@@ -724,7 +784,9 @@ class SpellTree:
 
 
 class SpellUI(Menu):
+    """SpellUI class, used to create the spell UI"""
     def __init__(self, player, spell, tree):
+        """Constructor for the SpellUI class, takes in player, spell, and tree"""
         title = open("ascii/spell", "r").read()
         options = ("Information", "Unlock", "Go to this spell", "Back")
         super().__init__(title, options, self.onSpace)
@@ -733,6 +795,7 @@ class SpellUI(Menu):
         self.spellTree = tree
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 print(separator)
@@ -806,7 +869,9 @@ class SpellUI(Menu):
 
 
 class CastSpellUI(Menu):
+    """CastSpellUI class, used to create the cast spell UI"""
     def __init__(self, spellTree, player, enemy, spell):
+        """Constructor for the CastSpellUI class, takes in spellTree, player, enemy, and spell"""
         title = open("ascii/spell", "r").read()
         options = ("Cast", "Go to this spell", "Back")
         super().__init__(title, options, self.onSpace)
@@ -817,6 +882,7 @@ class CastSpellUI(Menu):
         self.casted = False
 
     def printMenu(self):
+        """Prints the menu with the information about the spell"""
         clear()
         print('\033[1m' + self.title + '\033[0m')
         print(separator)
@@ -857,6 +923,7 @@ class CastSpellUI(Menu):
                 print(option)
 
     def getTarget(self):
+        """Gets the target of the spell"""
         if type(self.spell) == DamageSpell:
             return self.enemy
         elif type(self.spell) == HealSpell:
@@ -867,6 +934,7 @@ class CastSpellUI(Menu):
             return self.enemy
 
     def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
         match select:
             case 0:
                 pactRequired = ["Infernal Blade", "Infernal Shield", "Abyssal Regeneration"]
@@ -919,9 +987,11 @@ class CastSpellUI(Menu):
 
 
 class Game:
+    """Game class, main class of the game that contains the player and the current room"""
     separator = "─" * 61
-    def __init__(self, new = True, role = None): #new = True if the player start a new game
-        if new:
+    def __init__(self, new = True, role = None):
+        """Constructor for the Game class, takes in new and role"""
+        if new: #new = True if the player start a new game
             self.player = Player(role)
             self.save()
         else:
@@ -938,7 +1008,8 @@ class Game:
         self.lobby = Lobby(self.player)
         self.currentRoom = self.lobby #base room is the lobby
 
-    def getElementAroundPlayer(self): #get all interactable element around the player
+    def getElementAroundPlayer(self):
+        """Gets all interactable element around the player"""
         #get element adjacent to the player
         coord = self.currentRoom.getPlayerCoord()
         direction = ((1, 0), (-1, 0), (0, 1), (0, -1))
@@ -947,7 +1018,8 @@ class Game:
             adjList.append(self.currentRoom.map[coord[0] + dir[0]][coord[1] + dir[1]])
         return adjList
 
-    def playerInteraction(self): #player interaction handler
+    def playerInteraction(self):
+        """Player Interaction Handler. Interact with the element around the player"""
         adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal: #if there is a portal go to next room
@@ -1038,7 +1110,8 @@ class Game:
                 self.save()
         self.printRoom()
 
-    def interactionInfo(self): #print info about the interaction with the element around the player
+    def interactionInfo(self):
+        """Prints info about the interaction with the element around the player"""
         adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal:
@@ -1066,7 +1139,8 @@ class Game:
                 print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to check the \033[33mshop\033[0m")
                 print(separator)
 
-    def playerMove(self, direction): #player movement handler
+    def playerMove(self, direction):
+        """Player Movement Handler. Move the player in the room depending on the direction"""
         coord = self.currentRoom.getPlayerCoord()
         match direction:
             case'up':
@@ -1090,7 +1164,8 @@ class Game:
         sleep(0.1) #delay to avoid multiple key press
         self.printRoom()
 
-    def printRoom(self): #print the room and all infos -> called after every player action
+    def printRoom(self):
+        """Prints the room and all infos -> called after every player action"""
         clear()
         print(separator)
         #print current room name
@@ -1128,10 +1203,12 @@ class Game:
         self.interactionInfo()
 
     def save(self):
+        """Saves the player and the inventory data in the save folder"""
         self.player.save()
         self.player.inventory.save()
 
     def run(self):
+        """Runs the game"""
         run = True
         self.printRoom()
         while run:
@@ -1153,7 +1230,9 @@ class Game:
 
 
 class Fight:
+    """Fight class, used to create a fight between the player and an enemy"""
     def __init__(self, player, enemy):
+        """Constructor for the Fight class, takes in player and enemy"""
         self.player = player
         self.enemy = enemy
         self.resetBuffDebuff()
@@ -1164,6 +1243,7 @@ class Fight:
 
     @staticmethod
     def haveBuff(buff, target):
+        """Returns True if the target has the buff else returns False"""
         buffsList = [element[0] for element in target.buff]
         if buff in buffsList:
             return True
@@ -1171,12 +1251,14 @@ class Fight:
 
     @staticmethod
     def haveDebuff(debuff, target):
+        """Returns True if the target has the debuff else returns False"""
         debuffsList = [element[0] for element in target.debuff]
         if debuff in debuffsList:
             return True
         return False
 
     def removeBuffDebuff(self, target):
+        """Removes 1 turn to all buff and debuff of the target"""
         for i, element in enumerate(target.buff):
             if element[0] == "purify":
                 target.buff.pop(i)
@@ -1192,12 +1274,14 @@ class Fight:
                 i -= 1
 
     def resetBuffDebuff(self):
+        """Resets all buff and debuff of the player and the enemy"""
         self.player.buff = []
         self.player.debuff = []
         self.enemy.buff = []
         self.enemy.debuff = []
 
     def turn(self):
+        """Turn Handler. Manages the turn of the player and the enemy"""
         #player turn
         if self.player.health > 0:
             self.playerTurn()
@@ -1268,7 +1352,9 @@ class Fight:
         return self.endFight()
     
     def enemySpell(self):
+        """Enemy Spell Handler. Manages the enemy spell"""
         def evalSpell(spell):
+            """Evaluates the spell and returns the spell object"""
             if self.enemySpellData[spell]["type"] == "damage":
                 return DamageSpell(self.enemySpellData[spell]["name"], self.enemySpellData[spell]["symbol"], self.enemySpellData[spell]["cost"], self.enemySpellData[spell]["damage"], self.enemySpellData[spell]["scale"], self.enemySpellData[spell]["description"], self.enemySpellData[spell]["unlock"])
             elif self.enemySpellData[spell]["type"] == "heal":
@@ -1295,6 +1381,7 @@ class Fight:
             print(f"\033[31m{self.enemy.name}\033[0m has exhausted all his mana and can't cast any spell")
 
     def enemyTurn(self):
+        """Enemy Turn Handler. Manages the enemy turn"""
         if self.haveDebuff("stun", self.enemy):
             print(f"\033[31m{self.enemy.name}\033[0m is stunned and can't do anything")
         else:
@@ -1313,11 +1400,11 @@ class Fight:
         spaceToContinue()
 
     def playerTurn(self):
+        """Player Turn Handler. Manages the player turn"""
         if self.haveDebuff("stun", self.player):
             print("\033[32mYou\033[0m are stunned and can't do anything")
         else:
             #player choose an action
-            #attack skill item
             print("Choose an action:")
             print("1. Attack    2. Spell    3. Item    4. Run")
             getInput = True
@@ -1341,7 +1428,7 @@ class Fight:
                             if not spell.casted:
                                 self.print()
                                 self.playerTurn()
-                        getInput = False
+                    getInput = False
                 elif keyPress('3'): #item
                     invItems = self.player.inventory.getExistingItems()
                     empty = True
@@ -1378,6 +1465,7 @@ class Fight:
             self.player.debuff = []
 
     def evalDamage(self, user, target):
+        """Evaluates the damage dealt by the user to the target and applies it"""
         if self.haveBuff("invulnerable", target):
             if user == self.player:
                 print(f"\033[31m{target.name}\033[0m is invulnerable !")
@@ -1412,12 +1500,14 @@ class Fight:
                 print(f"\033[31m{user.name}\033[0m deals {atk} damage to \033[32mYou\033[0m")
 
     def endFight(self):
+        """Test if the fight is over"""
         if self.enemy.health <= 0 or self.player.health <= 0:
             return True
         else:
             return False
 
-    def endMessage(self): #return True if the player win else False
+    def endMessage(self):
+        """Returns the state of the fight"""
         win = False
         if self.player.health > 0:
             win = True
@@ -1430,6 +1520,7 @@ class Fight:
         return win
 
     def print(self):
+        """Prints the fight screen with all infos"""
         clear()
         #print enemy info
         print(f"\033[1;31m{self.enemy.name} - {self.enemy.type}:\033[0m")

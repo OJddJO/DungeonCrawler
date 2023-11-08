@@ -2,7 +2,9 @@ from classes.Item import randomWeapon, randomArmor
 import random
 
 class Enemy:
+    """Enemy class, used to create enemies for the player to fight"""
     def __init__(self, name, type, level, coord):
+        """Constructor for the Enemy class, takes in name, type, level, and coord"""
         self.name = name
         self.type = type
         self.health = 100
@@ -18,5 +20,6 @@ class Enemy:
         self.debuff = []
 
     def render(self):
+        """Renders the enemy's ascii art"""
         with open(f"ascii/enemies/{self.type}", "r") as f:
             print(f.read())
