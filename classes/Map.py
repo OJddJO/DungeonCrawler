@@ -27,7 +27,7 @@ class Dungeon:
 
 class Room(Maze):
     """Room class for the dungeon"""
-    def __init__(self, player, difficulty, nextRoom, width = 30, height = 10):
+    def __init__(self, player, difficulty, nextRoom, width = 59, height = 19):
         """Constructor for the Room class, takes in a player, a difficulty, the next room and the width and height of the room"""
         super().__init__(width, height)
         self.player = player
@@ -59,7 +59,7 @@ class Room(Maze):
             render.append([])
             for j, element in enumerate(row):
                 if mist:
-                    render[i].append(' ')
+                    render[i].append((" ", 8))
                 else:
                     if type(element) == str:
                         render[i].append(colorDict[element])
@@ -184,32 +184,32 @@ class Lobby(Room):
 
     def createRoom(self):
         """Creates the lobby"""
-        self.map.append(["#" for i in range(61)])
-        for i in range(19):
-            self.map.append(["#"] + ["." for i in range(59)] + ["#"])
-        self.map.append(["#" for i in range(61)])
+        self.map.append(["#" for i in range(119)])
+        for i in range(37):
+            self.map.append(["#"] + ["." for i in range(117)] + ["#"])
+        self.map.append(["#" for i in range(119)])
 
     def placePlayer(self):
         """Places the player in the lobby"""
         #place player in the middle of the lobby
-        self.map[10][30] = self.player
+        self.map[20][60] = self.player
 
     def placePortal(self):
         """Places the portal in the lobby"""
         #place portal on the top middle of the lobby
-        self.map[1][30] = Portal(self, self.dungeon.rooms[0])
+        self.map[15][60] = Portal(self, self.dungeon.rooms[0])
 
     def placeChest(self):
         """Places the chest in the lobby"""
-        self.map[19][30] = "C"
+        self.map[25][60] = "C"
 
     def placeGrimoire(self):
         """Places the grimoire in the lobby"""
-        self.map[10][15] = "G"
+        self.map[20][50] = "G"
 
     def placeShop(self):
         """Places the shop in the lobby"""
-        self.map[10][45] = "S"
+        self.map[20][70] = "S"
 
 
 class Portal:
