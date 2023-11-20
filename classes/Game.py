@@ -50,7 +50,7 @@ def bar(current, maximum, reversed = False, length = 20):
 
 def spaceToContinue():
     """wait for the spacebar to be pressed and released"""
-    print("Press \033[1m˽\033[0m to continue")
+    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
     wait = True
     while wait:
         if keyPress('space'):
@@ -78,15 +78,15 @@ class Menu:
 
     def printMenu(self):
         """Prints the menu"""
-        clear()
-        print('\033[1m' + self.title + '\033[0m')
-        print(separator)
+        clearMain()
+        printText(mainWin, 0, [(self.title, 9, "bold")])
+        printText(mainWin, 1, [(separator, 9, None)])
         #selected option will be in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f"\033[1;32m> {option}\033[0m")
+                printText(mainWin, i+2, [(">", 5, "bold"), (option, 5, "bold")])
             else:
-                print(option)
+                printText(mainWin, i+2, [(option, 9, None)])
 
     def selectOption(self):
         """Selects the option"""
