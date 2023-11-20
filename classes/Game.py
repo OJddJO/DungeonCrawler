@@ -120,6 +120,7 @@ class MainMenu(Menu):
     """MainMenu class, used to create the main menu"""
     def __init__(self):
         """Constructor for the MainMenu class"""
+        clearAll()
         title = open("ascii/title", "r").read()
         options = ("New Game", "Continue", "Options", "How to play", "Exit")
         super().__init__(title, options, self.onSpace)
@@ -129,10 +130,10 @@ class MainMenu(Menu):
         match select:
             case 0:
                 if os.path.exists("save/stats.json"):
-                    print(separator)
-                    print("\033[1;31mWARNING\033[0m: You will overwrite your save file")
-                    print("\033[1mAre you sure you want to start a new game ?\033[0m")
-                    print("1. Yes    2. No")
+                    clearMain()
+                    printText(mainWin, 0, [("WARNING", 1, "bold"), (": You will overwrite your save file", 9, None)])
+                    printText(mainWin, 1, [("Are you sure you want to start a new game ?", 9, "bold")])
+                    printText(mainWin, 2, [("1. Yes    2. No", 9, None)])
                     getInput = True
                     while getInput:
                         if keyPress('1'):
@@ -147,13 +148,12 @@ class MainMenu(Menu):
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
-                        print(separator)
-                        print("No save file found")
+                        clearMain()
+                        printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
                 except Exception as e:
-                    print(separator)
-                    print("An error occurred while loading the save file")
-                    print(e)
+                    printText(mainWin, 0, [("An error occurred while loading the save file", 1, None)])
+                    printText(mainWin, 1, [(str(e), 1, None)])
                     spaceToContinue()
             case 2:
                 OptionMenu().run()
@@ -192,6 +192,7 @@ class RoleMenu(Menu):
 class HelpMenu(Menu):
     """HelpMenu class, used to create the help menu"""
     def __init__(self):
+        clearAll()
         """Constructor for the HelpMenu class"""
         title = open("ascii/help", "r").read()
         options = ("How to play", "Map", "Save", "Back")
@@ -228,22 +229,17 @@ You can exit the game using the menu that appears when you press the ESC key."""
 
     def renderText(self, text):
         """Renders the text"""
-        print(separator)
+        clearMain()
         lines = text.split("\n")
-        for line in lines:
-            lenght = len(line)
-            if lenght > 61:
-                print(line[:61])
-                print(line[61:])
-            else:
-                print(line)
-        print(separator)
+        for i, line in enumerate(lines):
+            printText(mainWin, i, [(line, 9, None)])
         spaceToContinue()
 
 
 class OptionMenu(Menu):
     """OptionMenu class, used to create the option menu"""
     def __init__(self):
+        clearAll()
         title = open("ascii/options", "r").read()
         options = ("Keybind", "Back")
         super().__init__(title, options, self.onSpace)
@@ -260,6 +256,7 @@ class OptionMenu(Menu):
 class KeybindMenu(Menu):
     """KeybindMenu class, used to create the keybind menu"""
     def __init__(self):
+        clearAll()
         title = open("ascii/keybind", "r").read()
         options = [f"Up: [{keybind['up']}]", f"Down: [{keybind['down']}]", f"Left: [{keybind['left']}]", f"Right: [{keybind['right']}]", "Back"]
         super().__init__(title, options, self.onSpace)
@@ -275,8 +272,8 @@ class KeybindMenu(Menu):
     def replaceKey(self, key):
         """Replaces the key with the input key"""
         clear()
-        print("Press the key you want to replace", key, "with")
-        print("Press \033[1m˽\033[0m to cancel")
+        printText(mainWin, 0, [("Press the key you want to replace", 9, None), (f" {key} ", 5, "bold"), ("with", 9, None)])
+        printText(mainWin, 1, [("Press \033[1m˽\033[0m to cancel", 9, None)])
         inputKey = keyboard.read_key()
         while keyboard.is_pressed(inputKey): pass
         if inputKey == 'space':
@@ -306,6 +303,8 @@ class KeybindMenu(Menu):
 class PauseMenu(Menu):
     """PauseMenu class, used to create the pause menu"""
     def __init__(self, game):
+        """Constructor for the PauseMenu class, takes in game"""
+        clearAll()
         title = open("ascii/pause", "r").read()
         options = ("Resume", "Save", "Options", "Exit")
         super().__init__(title, options, self.onSpace)
@@ -318,16 +317,14 @@ class PauseMenu(Menu):
                 self.runVar = False
             case 1:
                 self.game.save()
-                print(separator)
-                print("Game saved")
+                printText(mainWin, 0, [("Game saved", 9, None)])
                 spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
-                print(separator)
-                print("\033[1;31mWARNING\033[0m: Be sure to save your game before exiting")
-                print("\033[1mAre you sure you want to exit ?\033[0m")
-                print("1. Yes    2. No")
+                printText(mainWin, 0, [("WARNING", 1, "bold"), (": You will lose your progression", 9, None)])
+                printText(mainWin, 1, [("Are you sure you want to exit ?", 9, "bold")])
+                printText(mainWin, 2, [("1. Yes    2. No", 9, None)])
                 getInput = True
                 while getInput:
                     if keyPress('1'):
@@ -341,6 +338,7 @@ class Shop(Menu):
     """Shop class, used to create the shop"""
     def __init__(self, player):
         """Constructor for the Shop class, takes in player"""
+        clearAll()
         self.player = player
         title = open("ascii/shop", "r").read()
         self.createOptions()
@@ -367,6 +365,7 @@ class ItemShop(Menu):
     """ItemShop class, used to create the item shop"""
     def __init__(self, data, player):
         """Constructor for the ItemShop class, takes in data and player"""
+        clearAll()
         self.player = player
         self.data = data
         if self.data['type'] == "heal":
@@ -381,24 +380,21 @@ class ItemShop(Menu):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
-                print(separator)
-                print(self.item)
+                printText(mainWin, 0, [(self.item, 9, None)])
                 spaceToContinue()
             case 1:
                 if self.player.gold >= self.item.value:
                     self.player.gold -= self.item.value
                     self.player.inventory.addItem(self.item)
-                    print(separator)
-                    print(f"You bought {self.item.name}")
+                    printText(mainWin, 0, [("You bought ", 9, None), (f" {self.item.name} ", 9, "bold")])
                     i = self.player.inventory.getExistingItems().index(self.item.name)
                     qty = self.player.inventory.items[i][1]
-                    print(f"You now have \033[33m{qty}\033[0mx {self.item.name}")
-                    print(f"You have \033[33m{self.player.gold}\033[0m gold left")
+                    printText(mainWin, 1, [("You now have ", 9, None), (f" {qty} ", 9, "bold"), ("x ", 9, None), (f" {self.item.name} ", 9, "bold")])
+                    printText(mainWin, 2, [("You have ", 9, None), (f" {self.player.gold} ", 9, "bold"), ("gold left", 9, None)])
                     spaceToContinue()
                 else:
-                    print(separator)
-                    print("You don't have enough gold")
-                    print(f"You need \033[33m{self.item.value - self.player.gold}\033[0m more gold")
+                    printText(mainWin, 0, [("You don't have enough gold", 1, None)])
+                    printText(mainWin, 1, [("You need ", 9, None), (f" {self.item.value - self.player.gold} ", 9, "bold"), ("more gold", 9, None)])
                     spaceToContinue()
             case 2:
                 self.runVar = False
@@ -408,6 +404,7 @@ class InventoryUI(Menu):
     """InventoryUI class, used to create the inventory UI"""
     def __init__(self, inventory, player):
         """Constructor for the InventoryUI class, takes in inventory and player"""
+        clearAll()
         self.inventory = inventory
         self.player = player
         title = open('ascii/inventory', 'r').read()
@@ -429,6 +426,7 @@ class ItemInventoryUI(Menu):
     """ItemInventoryUI class, used to create the item inventory UI"""
     def __init__(self, inventory, player, inFight = False):
         """Constructor for the ItemInventoryUI class, takes in inventory, player, and inFight"""
+        clearAll()
         self.inventory = inventory
         self.player = player
         self.inFight = inFight
@@ -444,7 +442,7 @@ class ItemInventoryUI(Menu):
             if item[0] != None:
                 self.option.append(f"{item[0].name} x{item[1]}")
             else:
-                self.option.append("\033[90mEmpty\033[0m")
+                self.option.append("Empty")
         self.option.append("Back")
 
     def onSpace(self, select):
@@ -467,6 +465,7 @@ class ItemUI(Menu):
     """ItemUI class, used to create the item UI"""
     def __init__(self, inventory, item, player, inFight = False):
         """Constructor for the ItemUI class, takes in inventory, item, player, and inFight"""
+        clearAll()
         self.inventory = inventory
         self.item = item[0]
         self.quantity = item[1]
@@ -482,13 +481,12 @@ class ItemUI(Menu):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
-                print(separator)
-                print(self.item)
+                printText(mainWin, 0, [(self.item, 9, None)])
                 spaceToContinue()
             case 1:
                 use = True
                 if not self.inFight and type(self.item) == BuffItem:
-                    print(separator)
+                    printInfo([("Can't use this item outside of a fight", 1, None)])
                     print("Can't use this item outside of a fight")
                     use = False
                 if use:

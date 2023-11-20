@@ -3,6 +3,7 @@ from curses import textpad
 
 screen = curses.initscr()
 screen.clear()
+screen.keypad(True)
 mainWin = curses.newwin(42, 121, 1, 1) #size 41, 121
 statsWin = curses.newwin(42, 60, 1, 125) #size 41, 61
 infoWin = curses.newwin(7, 183, 43, 1) #size 6, 183
@@ -28,8 +29,15 @@ def clearStats():
     statsWin.refresh()
 
 def clearInfo():
+    global infoList
+    infoList = []
     infoWin.clear()
     infoWin.refresh()
+
+def clearAll():
+    clearMain()
+    clearStats()
+    clearInfo()
 
 def drawOutlines():
     textpad.rectangle(screen, 0, 0, 42, 122) #main rectangle
