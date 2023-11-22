@@ -12,7 +12,8 @@ from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
 from cursesInit import *
 
-keyboard.press("f11")
+# keyboard.press("f11")
+refreshAll()
 
 #load keybind from save file
 os.makedirs("save", exist_ok=True)
@@ -79,14 +80,15 @@ class Menu:
     def printMenu(self):
         """Prints the menu"""
         clearMain()
-        printText(mainWin, 0, [(self.title, 9, "bold")])
-        printText(mainWin, 1, [(separator, 9, None)])
+        # printText(mainWin, 0, [(self.title, 9, "bold")])
+        printText(mainWin, 5, [(separator, 9, None)])
         #selected option will be in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                printText(mainWin, i+2, [(">", 5, "bold"), (option, 5, "bold")])
+                printText(mainWin, i+6, [(">", 5, "bold"), (option, 5, "bold")])
             else:
-                printText(mainWin, i+2, [(option, 9, None)])
+                printText(mainWin, i+6, [(option, 9, None)])
+        refreshAll()
 
     def selectOption(self):
         """Selects the option"""
@@ -493,10 +495,9 @@ class ItemUI(Menu):
                     self.item.onUse(self.player)
                     self.inventory.removeItem(self.item)
                     self.title = f"{open('ascii/inventory', 'r').read()}\n{self.item.name} x{self.quantity}"
-                    print(separator)
-                    print("\033[32mYou\033[0m used", self.item.name)
-                    print("\033[32mYou\033[0m now have\033[33m", self.quantity-1, "\033[0mleft")
-                    print("\033[32mYou\033[0m have\033[31m", self.player.health, "/ 100 health\033[0m", "and\033[36m", self.player.mana, "/", self.player.maxMana, "mana\033[0m")
+                    printInfo([("You used ", 9, None), (f" {self.item.name} ", 9, "bold")])
+                    printInfo([("You now have ", 9, None), (f" {self.quantity} ", 9, "bold"), ("x ", 9, None), (f" {self.item.name} ", 9, "bold")])
+                    printInfo([("You have ", 9, None), (f" {self.player.gold} ", 9, "bold"), ("gold left", 9, None)])
                 if not self.inFight:
                     spaceToContinue()
                 else:
@@ -514,6 +515,7 @@ class GearInventoryUI(Menu):
     """GearInventoryUI class, used to create the gear inventory UI"""
     def __init__(self, inventory, player):
         """Constructor for the GearInventoryUI class, takes in inventory and player"""
+        clearAll()
         self.inventory = inventory
         self.player = player
         title = open('ascii/inventory', 'r').read()
@@ -544,6 +546,7 @@ class GearUI(Menu):
     """GearUI class, used to create the gear UI"""
     def __init__(self, inventory, gear, player):
         """Constructor for the GearUI class, takes in inventory, gear, and player"""
+        clearAll()
         self.inventory = inventory
         self.gear = gear
         self.player = player
@@ -559,8 +562,7 @@ class GearUI(Menu):
             else:
                 return f"\033[32m+{diff}\033[0m"
         clear()
-        print('\033[1m' + self.title + '\033[0m')
-        print(separator)
+        printText(mainWin, 0, [(self.title, 9, "bold")])
         part = type(self.gear)
         if part == Weapon:
             equiped = self.player.weapon
@@ -572,32 +574,30 @@ class GearUI(Menu):
         rarityDiff = diffColor(self.gear.rarity - equiped.rarity)
         manaDiff = diffColor(self.gear.mana - equiped.mana)
 
-        print(f"Description: {self.gear.description}") # current gear
-        print(f"Level: {self.gear.level} {levelDiff}")
-        print(f"Rarity: {color[self.gear.rarity]}\033[0m {rarityDiff}")
+        printText(mainWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
+        printText(mainWin, 2, [("Level: ", 9, None), (f"{self.gear.level} {levelDiff}", 9, "bold")])
+        printText(mainWin, 3, [(f"Rarity: {color[self.gear.rarity]}", 9, None), (f" {rarityDiff}", 9, "bold")])
         if part == Weapon:
-            print(f"Damage: {self.gear.baseDamage} {damageDiff}")
+            printText(mainWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} {damageDiff}", 9, "bold")])
         elif part == Armor:
-            print(f"Armor: {self.gear.baseArmor} {armorDiff}")
-        print(f"Mana: {self.gear.mana} {manaDiff}")
+            printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} {armorDiff}", 9, "bold")])
+        printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} {manaDiff}", 9, "bold")])
 
-        print(separator) # equiped gear
-        print(f"\033[1mEquiped:\033[0m {color[equiped.rarity]} {equiped.name}\033[0m")
-        print(f"Level: {equiped.level}")
-        print(f"Rarity: {color[equiped.rarity]}\033[0m")
+        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{color[equiped.rarity]} {equiped.name}\033[0m", 9, "bold")]) # equiped gear
+        printText(mainWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
+        printText(mainWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
         if part == Weapon:
-            print(f"Damage: {equiped.baseDamage}")
+            printText(mainWin, 10, [("Damage: ", 9, None), (f"{equiped.baseDamage}", 9, "bold")])
         elif part == Armor:
-            print(f"Armor: {equiped.baseArmor}")
-        print(f"Mana: {equiped.mana}")
+            printText(mainWin, 10, [("Armor: ", 9, None), (f"{equiped.baseArmor}", 9, "bold")])
+        printText(mainWin, 11, [("Mana: ", 9, None), (f"{equiped.mana}", 9, "bold")])
 
         #selected option will be in green
-        print(separator)
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f"\033[1;32m> {option}\033[0m")
+                printText(mainWin, i+13, [(">", 5, "bold"), (option, 5, "bold")])
             else:
-                print(option)
+                printText(mainWin, i+13, [(option, 9, None)])
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
@@ -615,8 +615,7 @@ class GearUI(Menu):
                     self.inventory.addGear(playerArmor)
                 #change player mana
                 self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
-                print(separator)
-                print("Gear equipped")
+                printInfo([("Gear equipped", 9, None)])
                 spaceToContinue()
                 self.runVar = False
             case 1:
@@ -631,6 +630,7 @@ class SpellTree:
     """SpellTree class, used to create the spell tree"""
     def __init__(self, role, player, inFight = False, enemy = None):
         """Constructor for the SpellTree class, takes in role, player, inFight, and enemy"""
+        clearAll()
         self.title = open("ascii/spell", "r").read()
         self.player = player
         self.current = self.initTree(role)
@@ -690,7 +690,7 @@ class SpellTree:
 
     def render(self):
         """Renders the tree"""
-        clear()
+        clearAll()
         print(self.title)
         print(separator)
         def offset(x): return ' ' * x
@@ -712,38 +712,38 @@ class SpellTree:
         selectedList = [False] * (len(self.current.branches)+1)  # +1 for the current spell
         selectedList[self.selected] = True # to set the selected spell in the tree
 
-        print(f'{offset(30)}║')
+        printText(mainWin, 0, [(offset(30), 9, None), ("║", 9, None)])
         spellSlice = sliceSpell(self.current, selectedList[0])
         for i in range(4):
-            print(offset(28) + spellSlice[i])
+            printText(mainWin, i+1, [(offset(28), 9, None), (spellSlice[i], 9, None)])
         if len(self.current.branches) == 1:
-            print(f'{offset(30)}║')
+            printText(mainWin, 5, [(offset(30), 9, None), ("║", 9, None)])
             spell1 = sliceSpell(self.current.branches[0], selectedList[1])
             for i in range(4):
-                print(offset(28) + spell1[i])
+                printText(mainWin, i+6, [(offset(28), 9, None), (spell1[i], 9, None)])
         elif len(self.current.branches) == 2:
-            print(f'{offset(15)}╔══════════════╩══════════════╗')
+            printText(mainWin, 5, [(offset(15), 9, None), ("╔══════════════╩══════════════╗", 9, None)])
             spell1 = sliceSpell(self.current.branches[0], selectedList[1])
             spell2 = sliceSpell(self.current.branches[1], selectedList[2])
             for i in range(4):
+                printText(mainWin, i+6, [(offset(13), 9, None), (spell1[i], 9, None), (offset(25), 9, None), (spell2[i], 9, None)])
                 print(offset(13) + spell1[i] + offset(25) + spell2[i])
         elif len(self.current.branches) == 3:
-            print(f'{offset(10)}╔═══════════════════╬═══════════════════╗')
+            printText(mainWin, 5, [(offset(10), 9, None), ("╔═══════════════════╬═══════════════════╗", 9, None)])
             spell1 = sliceSpell(self.current.branches[0], selectedList[1])
             spell2 = sliceSpell(self.current.branches[1], selectedList[2])
             spell3 = sliceSpell(self.current.branches[2], selectedList[3])
             for i in range(4):
-                print(offset(8) + spell1[i] + offset(15) + spell2[i] + offset(15) + spell3[i])
+                printText(mainWin, i+6, [(offset(8), 9, None), (spell1[i], 9, None), (offset(15), 9, None), (spell2[i], 9, None), (offset(15), 9, None), (spell3[i], 9, None)])
         elif len(self.current.branches) == 4:
-            print(f'{offset(14)}╔═══════╦═══════╩═══════╦═══════╗')
+            printText(mainWin, 5, [(offset(14), 9, None), ("╔═══════╦═══════╩═══════╦═══════╗", 9, None)])
             spell1 = sliceSpell(self.current.branches[0], selectedList[1])
             spell2 = sliceSpell(self.current.branches[1], selectedList[2])
             spell3 = sliceSpell(self.current.branches[2], selectedList[3])
             spell4 = sliceSpell(self.current.branches[3], selectedList[4])
             for i in range(4):
-                print(offset(12) + spell1[i] + offset(3) + spell2[i] + offset(11) + spell3[i] + offset(3) + spell4[i])
-        print(separator)
-        print("Navigate with \033[1m◄ ►\033[0m and press \033[1m˽\033[0m to select. ESC to go back")
+                printText(mainWin, i+6, [(offset(12), 9, None), (spell1[i], 9, None), (offset(3), 9, None), (spell2[i], 9, None), (offset(11), 9, None), (spell3[i], 9, None), (offset(3), 9, None), (spell4[i], 9, None)])
+        printInfo([("Navigate with ", 9, None), ("◄ ►", 9, "bold"), (" and press ", 9, None), ("˽", 9, "bold"), (" to select. ESC to go back", 9, None)])
 
 
     def initTree(self, role):
@@ -786,6 +786,7 @@ class SpellUI(Menu):
     """SpellUI class, used to create the spell UI"""
     def __init__(self, player, spell, tree):
         """Constructor for the SpellUI class, takes in player, spell, and tree"""
+        clearAll()
         title = open("ascii/spell", "r").read()
         options = ("Information", "Unlock", "Go to this spell", "Back")
         super().__init__(title, options, self.onSpace)
@@ -797,68 +798,57 @@ class SpellUI(Menu):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
-                print(separator)
-                print(self.spell.symbol, self.spell.name)
-                print(self.spell.description)
-                print(separator)
+                printText(mainWin, 0, [(self.spell.symbol), (self.spell.name, 9, None)])
+                printText(mainWin, 1, [(self.spell.description, 9, None)])
                 if self.spell.name in self.player.spells:
-                    print("\033[3;92mThis spell is unlocked\033[0m")
+                    printText(mainWin, 2, [("This spell is unlocked", 7, None)])
                 elif self.spell.unlock["level"] <= self.player.level:
-                    print("\033[3;96mThis spell can be unlocked\033[0m")
-                    print("Level required:", self.spell.unlock["level"])
-                    print("Cost:", self.spell.unlock["cost"])
+                    printText(mainWin, 2, [("This spell can be unlocked", 5, None)])
+                    printText(mainWin, 3, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
+                    printText(mainWin, 4, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
                 else:
-                    print("\033[3;31mThis spell can't be unlocked yet\033[0m")
-                    print("Level required:", self.spell.unlock["level"])
-                print(separator)
-                print("Mana Cost:", self.spell.cost)
+                    printText(mainWin, 2, [("\033[3;31mThis spell can't be unlocked yet\033[0m", 4, None)])
+                    printText(mainWin, 3, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
+                printText(mainWin, 5, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
                 if type(self.spell) == DamageSpell:
-                    print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
+                    printText(mainWin, 6, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
                 elif type(self.spell) == HealSpell:
-                    print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
+                    printText(mainWin, 6, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
                 elif type(self.spell) == BuffSpell:
-                    print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
-                    print("Buff:", self.spell.buff)
-                    print("Duration:", self.spell.duration)
+                    printText(mainWin, 6, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+                    printText(mainWin, 7, [("Buff: ", 9, None), (f"{self.spell.buff}", 9, "bold")])
+                    printText(mainWin, 8, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
                 elif type(self.spell) == DebuffSpell:
-                    print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
-                    print("Debuff:", self.spell.debuff)
-                    print("Duration:", self.spell.duration)
-                print(separator)
+                    printText(mainWin, 6, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+                    printText(mainWin, 7, [("Debuff: ", 9, None), (f"{self.spell.debuff}", 9, "bold")])
+                    printText(mainWin, 8, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
                 spaceToContinue()
             case 1:
                 if self.spell.name in self.player.spells:
-                    print(separator)
-                    print("\033[3mThis spell is already unlocked\033[0m")
+                    printInfo([("This spell is already unlocked", 7, None)])
                     spaceToContinue()
                 elif self.spell.unlock["level"] <= self.player.level:
                     if self.player.gold >= self.spell.unlock["cost"]:
                         self.player.gold -= self.spell.unlock["cost"]
                         self.player.spells.append(self.spell.name)
-                        print(separator)
-                        print("Spell unlocked !")
+                        printInfo([("You unlocked ", 9, None), (f"{self.spell.name}", 9, "bold")])
                         spaceToContinue()
                     else:
-                        print(separator)
-                        print("\033[3;31mYou don't have enough gold\033[0m")
+                        printInfo([("You don't have enough gold", 1, None)])
                         spaceToContinue()
                 else:
-                    print(separator)
-                    print("\033[3;31mThis spell can't be unlocked yet\033[0m")
+                    printInfo([("Your level is to low to unlock this spell", 1, None)])
                     spaceToContinue()
             case 2:
                 if self.spellTree.selected == 0:
-                    print(separator)
-                    print("\033[3;31mYou are already on this spell\033[0m")
+                    printInfo(mainWin, 0, [("You are already on this spell", 1, None)])
                     spaceToContinue()
                 elif len(self.spellTree.current.branches[self.spellTree.selected-1].branches) == 0:
-                    print(separator)
-                    print("\033[3;31mThis spell doesn't unlock any other spell\033[0m")
+                    printInfo([("This spell doesn't unlock any other spell", 1, None)])
                     spaceToContinue()
                 else:
                     if self.spell.name not in self.player.spells:
-                        print(separator)
-                        print("\033[3;31mYou didn't unlock this spell yet\033[0m")
+                        printInfo([("You didn't unlock this spell yet", 1, None)])
                         spaceToContinue()
                     else:
                         self.spellTree.changeTree(self.spellTree.current.branches[self.spellTree.selected-1])
@@ -882,44 +872,39 @@ class CastSpellUI(Menu):
 
     def printMenu(self):
         """Prints the menu with the information about the spell"""
-        clear()
-        print('\033[1m' + self.title + '\033[0m')
-        print(separator)
-        print(f"Mana: {self.player.mana}/{self.player.maxMana}")
-        print(separator)
-        print(self.spell.symbol, self.spell.name)
-        print(self.spell.description)
-        print(separator)
+        clearMain()
+        printText(mainWin, 0, [(self.title, 9, "bold")])
+        printText(mainWin, 1, [("Mana: ", 9, None), (f"{self.player.mana}/{self.player.maxMana}", 9, "bold")])
+        printText(mainWin, 2, [(self.spell.symbol, 9, None), (self.spell.name, 9, None)])
+        printText(mainWin, 3, [(self.spell.description, 9, None)])
         if self.spell.name in self.player.spells:
-            print("\033[3;92mThis spell is unlocked\033[0m")
+            printText(mainWin, 4, [("This spell is unlocked", 7, None)])
         elif self.spell.unlock["level"] <= self.player.level:
-            print("\033[3;96mThis spell can be unlocked\033[0m")
-            print("Level required:", self.spell.unlock["level"])
-            print("Cost:", self.spell.unlock["cost"])
+            printText(mainWin, 4, [("This spell can be unlocked", 5, None)])
+            printText(mainWin, 5, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
+            printText(mainWin, 6, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
         else:
-            print("\033[3;31mThis spell can't be unlocked yet\033[0m")
-            print("Level required:", self.spell.unlock["level"])
-        print(separator)
-        print("Mana Cost:", self.spell.cost)
+            printText(mainWin, 4, [("\033[3;31mThis spell can't be unlocked yet\033[0m", 4, None)])
+            printText(mainWin, 5, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
+        printText(mainWin, 7, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
         if type(self.spell) == DamageSpell:
-            print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
+            printText(mainWin, 8, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
         elif type(self.spell) == HealSpell:
-            print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
+            printText(mainWin, 8, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
         elif type(self.spell) == BuffSpell:
-            print("Heal:", int(self.spell.heal+(self.spell.scale*self.player.mana)))
-            print("Buff:", self.spell.buff)
-            print("Duration:", self.spell.duration)
+            printText(mainWin, 8, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(mainWin, 9, [("Buff: ", 9, None), (f"{self.spell.buff}", 9, "bold")])
+            printText(mainWin, 10, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
         elif type(self.spell) == DebuffSpell:
-            print("Damage:", int(self.spell.damage+(self.spell.scale*self.player.mana)))
-            print("Debuff:", self.spell.debuff)
-            print("Duration:", self.spell.duration)
-        print(separator)
+            printText(mainWin, 8, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(mainWin, 9, [("Debuff: ", 9, None), (f"{self.spell.debuff}", 9, "bold")])
+            printText(mainWin, 10, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
         #selected option will be in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                print(f"\033[1;32m> {option}\033[0m")
+                printText(mainWin, i+12, [(">", 5, "bold"), (option, 5, "bold")])
             else:
-                print(option)
+                printText(mainWin, i+12, [(option, 9, None)])
 
     def getTarget(self):
         """Gets the target of the spell"""
@@ -939,44 +924,35 @@ class CastSpellUI(Menu):
                 pactRequired = ["Infernal Blade", "Infernal Shield", "Abyssal Regeneration"]
                 demonizedRequired = ["Demonic Blade", "Demon's Mark"]
                 if self.spell.name not in self.player.spells:
-                    print(separator)
-                    print("\033[3;31mThis spell is not unlocked\033[0m")
+                    printText(mainWin, 0, [("This spell is not unlocked", 1, None)])
                     spaceToContinue()
                 elif self.spell.cost > self.player.mana:
-                    print(separator)
-                    print("\033[3;31mYou don't have enough mana\033[0m")
+                    printText(mainWin, 0, [("You don't have enough mana", 1, None)])
                     spaceToContinue()
                 elif self.spell.unlock["level"] > self.player.level:
-                    print(separator)
-                    print("\033[3;31mYour level is to low to use this spell\033[0m")
+                    printText(mainWin, 0, [("Your level is to low to use this spell", 1, None)])
                     spaceToContinue()
                 elif self.spell.name in pactRequired and not Fight.haveBuff("pact", self.player):
-                    print(separator)
-                    print("\033[3;31mYou need to make a pact with a demon to use  this spell\033[0m")
+                    printText(mainWin, 0, [("You need to make a pact with a demon to use  this spell", 1, None)])
                     spaceToContinue()
                 elif self.spell.name in demonizedRequired and not Fight.haveBuff("demonized", self.player):
-                    print(separator)
-                    print("\033[3;31mYou need in your demon form to use this spell\033[0m")
+                    printText(mainWin, 0, [("You need in your demon form to use this spell", 1, None)])
                     spaceToContinue()
                 elif self.spell.name in self.player.spells:
                     text = self.spell.onUse(self.player, self.getTarget())
-                    print(separator)
-                    print(text)
+                    printText(mainWin, 0, [(text, 9, None)])
                     self.casted = True
                 self.runVar = False
             case 1:
                 if self.spellTree.selected == 0:
-                    print(separator)
-                    print("\033[3;31mYou are already on this spell\033[0m")
+                    printText(mainWin, 0, [("You are already on this spell", 1, None)])
                     spaceToContinue()
                 elif len(self.spellTree.current.branches[self.spellTree.selected-1].branches) == 0:
-                    print(separator)
-                    print("\033[3;31mThis spell doesn't unlock any other spell\033[0m")
+                    printText(mainWin, 0, [("This spell doesn't unlock any other spell", 1, None)])
                     spaceToContinue()
                 else:
                     if self.spell.name not in self.player.spells:
-                        print(separator)
-                        print("\033[3;31mYou didn't unlock this spell yet\033[0m")
+                        printText(mainWin, 0, [("You didn't unlock this spell yet", 1, None)])
                         spaceToContinue()
                     else:
                         self.spellTree.changeTree(self.spellTree.current.branches[self.spellTree.selected-1])
@@ -991,6 +967,7 @@ class Game:
     def __init__(self, new = True, role = None):
         """Constructor for the Game class, takes in new and role"""
         if new: #new = True if the player start a new game
+            clearAll()
             self.player = Player(role)
             self.save()
         else:
@@ -1019,6 +996,7 @@ class Game:
 
     def playerInteraction(self):
         """Player Interaction Handler. Interact with the element around the player"""
+        clearInfo()
         adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal: #if there is a portal go to next room
@@ -1043,7 +1021,7 @@ class Game:
                 else:
                     self.player.inventory.addItem(item)
                 self.player.gold += money
-                print(f"You found '{color[item.rarity]} {item.name}\033[0m' and \033[33m{money} gold\033[0m in the treasure")
+                printInfo([(f"You found {color[item.rarity]} {item.name} and {money} gold in the treasure", 9, None)])
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                 self.save()
                 spaceToContinue()
@@ -1056,12 +1034,12 @@ class Game:
                     fight.print()
                 win = fight.endMessage()
                 if win == "flee":
-                    print("\033[3mInfo:\033[0m You flee the fight")
+                    printInfo([("You flee the fight", 9, None)])
                 elif win == "skip":
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
-                    print("\033[3mInfo:\033[0m You skip the fight")
+                    printInfo([("You skip the fight", 9, None)])
                 elif win == "floorSkip":
-                    print("\033[3mInfo:\033[0m You skip the fight and the floor")
+                    printInfo([("You skip the fight and the floor", 9, None)])
                     if self.currentRoom.portal.room2 == None: #if there is no next room -> last room of the dungeon, go back to lobby
                         #go to lobby
                         self.currentRoom = self.lobby
@@ -1074,29 +1052,28 @@ class Game:
                         self.lobby.dungeon.floor += 1
                 elif win == True:
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
-                    print("\033[3mInfo:\033[0m You win the fight")
-                    print(f"      You gain \033[1;33m{element.exp} exp\033[0m and \033[1;33m{element.gold} gold\033[0m")
+                    printInfo([("You win the fight", 9, None)])
+                    printInfo([(f"You gain {element.exp} exp and {element.gold} gold", 9, None)])
                     self.player.exp += element.exp
                     self.player.gold += element.gold
                     if self.player.exp >= (self.player.level*5)**2:
                         self.player.exp = 0
                         if self.player.level < 50:
                             self.player.level += 1
-                            print("      You level up")
-                            print("      You are now level", self.player.level)
+                            printInfo([("You level up", 9, None)])
+                            printInfo([(f"You are now level {self.player.level}", 9, None)])
                         elif self.player.level == 50:
-                            print("      You are now level max, you can't level up anymore")
+                            printInfo([("You are level max, you can't level up anymore", 9, None)])
                 else:
                     self.currentRoom = self.lobby
                     self.player.health = 100
                     self.lobby.dungeon.makeDungeon(self.player.level)
                     self.lobby.placePortal()
-                    print("\033[3mInfo:\033[0m You died, you will be teleported back to the \033[32mlobby\033[0m")
-                    print("      You lose all your exp and level")
+                    printInfo([("You died, you will be teleported back to the ", 9, None), ("lobby", 3, "bold")])
+                    printInfo([("You lose all your gold", 9, None)])
                     self.player.exp = 0
                     self.player.level = 1
                 self.save()
-                print(separator)
                 spaceToContinue()
             elif element == "C": #if there is a chest open it
                 InventoryUI(self.player.inventory, self.player).run()
@@ -1110,33 +1087,28 @@ class Game:
         self.printRoom()
 
     def interactionInfo(self):
+        clearInfo()
         """Prints info about the interaction with the element around the player"""
         adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal:
                 if type(self.currentRoom) == Lobby:
-                    print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to start a \033[1;35mdungeon\033[0m")
+                    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to start a ", 9, None), ("dungeon", 4, "bold")])
                 else:
                     if self.currentRoom.portal.room2 == None:
-                        print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go back to the \033[32mlobby\033[0m")
+                        printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to go back to the ", 9, None), ("lobby", 3, "bold")])
                     else:
-                        print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to go to the next \033[1;35mroom\033[0m")
-                print(separator)
+                        printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to go to the next ", 9, None), ("floor", 4, "bold")])
             elif type(element) == Enemy:
-                print(f"\033[3mInfo:\033[0m You encounter \033[3;31m{element.name}\033[0m.\n      Press \033[1m˽\033[0m to start the \033[31mfight\033[0m")
-                print(separator)
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to start the ", 9, None), ("fight", 1, "bold")])
             elif type(element) == Treasure:
-                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to open the \033[33mtreasure\033[0m")
-                print(separator)
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("treasure", 2, "bold")])
             elif element == "C":
-                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to see your \033[33minventory\033[0m")
-                print(separator)
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open your ", 9, None), ("inventory", 3, "bold")])
             elif element == "G":
-                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to see your \033[33mspell tree\033[0m")
-                print(separator)
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to see your ", 9, None), ("spell tree", 4, "bold")])
             elif element == "S":
-                print("\033[3mInfo:\033[0m Press \033[1m˽\033[0m to check the \033[33mshop\033[0m")
-                print(separator)
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("shop", 3, "bold")])
 
     def playerMove(self, direction):
         """Player Movement Handler. Move the player in the room depending on the direction"""
@@ -1165,42 +1137,36 @@ class Game:
 
     def printRoom(self):
         """Prints the room and all infos -> called after every player action"""
-        clear()
-        print(separator)
+        clearMain()
         #print current room name
-        print("\033[1mCurrent room:\033[0m ", end="")
         if type(self.currentRoom) == Lobby:
-            print("\033[32mLobby\033[0m")
+            text = "Lobby"
         else:
-            print("\033[1;35mDungeon: Floor", self.lobby.dungeon.floor, "of", len(self.lobby.dungeon.rooms) - 1, "\033[0m")
-        print(separator)
-        print("\033[1;33mGold:\033[0m", self.player.gold)
-        print(separator)
+            text = f"Dungeon: Floor {self.lobby.dungeon.floor + 1} of {len(self.lobby.dungeon.rooms)}"
+        printText(statsWin, 0, [("Current Room: ", 9, None), (text, 9, "bold")])
+        printText(statsWin, 1, [(f"Gold: {self.player.gold}", 2, None)])
         if self.currentRoom == self.lobby:
             mist = False
         else:
             mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
-        #use curses
-        
+        printMap(self.currentRoom.render)
 
-        print(separator)
         #print player info
         healthText = f'Health: {self.player.health}/100'
-        manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
-        whiteSpace = " " * (61 - len(healthText) - len(manaText))
-        print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
         healthBar = bar(self.player.health, 100)
-        manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
-        whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
-        print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
+        printText(statsWin, 2, [(healthText, 9, None)])
+        printText(statsWin, 3, [(healthBar, 9, None)])
+        manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
+        manaBar = bar(self.player.mana, self.player.maxMana)
+        printText(statsWin, 4, [(manaText, 9, None)])
+        printText(statsWin, 5, [(manaBar, 9, None)])
         expText = f'Exp: {self.player.exp}/{(self.player.level*5)**2}'
         levelText = f'Level: {self.player.level}'
-        whiteSpace = " " * (61 - len(expText) - len(levelText))
-        print(f'\033[33m{expText}\033[0m{whiteSpace}\033[33m{levelText}\033[0m')
-        expBar = bar(self.player.exp, (self.player.level*10)**2, length=59)
-        print(f'\033[33m{expBar}\033[0m')
-        print(separator)
+        whiteSpace = " " * (60 - len(expText) - len(levelText))
+        expBar = bar(self.player.exp, (self.player.level*10)**2, length=58)
+        printText(statsWin, 6, [(expText, 9, None), (whiteSpace, 9, None), (levelText, 9, None)])
+        printText(statsWin, 7, [(expBar, 9, None)])
         self.interactionInfo()
 
     def save(self):
@@ -1522,7 +1488,7 @@ class Fight:
 
     def print(self):
         """Prints the fight screen with all infos"""
-        clear()
+        clearMain()
         #print enemy info
         print(f"\033[1;31m{self.enemy.name} - {self.enemy.type}:\033[0m")
         healthText = f'Health: {self.enemy.health}/100'

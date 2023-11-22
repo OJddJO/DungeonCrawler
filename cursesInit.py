@@ -3,10 +3,13 @@ from curses import textpad
 
 screen = curses.initscr()
 screen.clear()
-screen.keypad(True)
-mainWin = curses.newwin(42, 121, 1, 1) #size 41, 121
-statsWin = curses.newwin(42, 60, 1, 125) #size 41, 61
-infoWin = curses.newwin(7, 183, 43, 1) #size 6, 183
+# screen.keypad(True)
+mainWin = curses.newwin(43, 123, 0, 0) #size 41, 121
+mainWin.border()
+statsWin = curses.newwin(43, 61, 0, 124) #size 41, 59
+statsWin.border()
+infoWin = curses.newwin(8, 185, 43, 0) #size 6, 183
+infoWin.border()    
 curses.curs_set(0)
 curses.start_color()
 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE) #wall (black on white)
@@ -39,29 +42,20 @@ def clearAll():
     clearStats()
     clearInfo()
 
-def drawOutlines():
-    textpad.rectangle(screen, 0, 0, 42, 122) #main rectangle
-    textpad.rectangle(screen, 0, 124, 42, 184) # stats rectangle
-    textpad.rectangle(screen, 42, 0, 49, 184) # info rectangle
-
 def refreshAll():
     mainWin.refresh()
     statsWin.refresh()
     infoWin.refresh()
-    textpad.rectangle(screen, 0, 0, 42, 122) #main rectangle
-    textpad.rectangle(screen, 0, 124, 42, 184) # stats rectangle
-    textpad.rectangle(screen, 43, 0, 50, 184) # info rectangle
-    screen.refresh()
 
 
 def printMap(matrix):
-    for i, row in enumerate(matrix):
-        for j, element in enumerate(row): #element is a tuple (char, color)
+    for i, row in enumerate(matrix, 1):
+        for j, element in enumerate(row, 1): #element is a tuple (char, color)
             mainWin.addch(i, j, element[0], curses.color_pair(element[1]))
     mainWin.refresh()
 
 def printText(win, line, text):
-    cursor = 0
+    cursor = 1
     for element in text:
         col = curses.color_pair(element[1])
         if element[2] == "bold":
