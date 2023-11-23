@@ -25,16 +25,19 @@ curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_BLACK) # for text base colo
 
 def clearMain():
     mainWin.clear()
+    mainWin.border()
     mainWin.refresh()
 
 def clearStats():
     statsWin.clear()
+    statsWin.border()
     statsWin.refresh()
 
 def clearInfo():
     global infoList
     infoList = []
     infoWin.clear()
+    infoWin.border()
     infoWin.refresh()
 
 def clearAll():
@@ -62,7 +65,7 @@ def printText(win, line, text):
             col += curses.A_BOLD
         elif element[2] == "italic":
             col += curses.A_ITALIC
-        win.addstr(line, cursor, element[0], col)
+        win.addstr(line+1, cursor, element[0], col)
         cursor += len(element[0])
     win.refresh()
 
@@ -71,7 +74,7 @@ def printInfo(text):
     infoList.append(text) #need to be [("string", color, type of text)]
     infoList.pop(0) if len(infoList) > 6 else None
     for i, text in enumerate(infoList):
-        printText(infoWin, 6-i, text)
+        printText(infoWin, 5-i, text)
 
 
 if __name__ == "__main__":
@@ -80,6 +83,7 @@ if __name__ == "__main__":
     from classes.Player import Player
 
     refreshAll()
+    clearMain()
     # room = Room(Player("warrior"), 1, Lobby(Player("warrrior"))).colorMap()
     room = Lobby(Player()).colorMap(mist=False)
     printMap(room)

@@ -69,18 +69,21 @@ color = { #color for rarity
 
 class Menu:
     """Menu class, used to create menus"""
-    def __init__(self, title, option, onSpace):
-        """Constructor for the Menu class, takes in title, option, and onSpace"""
+    def __init__(self, title, option, onSpace, addInfos=lambda:None):
+        """Constructor for the Menu class, takes in title, option, onSpace, and addInfos by default a function that does nothing"""
         self.title = title
         self.option = option
         self.select = 0
         self.onSpace = onSpace
+        self.addInfos = addInfos
         self.runVar = True
 
     def printMenu(self):
         """Prints the menu"""
         clearMain()
-        # printText(mainWin, 0, [(self.title, 9, "bold")])
+        for i, element in enumerate(self.title):
+            printText(mainWin, i, [(element, 9, "bold")])
+        self.addInfos()
         printText(mainWin, 5, [(separator, 9, None)])
         #selected option will be in green
         for i, option in enumerate(self.option):
@@ -123,7 +126,7 @@ class MainMenu(Menu):
     def __init__(self):
         """Constructor for the MainMenu class"""
         clearAll()
-        title = open("ascii/title", "r").read()
+        title = open("ascii/title", "r").readlines()
         options = ("New Game", "Continue", "Options", "How to play", "Exit")
         super().__init__(title, options, self.onSpace)
 
@@ -169,7 +172,7 @@ class RoleMenu(Menu):
     """RoleMenu class, used to create the role menu"""
     def __init__(self):
         """Constructor for the RoleMenu class"""
-        title = open("ascii/role", "r").read()
+        title = open("ascii/role", "r").readlines()
         options = ("Warrior", "Mage", "Archer", "Random", "Back")
         super().__init__(title, options, self.onSpace)
 
@@ -194,10 +197,10 @@ class RoleMenu(Menu):
 class HelpMenu(Menu):
     """HelpMenu class, used to create the help menu"""
     def __init__(self):
-        clearAll()
         """Constructor for the HelpMenu class"""
-        title = open("ascii/help", "r").read()
+        clearAll()
         options = ("How to play", "Map", "Save", "Back")
+        title = open("ascii/help", "r").readlines()
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
@@ -242,7 +245,7 @@ class OptionMenu(Menu):
     """OptionMenu class, used to create the option menu"""
     def __init__(self):
         clearAll()
-        title = open("ascii/options", "r").read()
+        title = open("ascii/options", "r").readlines()
         options = ("Keybind", "Back")
         super().__init__(title, options, self.onSpace)
 
@@ -259,7 +262,7 @@ class KeybindMenu(Menu):
     """KeybindMenu class, used to create the keybind menu"""
     def __init__(self):
         clearAll()
-        title = open("ascii/keybind", "r").read()
+        title = open("ascii/keybind", "r").readlines()
         options = [f"Up: [{keybind['up']}]", f"Down: [{keybind['down']}]", f"Left: [{keybind['left']}]", f"Right: [{keybind['right']}]", "Back"]
         super().__init__(title, options, self.onSpace)
 
@@ -307,7 +310,7 @@ class PauseMenu(Menu):
     def __init__(self, game):
         """Constructor for the PauseMenu class, takes in game"""
         clearAll()
-        title = open("ascii/pause", "r").read()
+        title = open("ascii/pause", "r").readlines()
         options = ("Resume", "Save", "Options", "Exit")
         super().__init__(title, options, self.onSpace)
         self.game = game
@@ -324,6 +327,7 @@ class PauseMenu(Menu):
             case 2:
                 OptionMenu().run()
             case 3:
+                clearMain()
                 printText(mainWin, 0, [("WARNING", 1, "bold"), (": You will lose your progression", 9, None)])
                 printText(mainWin, 1, [("Are you sure you want to exit ?", 9, "bold")])
                 printText(mainWin, 2, [("1. Yes    2. No", 9, None)])
@@ -342,7 +346,7 @@ class Shop(Menu):
         """Constructor for the Shop class, takes in player"""
         clearAll()
         self.player = player
-        title = open("ascii/shop", "r").read()
+        title = open("ascii/shop", "r").readlines()
         self.createOptions()
         super().__init__(title, self.options, self.onSpace)
 
@@ -374,7 +378,7 @@ class ItemShop(Menu):
             self.item = HealItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['rarity'], self.data['value'])
         elif self.data['type'] == "buff":
             self.item = BuffItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['buff'], self.data['duration'], self.data['rarity'], self.data['value'])
-        title = open("ascii/shop", "r").read()
+        title = open("ascii/shop", "r").readlines()
         option = ["Information", "Buy", "Back"]
         super().__init__(title, option, self.onSpace)
 
@@ -409,7 +413,7 @@ class InventoryUI(Menu):
         clearAll()
         self.inventory = inventory
         self.player = player
-        title = open('ascii/inventory', 'r').read()
+        title = open('ascii/inventory', 'r').readlines()
         options = ["Items", "Gear", "Back"]
         super().__init__(title, options, self.onSpace)
 
@@ -433,7 +437,7 @@ class ItemInventoryUI(Menu):
         self.player = player
         self.inFight = inFight
         if self.inFight: self.used = False
-        title = open('ascii/inventory', 'r').read()
+        title = open('ascii/inventory', 'r').readlines()
         self.rewriteOptions()
         super().__init__(title, self.option, self.onSpace)
 
@@ -475,9 +479,13 @@ class ItemUI(Menu):
         self.inFight = inFight
         if self.inFight:
             self.used = False
-        title = f"{open('ascii/inventory', 'r').read()}\n{item[0].name} x{item[1]}"
+        title = open('ascii/inventory', 'r').readlines()
         options = ["Information", "Use", "Throw One", "Throw All", "Back"]
         super().__init__(title, options, self.onSpace)
+
+    def addInfos(self):
+        text = f"{self.item.name} x{self.quantity}"
+        printText(mainWin, 5, [(text, 9, "bold")])
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
@@ -494,7 +502,6 @@ class ItemUI(Menu):
                 if use:
                     self.item.onUse(self.player)
                     self.inventory.removeItem(self.item)
-                    self.title = f"{open('ascii/inventory', 'r').read()}\n{self.item.name} x{self.quantity}"
                     printInfo([("You used ", 9, None), (f" {self.item.name} ", 9, "bold")])
                     printInfo([("You now have ", 9, None), (f" {self.quantity} ", 9, "bold"), ("x ", 9, None), (f" {self.item.name} ", 9, "bold")])
                     printInfo([("You have ", 9, None), (f" {self.player.gold} ", 9, "bold"), ("gold left", 9, None)])
@@ -518,7 +525,7 @@ class GearInventoryUI(Menu):
         clearAll()
         self.inventory = inventory
         self.player = player
-        title = open('ascii/inventory', 'r').read()
+        title = open('ascii/inventory', 'r').readlines()
         self.rewriteOptions()
         super().__init__(title, self.option, self.onSpace)
 
@@ -550,9 +557,14 @@ class GearUI(Menu):
         self.inventory = inventory
         self.gear = gear
         self.player = player
-        title = f"{open('ascii/inventory', 'r').read()}\n{color[self.gear.rarity]} {self.gear.name}\033[0m"
+        title = open('ascii/inventory', 'r').readlines()
         options = ["Equip", "Throw", "Back"]
-        super().__init__(title, options, self.onSpace)
+        super().__init__(title, options, self.onSpace, self.addInfos)
+
+    def addInfos(self):
+        """Function to add more infos on the menu"""
+        text = self.gear.name
+        printText(mainWin, 5, [(text, 9, "bold")])
 
     def printMenu(self):
         """Prints the menu with the information about the gear"""
@@ -583,7 +595,7 @@ class GearUI(Menu):
             printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} {armorDiff}", 9, "bold")])
         printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} {manaDiff}", 9, "bold")])
 
-        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{color[equiped.rarity]} {equiped.name}\033[0m", 9, "bold")]) # equiped gear
+        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{color[equiped.rarity]} {equiped.name}", 9, "bold")]) # equiped gear
         printText(mainWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
         printText(mainWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
         if part == Weapon:
