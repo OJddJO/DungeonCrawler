@@ -80,7 +80,7 @@ class Menu:
 
     def printMenu(self):
         """Prints the menu"""
-        clearMain()
+        clearAll()
         for i, element in enumerate(self.title):
             printText(mainWin, i, [(element, 9, "bold")])
         self.addInfos()
@@ -710,7 +710,7 @@ class SpellTree:
             symbol = branch.spell.symbol
             line1 = "╔═╩═╗"
             if selected:
-                line2 = f"║\033[30;107m{symbol} \033[0m║"
+                line2 = f"║{symbol} ║"
             else:
                 line2 = f"║{symbol} ║"
             if len(branch.branches) == 0:
@@ -1175,8 +1175,8 @@ class Game:
         printText(statsWin, 5, [(manaBar, 9, None)])
         expText = f'Exp: {self.player.exp}/{(self.player.level*5)**2}'
         levelText = f'Level: {self.player.level}'
-        whiteSpace = " " * (60 - len(expText) - len(levelText))
-        expBar = bar(self.player.exp, (self.player.level*10)**2, length=58)
+        whiteSpace = " " * (59 - len(expText) - len(levelText))
+        expBar = bar(self.player.exp, (self.player.level*10)**2, length=57)
         printText(statsWin, 6, [(expText, 9, None), (whiteSpace, 9, None), (levelText, 9, None)])
         printText(statsWin, 7, [(expBar, 9, None)])
         self.interactionInfo()
