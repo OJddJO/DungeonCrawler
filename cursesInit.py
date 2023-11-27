@@ -69,6 +69,10 @@ def printText(win, line, text):
         cursor += len(element[0])
     win.refresh()
 
+def printMultipleText(win, line, listText):
+    for i, text in enumerate(listText):
+        printText(win, line+i, text)
+
 infoList = [] #list ex: [[("You", 3, "bold"), (" are ", 9, None), ("burning", 4, None), (" for 2 turns", 9, None)]] list of list of tuple that contain a string, a color code and a type
 def printInfo(text):
     infoList.append(text) #need to be [("string", color, type of text)]
@@ -76,6 +80,9 @@ def printInfo(text):
     for i, text in enumerate(infoList):
         printText(infoWin, 5-i, text)
 
+def printMultipleInfo(listText):
+    for text in listText:
+        printInfo(text)
 
 if __name__ == "__main__":
     import time

@@ -44,12 +44,12 @@ class DamageSpell(Spell):
             dmg -= target.armor.onUse()
         if dmg < 0:
             dmg = 0
-        text = f"{user.name} used {self.name} on {target.name} for {dmg} damage"
+        text = [[(f"{user.name} used {self.name} on {target.name} for {dmg} damage", 9, None)]]
         if haveBuff("vampirism", user):
             user.health += dmg // 4
             if user.health > 100:
                 user.health = 100
-            text += f"\n\033[32mYou\033[0m gain \033[1;31m{dmg // 4} health\033[0m from \033[31m{target.name}\033[0m's blood"
+            text.append([("You ", 5, None), ("gain ", 9, None), (f"{dmg // 4} health", 4, None), (" from ", 9, None), (f"{target.name}", 3, None), ("'s blood", 9, None)])
         target.health -= dmg
         return text
     
@@ -81,7 +81,7 @@ class HealSpell(Spell):
         target.health += hp
         if target.health > 100:
             target.health = 100
-        return f"{user.name} used {self.name} on {target.name} for {hp} health"
+        return [[(f"{user.name} used {self.name} on {target.name} for {hp} health", 9, None)]]
     
     def __dict__(self):
         """Returns a dictionary representation of the spell"""
@@ -108,20 +108,20 @@ class BuffSpell(Spell):
     def onUse(self, user, target):
         """Apply the spell to the target and returns a string of the action"""
         user.mana -= self.cost
-        text = ""
+        text = []
         for buff in self.buff:
             existingBuff = [element[0] for element in target.buff]
             if buff in existingBuff:
                 target.buff[existingBuff.index(buff)][1] += self.duration
             else:
                 target.buff.append([buff, self.duration])
-            text += f"{target.name} gained {buff} for {self.duration} turns\n"
+            text.append([(f"{target.name} gained {buff} for {self.duration} turns", 9, None)])
         if self.heal > 0:
             hp = int(self.heal+(user.mana*self.scale))
             target.health += hp
             if target.health > 100:
                 target.health = 100
-            text += f"{target.name} healed {hp} health"
+            text.append([(f"{target.name} healed {hp} health", 9, None)])
         return text
     
     def __dict__(self):
@@ -152,14 +152,14 @@ class DebuffSpell(Spell):
     def onUse(self, user, target):
         """Apply the spell to the target and returns a string of the action"""
         user.mana -= self.cost
-        text = ""
+        text = []
         for debuff in self.debuff:
             existingDebuff = [element[0] for element in target.debuff]
             if debuff in existingDebuff:
                 target.debuff[existingDebuff.index(debuff)][1] += self.duration
             else:
                 target.debuff.append([debuff, self.duration])
-            text += f"{target.name} gained {debuff} for {self.duration} turns\n"
+            text.append([(f"{target.name} gained {debuff} for {self.duration} turns", 9, None)])
         if self.damage > 0:
             dmg = int(self.damage+(user.mana*self.scale))
             if haveDebuff("break", target):
@@ -169,13 +169,13 @@ class DebuffSpell(Spell):
             if dmg < 0:
                 dmg = 0
             target.health -= dmg
-            text += f"{target.name} took {dmg} damage"
+            text.append([(f"{target.name} took {dmg} damage", 9, None)])
             
             if haveBuff("vampirism", user):
                 user.health += dmg // 4
                 if user.health > 100:
                     user.health = 100
-                text += f"\n\033[32mYou\033[0m gain \033[1;31m{dmg // 4} health\033[0m from \033[31m{target.name}\033[0m's blood"
+                text.append([("You ", 5, None), ("gain ", 9, None), (f"{dmg // 4} health", 4, None), (" from ", 9, None), (f"{target.name}", 3, None), ("'s blood", 9, None)])
 
         return text    
     

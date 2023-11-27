@@ -396,7 +396,7 @@ class ItemShop(Menu):
                     i = self.player.inventory.getExistingItems().index(self.item.name)
                     qty = self.player.inventory.items[i][1]
                     printText(mainWin, 1, [("You now have ", 9, None), (f" {qty} ", 9, "bold"), ("x ", 9, None), (f" {self.item.name} ", 9, "bold")])
-                    printText(mainWin, 2, [("You have ", 9, None), (f" {self.player.gold} ", 9, "bold"), ("gold left", 9, None)])
+                    printText(mainWin, 2, [("You have ", 9, None), (self.player.gold, 2, "bold"), (" gold left", 9, None)])
                     spaceToContinue()
                 else:
                     printText(mainWin, 0, [("You don't have enough gold", 1, None)])
@@ -502,9 +502,9 @@ class ItemUI(Menu):
                 if use:
                     self.item.onUse(self.player)
                     self.inventory.removeItem(self.item)
-                    printInfo([("You used ", 9, None), (f" {self.item.name} ", 9, "bold")])
-                    printInfo([("You now have ", 9, None), (f" {self.quantity} ", 9, "bold"), ("x ", 9, None), (f" {self.item.name} ", 9, "bold")])
-                    printInfo([("You have ", 9, None), (f" {self.player.gold} ", 9, "bold"), ("gold left", 9, None)])
+                    printInfo([("You used ", 9, None), (self.item.name, 9, "bold")])
+                    printInfo([("You now have ", 9, None), (self.quantity, 9, "bold"), (" x ", 9, None), (self.item.name, 9, "bold")])
+                    printInfo([("You have ", 9, None), (self.player.gold, 9, "bold"), (" gold left", 9, None)])
                 if not self.inFight:
                     spaceToContinue()
                 else:
@@ -1267,7 +1267,7 @@ class Fight:
         #purify effect (player only)
         if self.haveBuff("purify", self.player):
             self.player.debuff = []
-            print(f"\033[3;92m{self.player.name}\033[0m are purified ! All debuffs are removed")
+            printInfo(["You ", 5, None], ["are purified ! All debuffs are removed", 9, None])
             spaceToContinue()
         #skip potion
         if self.haveBuff("skip", self.player):
@@ -1294,11 +1294,11 @@ class Fight:
         p = False
         if self.haveDebuff("poison", self.player):
             self.player.health -= 5
-            print(f"\033[3;31m{self.player.name}\033[0m are poisoned and lose \033[1;31m5 health\033[0m")
+            printInfo([("You ", 5, None), ("are poisoned and lose ", 9, None), ("5 health", 4, None)])
             p = True
         if self.haveDebuff("poison", self.enemy):
             self.enemy.health -= 5
-            print(f"\033[3;31m{self.enemy.name}\033[0m is poisoned and loses \033[1;31m5 health\033[0m")
+            printInfo([(self.enemy.name, 3, None), (" is poisoned and loses ", 9, None), ("5 health", 4, None)])
             p = True
         if p:
             spaceToContinue()
@@ -1307,11 +1307,11 @@ class Fight:
         b = False
         if self.haveDebuff("burn", self.player):
             self.player.health -= 5
-            print(f"\033[3;31m{self.player.name}\033[0m are burning and lose \033[1;31m5 health\033[0m")
+            printInfo([("You ", 5, None), ("are burning and lose ", 9, None), ("5 health", 4, None)])
             b = True
         if self.haveDebuff("burn", self.enemy):
             self.enemy.health -= 5
-            print(f"\033[3;31m{self.enemy.name}\033[0m is burning and loses \033[1;31m5 health\033[0m")
+            printInfo([(self.enemy.name, 3, None), (" is burning and loses ", 9, None), ("5 health", 4, None)])
             b = True
         if b:
             spaceToContinue()
@@ -1323,7 +1323,7 @@ class Fight:
             for i, element in enumerate(self.player.buff):
                 if element[0] == "revive":
                     self.player.buff.pop(i)
-            print(f"\033[3;92m{self.player.name}\033[0m is revived !")
+            printInfo([("You ", 5, None), ("are revived !", 9, None)])
             spaceToContinue()
 
         self.removeBuffDebuff(self.player)
@@ -1355,25 +1355,25 @@ class Fight:
                 text = spell.onUse(self.enemy, self.enemy)
             elif type(spell) == DebuffSpell:
                 text = spell.onUse(self.enemy, self.player)
-            print(text)
+            printMultipleInfo(text)
         else:
-            print(f"\033[31m{self.enemy.name}\033[0m has exhausted all his mana and can't cast any spell")
+            printInfo([(self.enemy.name, 3, None), (" has exhausted all his mana and can't cast any spell", 9, None)])
 
     def enemyTurn(self):
         """Enemy Turn Handler. Manages the enemy turn"""
         if self.haveDebuff("stun", self.enemy):
-            print(f"\033[31m{self.enemy.name}\033[0m is stunned and can't do anything")
+            printInfo([(self.enemy.name, 3, None), (" is stunned and can't do anything", 9, None)])
         else:
-            print(f"\033[1;31m{self.enemy.name}'s turn\033[0m")
+            printInfo([(self.enemy.name, 3, "bold"), ("'s turn", 9, "bold")])
             randomAction = random.randint(1, 2)
             match randomAction:
                 case 1:
                     self.evalDamage(self.enemy, self.player)
                 case 2:
-                    print(f"\033[31m{self.enemy.name}\033[0m uses a spell")
+                    printInfo([(self.enemy.name, 3, None), (" uses a spell", 9, None)])
                     if self.haveBuff("invulnerable", self.player):
-                        print("\033[32mYou\033[0m are invulnerable !")
-                        print(f"\033[31m{self.enemy.name}\033[0m's spell has no effect on \033[32mYou\033[0m")
+                        printInfo([("You ", 5, None), ("are invulnerable !", 9, None)])
+                        printInfo([(self.enemy.name, 3, None), ("'s spell has no effect on ", 5, None), ("You", 5, None)])
                     else:
                         self.enemySpell()
         spaceToContinue()
@@ -1381,11 +1381,11 @@ class Fight:
     def playerTurn(self):
         """Player Turn Handler. Manages the player turn"""
         if self.haveDebuff("stun", self.player):
-            print("\033[32mYou\033[0m are stunned and can't do anything")
+            printInfo([("You ", 5, None), ("are stunned and can't do anything", 9, None)])
         else:
             #player choose an action
-            print("Choose an action:")
-            print("1. Attack    2. Spell    3. Item    4. Run")
+            printInfo([("Choose an action", 9, None)])
+            printInfo([("1. Attack    2. Spell    3. Item    4. Run", 9, None)])
             getInput = True
             while getInput:
                 if keyPress('1'): #attack
@@ -1393,14 +1393,14 @@ class Fight:
                     getInput = False
                 elif keyPress('2'): #skill
                     if len(self.player.spells) == 0:
-                        print("\033[32mYou\033[0m don't have any spell")
+                        printInfo([("You ", 5, None), ("don't have any spell", 9, None)])
                         spaceToContinue()
                         self.print()
                         self.playerTurn()
                     else:
                         if self.haveBuff("invulnerable", self.enemy):
-                            print(f"\033[31m{self.enemy.name}\033[0m is invulnerable !")
-                            print("\033[32mYou\033[0mr spell has no effect on him")
+                            printInfo([(self.enemy.name, 3, None), (" is invulnerable !", 9, None)])
+                            printInfo([("Your spell has no effect on him", 9, None)])
                         else:
                             spell = SpellTree(self.player.role, self.player, inFight=True, enemy=self.enemy)
                             spell.run()
@@ -1416,7 +1416,7 @@ class Fight:
                             empty = False
                             break
                     if empty:
-                        print("\033[32mYou\033[0m don't have any item")
+                        printInfo([("You ", 5, None), ("don't have any item", 9, None)])
                         spaceToContinue()
                         self.print()
                         self.playerTurn()
@@ -1428,13 +1428,13 @@ class Fight:
                             self.playerTurn()
                     getInput = False
                 elif keyPress('4'): #run
-                    print("\033[32mYou\033[0m try to flee")
+                    printInfo([("You ", 5, None), ("try to flee", 9, None)])
                     flee = random.randint(1, 2)
                     if flee == 1:
-                        print("\033[32mYou\033[0m successfully flee")
+                        printInfo([("You ", 5, None), ("successfully flee", 9, None)])
                         self.flee = True
                     else:
-                        print("\033[32mYou\033[0m failed to flee")
+                        printInfo([("You ", 5, None), ("failed to flee", 9, None)])
                     getInput = False
         if self.player.mana < self.player.maxMana:
             self.player.mana += self.player.maxMana // 20
@@ -1447,11 +1447,11 @@ class Fight:
         """Evaluates the damage dealt by the user to the target and applies it"""
         if self.haveBuff("invulnerable", target):
             if user == self.player:
-                print(f"\033[31m{target.name}\033[0m is invulnerable !")
-                print("Your attack has no effect on him")
+                printInfo([(target.name, 3, None), (" is invulnerable !", 9, None)])
+                printInfo([("Your attack has no effect on him", 9, None)])
             else:
-                print("\033[32mYou\033[0m are invulnerable !")
-                print(f"\033[31m{user.name}\033[0m's attack has no effect on \033[32mYou\033[0m")
+                printInfo([("You ", 5, None), ("are invulnerable !", 9, None)])
+                printInfo([(user.name, 3, None), ("'s attack has no effect on ", 5, None), ("You", 5, None)])
         else:
             baseAtk = user.weapon.onUse()
             atk = baseAtk + random.randint(-1//(baseAtk // 5), 1//(baseAtk // 5))
@@ -1467,16 +1467,15 @@ class Fight:
             target.health -= atk
 
             if user == self.player:
-                print(f"\033[32mYou\033[0m deal {atk} damage to \033[31m{target.name}\033[0m")
+                printInfo([("You ", 5, None), ("deal ", 9, None), (f"{atk} damage", 4, None), (" to ", 9, None), (target.name, 3, None)])
 
                 if self.haveBuff("vampirism", user):
                     user.health += atk // 4
                     if user.health > 100:
                         user.health = 100
-                    print(f"\033[32mYou\033[0m gain \033[1;31m{atk // 4} health\033[0m from \033[31m{target.name}\033[0m's blood")
+                    printInfo([("You ", 5, None), ("gain ", 9, None), (f"{atk // 4} health", 4, None), (" from ", 9, None), (target.name, 3, None), ("'s blood", 9, None)])
             else:
-                print(f"\033[31m{user.name}\033[0m attacks \033[32mYou\033[0m !")
-                print(f"\033[31m{user.name}\033[0m deals {atk} damage to \033[32mYou\033[0m")
+                printInfo([(user.name, 3, None), (" attacks you and deals ", 9, None), (f"{atk} damage", 4, None), (" to ", 9, None), ("You", 5, None)])
 
     def endFight(self):
         """Test if the fight is over"""
@@ -1500,30 +1499,30 @@ class Fight:
 
     def print(self):
         """Prints the fight screen with all infos"""
-        clearMain()
+        clearAll()
         #print enemy info
-        print(f"\033[1;31m{self.enemy.name} - {self.enemy.type}:\033[0m")
+        printText(statsWin, 0, [("Enemy: ", 9, None), (f"{self.enemy.name} - {self.enemy.type}", 3, None)])
         healthText = f'Health: {self.enemy.health}/100'
-        print(f'\033[31m{healthText}\033[0m')
+        printText(statsWin, 1, [(healthText, 4, None)])
         healthBar = bar(self.enemy.health, 100)
-        print(f'\033[31m{healthBar}\033[0m')
-        # buffList = [element[0] for element in self.enemy.buff]
-        print(f"\033[32mBuff:\033[0m {self.enemy.buff}")
-        # debuffList = [element[0] for element in self.enemy.debuff]
-        print(f"\033[31mDebuff:\033[0m {self.enemy.debuff}")
+        printText(statsWin, 2, [(healthBar, 4, None)])
+        buffList = [element[0] for element in self.enemy.buff]
+        printText(statsWin, 3, [(f"Buff: {buffList}", 9, None)])
+        debuffList = [element[0] for element in self.enemy.debuff]
+        printText(statsWin, 4, [(f"Debuff: {debuffList}", 9, None)])
         self.enemy.render()
         #print player info
-        print("\033[1;32mYou\033[0m:")
+        printText(statsWin, 6, [("You: ", 5, None)])
         healthText = f'Health: {self.player.health}/100'
-        manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
-        whiteSpace = " " * (61 - len(healthText) - len(manaText))
-        print(f'\033[31m{healthText}\033[0m{whiteSpace}\033[36m{manaText}\033[0m')
+        printText(statsWin, 7, [(healthText, 4, None)])
         healthBar = bar(self.player.health, 100)
-        manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
-        whiteSpace = " " * (61 - len(healthBar) - len(manaBar))
-        print(f'\033[31m{healthBar}\033[0m{whiteSpace}\033[36m{manaBar}\033[0m')
-        # buffList = [element[0] for element in self.player.buff]
-        print(f"\033[32mBuff:\033[0m {self.player.buff}")
-        # debuffList = [element[0] for element in self.player.debuff]
-        print(f"\033[31mDebuff:\033[0m {self.player.debuff}")
+        printText(statsWin, 8, [(healthBar, 4, None)])
+        manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
+        printText(statsWin, 9, [(manaText, 6, None)])
+        manaBar = bar(self.player.mana, self.player.maxMana)
+        printText(statsWin, 10, [(manaBar, 6, None)])
+        buffList = [element[0] for element in self.player.buff]
+        printText(statsWin, 11, [(f"Buff: {buffList}", 9, None)])
+        debuffList = [element[0] for element in self.player.debuff]
+        printText(statsWin, 12, [(f"Debuff: {debuffList}", 9, None)])
         print(separator)
