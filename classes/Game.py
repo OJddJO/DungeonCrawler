@@ -57,14 +57,14 @@ def spaceToContinue():
         if keyPress('space'):
             wait = False
 
-separator = "─" * 61
+separator = "─" * 200
 color = { #color for rarity
-    1: "\033[1;37mCommon",
-    2: "\033[1;36mUncommon",
-    3: "\033[1;34mRare",
-    4: "\033[1;35mEpic",
-    5: "\033[1;33mLegendary",
-    6: "\033[1;31mMythic"
+    1: "Common",
+    2: "Uncommon",
+    3: "Rare",
+    4: "Epic",
+    5: "Legendary",
+    6: "Mythic"
 }
 
 class Menu:
@@ -81,16 +81,20 @@ class Menu:
     def printMenu(self):
         """Prints the menu"""
         clearAll()
+        if type(self.title) == str:
+            self.title = self.title.split("\n")
         for i, element in enumerate(self.title):
             printText(mainWin, i, [(element, 9, "bold")])
-        self.addInfos()
-        printText(mainWin, 5, [(separator, 9, None)])
+        addLine = self.addInfos()
+        if addLine == None:
+            addLine = 0
+        printText(mainWin, 5+addLine, [(separator, 9, None)])
         #selected option will be in green
         for i, option in enumerate(self.option):
             if i == self.select:
-                printText(mainWin, i+6, [(">", 5, "bold"), (option, 5, "bold")])
+                printText(mainWin, i+6+addLine, [(">", 5, "bold"), (option, 5, "bold")])
             else:
-                printText(mainWin, i+6, [(option, 9, None)])
+                printText(mainWin, i+6+addLine, [(option, 9, None)])
         refreshAll()
 
     def selectOption(self):
@@ -126,7 +130,7 @@ class MainMenu(Menu):
     def __init__(self):
         """Constructor for the MainMenu class"""
         clearAll()
-        title = open("ascii/title", "r").readlines()
+        title = open("ascii/title", "r").read()
         options = ("New Game", "Continue", "Options", "How to play", "Exit")
         super().__init__(title, options, self.onSpace)
 
@@ -172,7 +176,7 @@ class RoleMenu(Menu):
     """RoleMenu class, used to create the role menu"""
     def __init__(self):
         """Constructor for the RoleMenu class"""
-        title = open("ascii/role", "r").readlines()
+        title = open("ascii/role", "r").read()
         options = ("Warrior", "Mage", "Archer", "Random", "Back")
         super().__init__(title, options, self.onSpace)
 
@@ -200,7 +204,7 @@ class HelpMenu(Menu):
         """Constructor for the HelpMenu class"""
         clearAll()
         options = ("How to play", "Map", "Save", "Back")
-        title = open("ascii/help", "r").readlines()
+        title = open("ascii/help", "r").read()
         super().__init__(title, options, self.onSpace)
 
     def onSpace(self, select):
@@ -245,7 +249,7 @@ class OptionMenu(Menu):
     """OptionMenu class, used to create the option menu"""
     def __init__(self):
         clearAll()
-        title = open("ascii/options", "r").readlines()
+        title = open("ascii/options", "r").read()
         options = ("Keybind", "Back")
         super().__init__(title, options, self.onSpace)
 
@@ -262,7 +266,7 @@ class KeybindMenu(Menu):
     """KeybindMenu class, used to create the keybind menu"""
     def __init__(self):
         clearAll()
-        title = open("ascii/keybind", "r").readlines()
+        title = open("ascii/keybind", "r").read()
         options = [f"Up: [{keybind['up']}]", f"Down: [{keybind['down']}]", f"Left: [{keybind['left']}]", f"Right: [{keybind['right']}]", "Back"]
         super().__init__(title, options, self.onSpace)
 
@@ -278,7 +282,7 @@ class KeybindMenu(Menu):
         """Replaces the key with the input key"""
         clear()
         printText(mainWin, 0, [("Press the key you want to replace", 9, None), (f" {key} ", 5, "bold"), ("with", 9, None)])
-        printText(mainWin, 1, [("Press \033[1m˽\033[0m to cancel", 9, None)])
+        printText(mainWin, 1, [("Press ", 9, None) ("˽", 9, "bold"),  (" to cancel", 9, None)])
         inputKey = keyboard.read_key()
         while keyboard.is_pressed(inputKey): pass
         if inputKey == 'space':
@@ -310,7 +314,7 @@ class PauseMenu(Menu):
     def __init__(self, game):
         """Constructor for the PauseMenu class, takes in game"""
         clearAll()
-        title = open("ascii/pause", "r").readlines()
+        title = open("ascii/pause", "r").read()
         options = ("Resume", "Save", "Options", "Exit")
         super().__init__(title, options, self.onSpace)
         self.game = game
@@ -346,7 +350,7 @@ class Shop(Menu):
         """Constructor for the Shop class, takes in player"""
         clearAll()
         self.player = player
-        title = open("ascii/shop", "r").readlines()
+        title = open("ascii/shop", "r").read()
         self.createOptions()
         super().__init__(title, self.options, self.onSpace)
 
@@ -378,7 +382,7 @@ class ItemShop(Menu):
             self.item = HealItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['rarity'], self.data['value'])
         elif self.data['type'] == "buff":
             self.item = BuffItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['buff'], self.data['duration'], self.data['rarity'], self.data['value'])
-        title = open("ascii/shop", "r").readlines()
+        title = open("ascii/shop", "r").read()
         option = ["Information", "Buy", "Back"]
         super().__init__(title, option, self.onSpace)
 
@@ -413,7 +417,7 @@ class InventoryUI(Menu):
         clearAll()
         self.inventory = inventory
         self.player = player
-        title = open('ascii/inventory', 'r').readlines()
+        title = open('ascii/inventory', 'r').read()
         options = ["Items", "Gear", "Back"]
         super().__init__(title, options, self.onSpace)
 
@@ -437,7 +441,7 @@ class ItemInventoryUI(Menu):
         self.player = player
         self.inFight = inFight
         if self.inFight: self.used = False
-        title = open('ascii/inventory', 'r').readlines()
+        title = open('ascii/inventory', 'r').read()
         self.rewriteOptions()
         super().__init__(title, self.option, self.onSpace)
 
@@ -479,13 +483,14 @@ class ItemUI(Menu):
         self.inFight = inFight
         if self.inFight:
             self.used = False
-        title = open('ascii/inventory', 'r').readlines()
+        title = open('ascii/inventory', 'r').read()
         options = ["Information", "Use", "Throw One", "Throw All", "Back"]
         super().__init__(title, options, self.onSpace)
 
     def addInfos(self):
         text = f"{self.item.name} x{self.quantity}"
         printText(mainWin, 5, [(text, 9, "bold")])
+        return 1
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
@@ -497,7 +502,6 @@ class ItemUI(Menu):
                 use = True
                 if not self.inFight and type(self.item) == BuffItem:
                     printInfo([("Can't use this item outside of a fight", 1, None)])
-                    print("Can't use this item outside of a fight")
                     use = False
                 if use:
                     self.item.onUse(self.player)
@@ -525,7 +529,7 @@ class GearInventoryUI(Menu):
         clearAll()
         self.inventory = inventory
         self.player = player
-        title = open('ascii/inventory', 'r').readlines()
+        title = open('ascii/inventory', 'r').read()
         self.rewriteOptions()
         super().__init__(title, self.option, self.onSpace)
 
@@ -534,9 +538,9 @@ class GearInventoryUI(Menu):
         self.option = []
         for gear in self.inventory.gear:
             if gear != None:
-                self.option.append(f"{color[gear.rarity]} {gear.name}\033[0m")
+                self.option.append(gear.name)
             else:
-                self.option.append("\033[90mEmpty\033[0m")
+                self.option.append("Empty")
         self.option.append("Back")
 
     def onSpace(self, select):
@@ -557,7 +561,7 @@ class GearUI(Menu):
         self.inventory = inventory
         self.gear = gear
         self.player = player
-        title = open('ascii/inventory', 'r').readlines()
+        title = open('ascii/inventory', 'r').read()
         options = ["Equip", "Throw", "Back"]
         super().__init__(title, options, self.onSpace, self.addInfos)
 
@@ -565,6 +569,7 @@ class GearUI(Menu):
         """Function to add more infos on the menu"""
         text = self.gear.name
         printText(mainWin, 5, [(text, 9, "bold")])
+        return 1
 
     def printMenu(self):
         """Prints the menu with the information about the gear"""
@@ -703,8 +708,8 @@ class SpellTree:
     def render(self):
         """Renders the tree"""
         clearAll()
-        print(self.title)
-        print(separator)
+        # print(self.title)
+        # print(separator)
         def offset(x): return ' ' * x
         def sliceSpell(branch, selected = False):
             symbol = branch.spell.symbol
@@ -975,7 +980,6 @@ class CastSpellUI(Menu):
 
 class Game:
     """Game class, main class of the game that contains the player and the current room"""
-    separator = "─" * 61
     def __init__(self, new = True, role = None):
         """Constructor for the Game class, takes in new and role"""
         if new: #new = True if the player start a new game
@@ -1149,14 +1153,15 @@ class Game:
 
     def printRoom(self):
         """Prints the room and all infos -> called after every player action"""
-        clearMain()
         #print current room name
         if type(self.currentRoom) == Lobby:
             text = "Lobby"
+            printText(statsWin, 0, [("Current Room: ", 9, None), (text, 6, "bold")])
         else:
             text = f"Dungeon: Floor {self.lobby.dungeon.floor + 1} of {len(self.lobby.dungeon.rooms)}"
-        printText(statsWin, 0, [("Current Room: ", 9, None), (text, 9, "bold")])
-        printText(statsWin, 1, [(f"Gold: {self.player.gold}", 2, None)])
+            printText(statsWin, 0, [("Current Room: ", 9, None), (text, 3, "bold")])
+        printText(statsWin, 1, [(separator, 9, None)])
+        printText(statsWin, 2, [(f"Gold: {self.player.gold}", 2, None)])
         if self.currentRoom == self.lobby:
             mist = False
         else:
@@ -1165,20 +1170,22 @@ class Game:
         printMap(self.currentRoom.render)
 
         #print player info
+        printText(statsWin, 3, [(separator, 9, None)])
         healthText = f'Health: {self.player.health}/100'
         healthBar = bar(self.player.health, 100)
-        printText(statsWin, 2, [(healthText, 9, None)])
-        printText(statsWin, 3, [(healthBar, 9, None)])
+        printText(statsWin, 4, [(healthText, 4, None)])
+        printText(statsWin, 5, [(healthBar, 4, None)])
         manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
         manaBar = bar(self.player.mana, self.player.maxMana)
-        printText(statsWin, 4, [(manaText, 9, None)])
-        printText(statsWin, 5, [(manaBar, 9, None)])
+        printText(statsWin, 6, [(manaText, 6, None)])
+        printText(statsWin, 7, [(manaBar, 6, None)])
+        printText(statsWin, 8, [(separator, 9, None)])
         expText = f'Exp: {self.player.exp}/{(self.player.level*5)**2}'
         levelText = f'Level: {self.player.level}'
         whiteSpace = " " * (59 - len(expText) - len(levelText))
         expBar = bar(self.player.exp, (self.player.level*10)**2, length=57)
-        printText(statsWin, 6, [(expText, 9, None), (whiteSpace, 9, None), (levelText, 9, None)])
-        printText(statsWin, 7, [(expBar, 9, None)])
+        printText(statsWin, 9, [(expText, 2, None), (whiteSpace, 9, None), (levelText, 2, None)])
+        printText(statsWin, 10, [(expBar, 2, None)])
         self.interactionInfo()
 
     def save(self):
@@ -1206,6 +1213,7 @@ class Game:
                 self.playerInteraction()
             if keyPress('esc'):
                 PauseMenu(self).run()
+                self.printRoom()
 
 
 class Fight:
@@ -1261,6 +1269,7 @@ class Fight:
 
     def turn(self):
         """Turn Handler. Manages the turn of the player and the enemy"""
+        clearInfo()
         #player turn
         if self.player.health > 0:
             self.playerTurn()
@@ -1391,6 +1400,7 @@ class Fight:
                 if keyPress('1'): #attack
                     self.evalDamage(self.player, self.enemy)
                     getInput = False
+                    spaceToContinue()
                 elif keyPress('2'): #skill
                     if len(self.player.spells) == 0:
                         printInfo([("You ", 5, None), ("don't have any spell", 9, None)])
@@ -1442,6 +1452,7 @@ class Fight:
                 self.player.mana = self.player.maxMana
         if self.haveBuff("purify", self.player):
             self.player.debuff = []
+            printInfo([("You ", 5, None), ("are purified ! All debuffs are removed", 9, None)])
 
     def evalDamage(self, user, target):
         """Evaluates the damage dealt by the user to the target and applies it"""
@@ -1512,6 +1523,7 @@ class Fight:
         printText(statsWin, 4, [(f"Debuff: {debuffList}", 9, None)])
         self.enemy.render()
         #print player info
+        printText(statsWin, 5, [(separator, 9, None)])
         printText(statsWin, 6, [("You: ", 5, None)])
         healthText = f'Health: {self.player.health}/100'
         printText(statsWin, 7, [(healthText, 4, None)])
@@ -1525,4 +1537,3 @@ class Fight:
         printText(statsWin, 11, [(f"Buff: {buffList}", 9, None)])
         debuffList = [element[0] for element in self.player.debuff]
         printText(statsWin, 12, [(f"Debuff: {debuffList}", 9, None)])
-        print(separator)

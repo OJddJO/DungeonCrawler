@@ -1,5 +1,4 @@
 import curses
-from curses import textpad
 
 screen = curses.initscr()
 screen.clear()
@@ -60,13 +59,16 @@ def printMap(matrix):
 def printText(win, line, text):
     cursor = 1
     for element in text:
+        # cut the string if it's too long
+        t = element[0]
+        t = t[:win.getmaxyx()[1]-cursor-1] if len(t) > win.getmaxyx()[1]-cursor-1 else t
         col = curses.color_pair(element[1])
         if element[2] == "bold":
             col += curses.A_BOLD
         elif element[2] == "italic":
             col += curses.A_ITALIC
-        win.addstr(line+1, cursor, element[0], col)
-        cursor += len(element[0])
+        win.addstr(line+1, cursor, t, col)
+        cursor += len(t)
     win.refresh()
 
 def printMultipleText(win, line, listText):
@@ -75,30 +77,13 @@ def printMultipleText(win, line, listText):
 
 infoList = [] #list ex: [[("You", 3, "bold"), (" are ", 9, None), ("burning", 4, None), (" for 2 turns", 9, None)]] list of list of tuple that contain a string, a color code and a type
 def printInfo(text):
+    infoWin.clear()
+    infoWin.border()
     infoList.append(text) #need to be [("string", color, type of text)]
     infoList.pop(0) if len(infoList) > 6 else None
     for i, text in enumerate(infoList):
-        printText(infoWin, 5-i, text)
+        printText(infoWin, i, text)
 
 def printMultipleInfo(listText):
     for text in listText:
         printInfo(text)
-
-if __name__ == "__main__":
-    import time
-    from classes.Map import Lobby, Room
-    from classes.Player import Player
-
-    refreshAll()
-    clearMain()
-    # room = Room(Player("warrior"), 1, Lobby(Player("warrrior"))).colorMap()
-    room = Lobby(Player()).colorMap(mist=False)
-    printMap(room)
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
-    time.sleep(5)

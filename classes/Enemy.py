@@ -23,6 +23,6 @@ class Enemy:
     def render(self):
         """Renders the enemy's ascii art"""
         with open(f"ascii/enemies/{self.type}", "r") as f:
-            textList = f.readlines()
+            textList = f.read().split("\n")
             textList = [[(str(line), 9, None)] for line in textList]
             printMultipleText(mainWin, 0, textList)
