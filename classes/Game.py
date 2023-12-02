@@ -30,9 +30,6 @@ else:
     with open("save/keybind.json", "w") as f:
         json.dump(keybind, f)
 
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
 def keyPress(key):
     """return True if the key is pressed and wait for the key to be released"""
     if keyboard.is_pressed(key):
@@ -59,12 +56,12 @@ def spaceToContinue():
 
 separator = "─" * 200
 color = { #color for rarity
-    1: "Common",
-    2: "Uncommon",
-    3: "Rare",
-    4: "Epic",
-    5: "Legendary",
-    6: "Mythic"
+    1: 9,
+    2: 5,
+    3: 7,
+    4: 3,
+    5: 2,
+    6: 4
 }
 
 class Menu:
@@ -383,13 +380,28 @@ class ItemShop(Menu):
             self.item = BuffItem(self.data['name'], self.data['description'], self.data['health'], self.data['mana'], self.data['buff'], self.data['duration'], self.data['rarity'], self.data['value'])
         title = open("ascii/shop", "r").read()
         option = ["Information", "Buy", "Back"]
-        super().__init__(title, option, self.onSpace)
+        super().__init__(title, option, self.onSpace, self.addInfos)
+
+    def addInfos(self):
+        """Adds infos"""
+        l = 0
+        printText(statsWin, l, [(self.item.name, 9, "bold")])
+        l += 1
+        if len(self.item.description) > 59:
+            printText(statsWin, l, [(self.item.description[:59], 9, None)])
+            printText(statsWin, l+1, [(self.item.description[59:], 9, None)])
+            l += 2
+        else:
+            printText(statsWin, l, [(self.item.description, 9, None)])
+            l += 1
+        printText(statsWin, l, [("Rarity: ", 9, None), (str(self.item.rarity), color[self.item.rarity], None)])
+        printText(statsWin, l+1, [("Value: ", 9, None), (str(self.item.value), 2, None)])
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
-                printText(mainWin, 0, [(self.item, 9, None)])
+                printText(mainWin, 0, [(self.item.name, 9, None)])
                 spaceToContinue()
             case 1:
                 if self.player.gold >= self.item.value:
@@ -574,10 +586,10 @@ class GearUI(Menu):
         """Prints the menu with the information about the gear"""
         def diffColor(diff):
             if diff < 0:
-                return f"\033[31m{diff}\033[0m"
+                return (diff, 4, None)
             else:
-                return f"\033[32m+{diff}\033[0m"
-        clear()
+                return (diff, 5, None)
+        clearAll()
         printText(mainWin, 0, [(self.title, 9, "bold")])
         part = type(self.gear)
         if part == Weapon:
@@ -591,15 +603,15 @@ class GearUI(Menu):
         manaDiff = diffColor(self.gear.mana - equiped.mana)
 
         printText(mainWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
-        printText(mainWin, 2, [("Level: ", 9, None), (f"{self.gear.level} {levelDiff}", 9, "bold")])
-        printText(mainWin, 3, [(f"Rarity: {color[self.gear.rarity]}", 9, None), (f" {rarityDiff}", 9, "bold")])
+        printText(mainWin, 2, [("Level: ", 9, None), (f"{self.gear.level} ", 9, "bold"), levelDiff])
+        printText(mainWin, 3, [(f"Rarity: {self.gear.rarity} ", color[self.gear.rarity], None), rarityDiff])
         if part == Weapon:
-            printText(mainWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} {damageDiff}", 9, "bold")])
+            printText(mainWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} ", 9, "bold"), damageDiff])
         elif part == Armor:
-            printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} {armorDiff}", 9, "bold")])
-        printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} {manaDiff}", 9, "bold")])
+            printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
+        printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
 
-        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{color[equiped.rarity]} {equiped.name}", 9, "bold")]) # equiped gear
+        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
         printText(mainWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
         printText(mainWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
         if part == Weapon:
@@ -648,6 +660,7 @@ class SpellTree:
         """Constructor for the SpellTree class, takes in role, player, inFight, and enemy"""
         clearAll()
         self.title = open("ascii/spell", "r").read()
+        self.title = self.title.split("\n")
         self.player = player
         self.current = self.initTree(role)
         self.selected = 0
@@ -677,12 +690,12 @@ class SpellTree:
         """Navigate in the tree"""
         getInput = True
         while getInput:
-            if keyPress("left"):
+            if keyPress(keybind['left']):
                 self.selected -= 1
                 if self.selected < 0:
                     self.selected = len(self.spells)-1
                 getInput = False
-            elif keyPress("right"):
+            elif keyPress(keybind['right']):
                 self.selected += 1
                 if self.selected > len(self.spells)-1:
                     self.selected = 0
@@ -707,11 +720,13 @@ class SpellTree:
     def render(self):
         """Renders the tree"""
         clearAll()
-        # print(self.title)
-        # print(separator)
+        for i, element in enumerate(self.title):
+            printText(mainWin, i, [(element, 9, "bold")])
+        printText(mainWin, 5, [(separator, 9, None)])
         def offset(x): return ' ' * x
         def sliceSpell(branch, selected = False):
-            symbol = branch.spell.symbol
+            symbol = str(branch.spell.symbol)
+            print(symbol)
             line1 = [("╔═╩═╗", 9, None)]
             if selected:
                 line2 = [("║", 9, None), (f"{symbol} ", 1, None) , ("║", 9, None)]
@@ -735,7 +750,7 @@ class SpellTree:
         d2 = d - d1 # space after the tree
 
         spell = sliceSpell(self.current, selectedList[0])
-        line = 0
+        line = 6
         for i in range(len(spell)):
             printText(mainWin, line, [(offset(121//2-2), 9, None)] + spell[i])
             line += 1
@@ -754,7 +769,7 @@ class SpellTree:
         else:
             links[121//2] = "╬"
         links = "".join(links)
-        printText(mainWin, line, (links, 9, None))
+        printText(mainWin, line, [(links, 9, None)])
         line += 1
 
         spells = [sliceSpell(branch, selectedList[i+1]) for i, branch in enumerate(self.current.branches)]
@@ -763,13 +778,13 @@ class SpellTree:
         s = [(offset(d1+k), 9, None)]
         for i in range(4):
             for j in range(n):
-                s += [(spells[j][i], 9, None)]
+                s += spells[j][i]
                 s += [(offset(2*k+1), 9, None)]
             s += [(offset(d2+k), 9, None)]
             spellsStr.append(s)
             s = [(offset(d1+k), 9, None)]
         for i in range(len(spellsStr)):
-            print(mainWin, line, spellsStr[i])
+            printText(mainWin, line, spellsStr[i])
             line += 1
         printInfo([("Navigate with ", 9, None), ("◄ ►", 9, "bold"), (" and press ", 9, None), ("˽", 9, "bold"), (" to select. ESC to go back", 9, None)])
 
@@ -842,7 +857,7 @@ class SpellUI(Menu):
             printText(statsWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
             l += 3
         else:
-            printText(statsWin, l, [("\033[3;31mThis spell can't be unlocked yet\033[0m", 4, None)])
+            printText(statsWin, l, [("This spell can't be unlocked yet", 4, None)])
             printText(statsWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
             l += 2
         printText(statsWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
@@ -887,7 +902,7 @@ class SpellUI(Menu):
                     printText(mainWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
                     l += 3
                 else:
-                    printText(mainWin, l, [("\033[3;31mThis spell can't be unlocked yet\033[0m", 4, None)])
+                    printText(mainWin, l, [("This spell can't be unlocked yet", 4, None)])
                     printText(mainWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
                     l += 2
                 printText(mainWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
@@ -976,7 +991,7 @@ class CastSpellUI(Menu):
             printText(statsWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
             l += 3
         else:
-            printText(statsWin, l, [("\033[3;31mThis spell can't be unlocked yet\033[0m", 4, None)])
+            printText(statsWin, l, [("This spell can't be unlocked yet", 4, None)])
             printText(statsWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
             l += 2
         printText(statsWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
