@@ -153,17 +153,17 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                try:
+                # try:
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         clearMain()
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
-                except Exception as e:
-                    printText(mainWin, 0, [("An error occurred", 1, None)])
-                    printText(mainWin, 1, [(str(e), 1, None)])
-                    spaceToContinue()
+                # except Exception as e:
+                    # printText(mainWin, 0, [("An error occurred", 1, None)])
+                    # printText(mainWin, 1, [(str(e), 1, None)])
+                    # spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -280,9 +280,8 @@ class KeybindMenu(Menu):
 
     def replaceKey(self, key):
         """Replaces the key with the input key"""
-        clear()
         printText(mainWin, 0, [("Press the key you want to replace", 9, None), (f" {key} ", 5, "bold"), ("with", 9, None)])
-        printText(mainWin, 1, [("Press ", 9, None) ("˽", 9, "bold"),  (" to cancel", 9, None)])
+        printText(mainWin, 1, [("Press ", 9, None), ("˽", 9, "bold"),  (" to cancel", 9, None)])
         inputKey = keyboard.read_key()
         while keyboard.is_pressed(inputKey): pass
         if inputKey == 'space':
@@ -713,53 +712,65 @@ class SpellTree:
         def offset(x): return ' ' * x
         def sliceSpell(branch, selected = False):
             symbol = branch.spell.symbol
-            line1 = "╔═╩═╗"
+            line1 = [("╔═╩═╗", 9, None)]
             if selected:
-                line2 = f"║{symbol} ║"
+                line2 = [("║", 9, None), (f"{symbol} ", 1, None) , ("║", 9, None)]
             else:
-                line2 = f"║{symbol} ║"
+                line2 = [(f"║{symbol} ║", 9, None)]
             if len(branch.branches) == 0:
-                line3 = "╚═══╝"
-                line4 = "     "
+                line3 = [("╚═╦═╝", 9, None)]
+                line4 = [("     ", 9, None)]
             else:
-                line3 = "╚═╦═╝"
-                line4 = "  ║  "
+                line3 = [("╚═╦═╝", 9, None)]
+                line4 = [("  ║  ", 9, None)]
             return line1, line2, line3, line4
 
         selectedList = [False] * (len(self.current.branches)+1)  # +1 for the current spell
         selectedList[self.selected] = True # to set the selected spell in the tree
 
-        printText(mainWin, 0, [(offset(30), 9, None), ("║", 9, None)])
-        spellSlice = sliceSpell(self.current, selectedList[0])
+        n = len(self.current.branches)
+        k = (122 - 6*n)//(2*n) # space between squares
+        d = 122 - 2*k*n - 6*n # space between the tree and the border
+        d1 = d//2 # space before the tree
+        d2 = d - d1 # space after the tree
+
+        spell = sliceSpell(self.current, selectedList[0])
+        line = 0
+        for i in range(len(spell)):
+            printText(mainWin, line, [(offset(121//2-2), 9, None)] + spell[i])
+            line += 1
+
+        # link between spells
+        links = ""
+        links += offset(d1+k+2)+"╔"
+        for i in range(n-2):
+            links += "═"*(2*k+5)
+            links += "╦"
+        links += "═"*(2*k+5)
+        links += "╗"
+        links = list(links)
+        if n%2 == 0:
+            links[121//2] = "╩"
+        else:
+            links[121//2] = "╬"
+        links = "".join(links)
+        printText(mainWin, line, (links, 9, None))
+        line += 1
+
+        spells = [sliceSpell(branch, selectedList[i+1]) for i, branch in enumerate(self.current.branches)]
+        spellsStr = []
+
+        s = [(offset(d1+k), 9, None)]
         for i in range(4):
-            printText(mainWin, i+1, [(offset(28), 9, None), (spellSlice[i], 9, None)])
-        if len(self.current.branches) == 1:
-            printText(mainWin, 5, [(offset(30), 9, None), ("║", 9, None)])
-            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
-            for i in range(4):
-                printText(mainWin, i+6, [(offset(28), 9, None), (spell1[i], 9, None)])
-        elif len(self.current.branches) == 2:
-            printText(mainWin, 5, [(offset(15), 9, None), ("╔══════════════╩══════════════╗", 9, None)])
-            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
-            spell2 = sliceSpell(self.current.branches[1], selectedList[2])
-            for i in range(4):
-                printText(mainWin, i+6, [(offset(13), 9, None), (spell1[i], 9, None), (offset(25), 9, None), (spell2[i], 9, None)])
-                print(offset(13) + spell1[i] + offset(25) + spell2[i])
-        elif len(self.current.branches) == 3:
-            printText(mainWin, 5, [(offset(10), 9, None), ("╔═══════════════════╬═══════════════════╗", 9, None)])
-            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
-            spell2 = sliceSpell(self.current.branches[1], selectedList[2])
-            spell3 = sliceSpell(self.current.branches[2], selectedList[3])
-            for i in range(4):
-                printText(mainWin, i+6, [(offset(8), 9, None), (spell1[i], 9, None), (offset(15), 9, None), (spell2[i], 9, None), (offset(15), 9, None), (spell3[i], 9, None)])
-        elif len(self.current.branches) == 4:
-            printText(mainWin, 5, [(offset(14), 9, None), ("╔═══════╦═══════╩═══════╦═══════╗", 9, None)])
-            spell1 = sliceSpell(self.current.branches[0], selectedList[1])
-            spell2 = sliceSpell(self.current.branches[1], selectedList[2])
-            spell3 = sliceSpell(self.current.branches[2], selectedList[3])
-            spell4 = sliceSpell(self.current.branches[3], selectedList[4])
-            for i in range(4):
-                printText(mainWin, i+6, [(offset(12), 9, None), (spell1[i], 9, None), (offset(3), 9, None), (spell2[i], 9, None), (offset(11), 9, None), (spell3[i], 9, None), (offset(3), 9, None), (spell4[i], 9, None)])
+            for j in range(n):
+                s += [(spells[j][i], 9, None)]
+                s += [(offset(2*k+1), 9, None)]
+            s += [(offset(d2+k), 9, None)]
+            spellsStr.append(s)
+            s = [(offset(d1+k), 9, None)]
+        for i in range(len(spellsStr)):
+            print(mainWin, line, spellsStr[i])
+            line += 1
         printInfo([("Navigate with ", 9, None), ("◄ ►", 9, "bold"), (" and press ", 9, None), ("˽", 9, "bold"), (" to select. ESC to go back", 9, None)])
 
 
