@@ -385,7 +385,7 @@ class ItemShop(Menu):
     def addInfos(self):
         """Adds infos"""
         l = 0
-        printText(statsWin, l, [(self.item.name, 9, "bold")])
+        printText(statsWin, l, [(self.item.name, color[self.item.rarity], "bold")])
         l += 1
         if len(self.item.description) > 59:
             printText(statsWin, l, [(self.item.description[:59], 9, None)])
@@ -500,8 +500,19 @@ class ItemUI(Menu):
 
     def addInfos(self):
         text = f"{self.item.name} x{self.quantity}"
-        printText(mainWin, 5, [(text, 9, "bold")])
-        return 1
+        l = 0
+        printText(mainWin, l, [(text, 9, "bold")])
+        printText(statsWin, l, [(self.item.name, color[self.item.rarity], "bold")])
+        l += 1
+        if len(self.item.description) > 59:
+            printText(statsWin, l, [(self.item.description[:59], 9, None)])
+            printText(statsWin, l+1, [(self.item.description[59:], 9, None)])
+            l += 2
+        else:
+            printText(statsWin, l, [(self.item.description, 9, None)])
+            l += 1
+        printText(statsWin, l, [("Rarity: ", 9, None), (str(self.item.rarity), color[self.item.rarity], None)])
+        printText(statsWin, l+1, [("Value: ", 9, None), (str(self.item.value), 2, None)])
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
@@ -578,9 +589,41 @@ class GearUI(Menu):
 
     def addInfos(self):
         """Function to add more infos on the menu"""
+        def diffColor(diff):
+            if diff < 0:
+                return (diff, 4, None)
+            else:
+                return (diff, 5, None)
         text = self.gear.name
-        printText(mainWin, 5, [(text, 9, "bold")])
-        return 1
+        part = type(self.gear)
+        if part == Weapon:
+            equiped = self.player.weapon
+            damageDiff = diffColor(self.gear.baseDamage - equiped.baseDamage)
+        elif part == Armor:
+            equiped = self.player.armor
+            armorDiff = diffColor(self.gear.baseArmor - equiped.baseArmor)
+        levelDiff = diffColor(self.gear.level - equiped.level)
+        rarityDiff = diffColor(self.gear.rarity - equiped.rarity)
+        manaDiff = diffColor(self.gear.mana - equiped.mana)
+
+        printText(mainWin, 0, [(text, color[self.gear.rarity], "bold")])
+        printText(mainWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
+        printText(mainWin, 2, [("Level: ", 9, None), (f"{self.gear.level} ", 9, "bold"), levelDiff])
+        printText(mainWin, 3, [(f"Rarity: {self.gear.rarity} ", color[self.gear.rarity], None), rarityDiff])
+        if part == Weapon:
+            printText(mainWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} ", 9, "bold"), damageDiff])
+        elif part == Armor:
+            printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
+        printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
+
+        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
+        printText(mainWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
+        printText(mainWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
+        if part == Weapon:
+            printText(mainWin, 10, [("Damage: ", 9, None), (f"{equiped.baseDamage}", 9, "bold")])
+        elif part == Armor:
+            printText(mainWin, 10, [("Armor: ", 9, None), (f"{equiped.baseArmor}", 9, "bold")])
+        printText(mainWin, 11, [("Mana: ", 9, None), (f"{equiped.mana}", 9, "bold")])
 
     def printMenu(self):
         """Prints the menu with the information about the gear"""
@@ -726,7 +769,6 @@ class SpellTree:
         def offset(x): return ' ' * x
         def sliceSpell(branch, selected = False):
             symbol = str(branch.spell.symbol)
-            print(symbol)
             line1 = [("╔═╩═╗", 9, None)]
             if selected:
                 line2 = [("║", 9, None), (f"{symbol} ", 1, None) , ("║", 9, None)]
