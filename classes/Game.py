@@ -153,17 +153,17 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                # try:
+                try:
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         clearMain()
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
-                # except Exception as e:
-                    # printText(mainWin, 0, [("An error occurred", 1, None)])
-                    # printText(mainWin, 1, [(str(e), 1, None)])
-                    # spaceToContinue()
+                except Exception as e:
+                    printText(mainWin, 0, [("An error occurred", 1, None)])
+                    printText(mainWin, 1, [(str(e), 1, None)])
+                    spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -411,15 +411,15 @@ class ItemShop(Menu):
                 if self.player.gold >= self.item.value:
                     self.player.gold -= self.item.value
                     self.player.inventory.addItem(self.item)
-                    printText(mainWin, 0, [("You bought ", 9, None), (f" {self.item.name} ", 9, "bold")])
+                    printInfo([("You bought ", 9, None), (self.item.name, 9, "bold")])
                     i = self.player.inventory.getExistingItems().index(self.item.name)
                     qty = self.player.inventory.items[i][1]
-                    printText(mainWin, 1, [("You now have ", 9, None), (f" {qty} ", 9, "bold"), ("x ", 9, None), (f" {self.item.name} ", 9, "bold")])
-                    printText(mainWin, 2, [("You have ", 9, None), (self.player.gold, 2, "bold"), (" gold left", 9, None)])
+                    printInfo([("You now have ", 9, None), (str(qty), 9, "bold"), (" x ", 9, None), (f" {self.item.name} ", 9, "bold")])
+                    printInfo([("You have ", 9, None), (str(self.player.gold), 2, "bold"), (" gold left", 9, None)])
                     spaceToContinue()
                 else:
-                    printText(mainWin, 0, [("You don't have enough gold", 1, None)])
-                    printText(mainWin, 1, [("You need ", 9, None), (f" {self.item.value - self.player.gold} ", 9, "bold"), ("more gold", 9, None)])
+                    printInfo([("You don't have enough gold", 1, None)])
+                    printInfo([("You need ", 9, None), (f" {self.item.value - self.player.gold} ", 9, "bold"), ("more gold", 9, None)])
                     spaceToContinue()
             case 2:
                 self.runVar = False
@@ -810,7 +810,7 @@ class SpellTree:
         spell = sliceSpell(self.current, selectedList[0])
         line = 6
         for i in range(len(spell)):
-            printTextR(mainWin, line, [(offset(121//2-2), 9, None)] + spell[i])
+            printText(mainWin, line, [(offset(121//2-2), 9, None)] + spell[i])
             line += 1
 
         # link between spells
@@ -827,7 +827,7 @@ class SpellTree:
         else:
             links[121//2] = "╬"
         links = "".join(links)
-        printTextR(mainWin, line, [(links, 9, None)])
+        printText(mainWin, line, [(links, 9, None)])
         line += 1
 
         spells = [sliceSpell(branch, selectedList[i+1]) for i, branch in enumerate(self.current.branches)]
@@ -842,7 +842,7 @@ class SpellTree:
             spellsStr.append(s)
             s = [(offset(d1+k), 9, None)]
         for i in range(len(spellsStr)):
-            printTextR(mainWin, line, spellsStr[i])
+            printText(mainWin, line, spellsStr[i])
             line += 1
         printInfo([("Navigate with ", 9, None), ("◄ ►", 9, "bold"), (" and press ", 9, None), ("˽", 9, "bold"), (" to select. ESC to go back", 9, None)])
 
@@ -1315,7 +1315,7 @@ class Game:
         if self.currentRoom == self.lobby:
             mist = False
         else:
-            mist = False
+            mist = True
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
         printMap(self.currentRoom.render)
 

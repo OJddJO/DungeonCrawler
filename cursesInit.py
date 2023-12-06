@@ -55,23 +55,6 @@ def printMap(matrix):
             mainWin.addch(i, j, element[0], curses.color_pair(element[1]))
     mainWin.refresh()
 
-def printTextR(win, line, text):
-    cursor = 1
-    for element in text:
-        # cut the string if it's too long
-        t = element[0]
-        t = t[:win.getmaxyx()[1]-cursor-1] if len(t) > win.getmaxyx()[1]-cursor-1 else t
-        col = curses.color_pair(element[1])
-        if element[2] == "bold":
-            col += curses.A_BOLD
-        elif element[2] == "italic":
-            col += curses.A_ITALIC
-        for char in t:
-            win.addch(line+1, cursor, char, col)
-            cursor += 1
-    win.refresh()
-
-
 def printText(win, line, text):
     cursor = 1
     for element in text:
