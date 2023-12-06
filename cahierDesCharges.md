@@ -24,7 +24,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 -   Évolutivité : Augmentation de la difficulté avec le niveau du personnage.
 -   Système de Quêtes *: Intégration d'objectifs facultatifs dans le donjon.
 -   Événements Aléatoires *: Introduction d'événements aléatoires pour pimenter le gameplay.
--   Multijoueur *: Possibilité de jouer en coopération.
+-   ~Multijoueur *: Possibilité de jouer en coopération.~
     Le multijoueur sera du multijoueur local soit directement sur le même ordinateur soit sur le même réseau (mis en place avec la librairie Python "socket")
 
 *: ne sera pas implémenté dans le jeu lors de la première version, le 8 novembre 2023 
@@ -35,7 +35,7 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 -   Langage de Programmation : Python
 -   Interface Utilisateur : Création d'une interface utilisateur basée sur le terminal.
 -   Graphismes et Son : Intégration de graphismes ASCII, pas de son.
--   Multijoueur *: Mise en place d'une fonctionnalité multijoueur locale.
+-   ~Multijoueur *: Mise en place d'une fonctionnalité multijoueur locale.~
 
 *: ne sera pas implémenté dans le jeu lors de la première version, rendu le 8 novembre 2023 
 

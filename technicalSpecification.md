@@ -23,7 +23,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 -   Scalability: Increasing difficulty with character level.
 -   Quest System *: Integration of optional objectives in the dungeon.
 -   Random Events *: Introduction of random events to spice up gameplay.
--   Multiplayer *: Possibility to play cooperatively. Multiplayer will be local, either on the same computer or on the same network (implemented with the Python library 'socket').
+-   ~Multiplayer *: Possibility to play cooperatively. Multiplayer will be local, either on the same computer or on the same network (implemented with the Python library 'socket').~
 
 *: Not implemented in the game in the initial version, as of November 8, 2023.
 
@@ -33,7 +33,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 -   Programming Language: Python
 -   User Interface: Terminal-based user interface.
 -   Graphics and Sound: Integration of ASCII graphics, no sound.
--   Multiplayer *: Implementation of local multiplayer functionality.
+-   ~Multiplayer *: Implementation of local multiplayer functionality.~
 
 *: Not implemented in the game in the initial version, as of November 8, 2023.
 
