@@ -176,7 +176,6 @@ class DebuffSpell(Spell):
                 if user.health > 100:
                     user.health = 100
                 text.append([("You ", 5, None), ("gain ", 9, None), (f"{dmg // 4} health", 4, None), (" from ", 9, None), (f"{target.name}", 3, None), ("'s blood", 9, None)])
-
         return text    
     
     def __dict__(self):

@@ -102,6 +102,11 @@ class Weapon:
         self.level = level
         self.rarity = rarity
         self.mana = mana
+        self.rank = 1
+
+    def upgrade(self):
+        self.rank += 1
+        self.baseDamage = int(self.baseDamage*1.1)
 
     def onUse(self):
         """Returns the damage of the weapon"""
@@ -116,7 +121,8 @@ class Weapon:
             "level": self.level,
             "damage": self.baseDamage,
             "rarity": self.rarity,
-            "mana": self.mana
+            "mana": self.mana,
+            "rank": self.rank
         }
 
 
@@ -130,6 +136,11 @@ class Armor:
         self.level = level
         self.rarity = rarity
         self.mana = mana
+        self.rank = 1
+
+    def upgrade(self):
+        self.rank += 1
+        self.baseArmor = int(self.baseArmor*1.1)
 
     def onUse(self):
         """Returns the armor of the armor"""

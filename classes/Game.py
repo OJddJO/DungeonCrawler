@@ -12,6 +12,19 @@ from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
 from cursesInit import *
 
+separator = "─" * 200
+color = { #color for rarity
+    1: 9,
+    2: 5,
+    3: 7,
+    4: 3,
+    5: 2,
+    6: 4
+}
+
+
+os.system("cls")
+
 # keyboard.press("f11")
 refreshAll()
 
@@ -53,16 +66,6 @@ def spaceToContinue():
     while wait:
         if keyPress('space'):
             wait = False
-
-separator = "─" * 200
-color = { #color for rarity
-    1: 9,
-    2: 5,
-    3: 7,
-    4: 3,
-    5: 2,
-    6: 4
-}
 
 class Menu:
     """Menu class, used to create menus"""
@@ -321,6 +324,7 @@ class PauseMenu(Menu):
             case 0:
                 self.runVar = False
             case 1:
+                clearMain()
                 self.game.save()
                 printText(mainWin, 0, [("Game saved", 9, None)])
                 spaceToContinue()
@@ -419,6 +423,7 @@ class ItemShop(Menu):
                     spaceToContinue()
             case 2:
                 self.runVar = False
+
 
 #INVENTORY
 class InventoryUI(Menu): 
@@ -584,7 +589,7 @@ class GearUI(Menu):
         self.gear = gear
         self.player = player
         title = open('ascii/inventory', 'r').read()
-        options = ["Equip", "Throw", "Back"]
+        options = ["Equip", "Upgrade", "Throw", "Back"]
         super().__init__(title, options, self.onSpace, self.addInfos)
 
     def addInfos(self):
@@ -690,11 +695,22 @@ class GearUI(Menu):
                 spaceToContinue()
                 self.runVar = False
             case 1:
+                cost = self.gear.rank * self.gear.level * 10
+                if self.player.money >= cost:
+                    self.player.money -= cost
+                    self.gear.upgrade()
+                    printInfo([("Gear upgraded", 9, None)])
+                    printInfo([("You have ", 9, None), (self.player.money, 2, "bold"), (" gold left", 9, None)])
+                    spaceToContinue()
+                else:
+                    printInfo([("You don't have enough gold", 1, None)])
+                    printInfo([("You need ", 9, None), (cost - self.player.money, 9, "bold"), (" more gold", 9, None)])
+                    spaceToContinue()
+            case 2:
                 self.inventory.removeGear(self.gear)
                 self.runVar = False
-            case 2:
+            case 3:
                 self.runVar = False
-
 
 #SPELL
 class SpellTree:
@@ -768,7 +784,7 @@ class SpellTree:
         printText(mainWin, 5, [(separator, 9, None)])
         def offset(x): return ' ' * x
         def sliceSpell(branch, selected = False):
-            symbol = str(branch.spell.symbol)
+            symbol = branch.spell.symbol
             line1 = [("╔═╩═╗", 9, None)]
             if selected:
                 line2 = [("║", 9, None), (f"{symbol} ", 1, None) , ("║", 9, None)]
@@ -794,7 +810,7 @@ class SpellTree:
         spell = sliceSpell(self.current, selectedList[0])
         line = 6
         for i in range(len(spell)):
-            printText(mainWin, line, [(offset(121//2-2), 9, None)] + spell[i])
+            printTextR(mainWin, line, [(offset(121//2-2), 9, None)] + spell[i])
             line += 1
 
         # link between spells
@@ -811,7 +827,7 @@ class SpellTree:
         else:
             links[121//2] = "╬"
         links = "".join(links)
-        printText(mainWin, line, [(links, 9, None)])
+        printTextR(mainWin, line, [(links, 9, None)])
         line += 1
 
         spells = [sliceSpell(branch, selectedList[i+1]) for i, branch in enumerate(self.current.branches)]
@@ -826,7 +842,7 @@ class SpellTree:
             spellsStr.append(s)
             s = [(offset(d1+k), 9, None)]
         for i in range(len(spellsStr)):
-            printText(mainWin, line, spellsStr[i])
+            printTextR(mainWin, line, spellsStr[i])
             line += 1
         printInfo([("Navigate with ", 9, None), ("◄ ►", 9, "bold"), (" and press ", 9, None), ("˽", 9, "bold"), (" to select. ESC to go back", 9, None)])
 
@@ -865,6 +881,7 @@ class SpellTree:
         while self.runVar:
             self.render()
             self.navigate()
+        clearAll()
 
 
 class SpellUI(Menu):
@@ -1089,7 +1106,7 @@ class CastSpellUI(Menu):
                     spaceToContinue()
                 elif self.spell.name in self.player.spells:
                     text = self.spell.onUse(self.player, self.getTarget())
-                    printText(mainWin, 0, [(text, 9, None)])
+                    printMultipleInfo(text)
                     self.casted = True
                 self.runVar = False
             case 1:
@@ -1148,6 +1165,7 @@ class Game:
         adjList = self.getElementAroundPlayer()
         for element in adjList:
             if type(element) == Portal: #if there is a portal go to next room
+                clearStats()
                 if type(self.currentRoom) == Lobby:
                     self.currentRoom = self.currentRoom.dungeon.rooms[0]
                 else:
@@ -1244,19 +1262,19 @@ class Game:
                     printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to start a ", 9, None), ("dungeon", 4, "bold")])
                 else:
                     if self.currentRoom.portal.room2 == None:
-                        printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to go back to the ", 9, None), ("lobby", 3, "bold")])
+                        printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to go back to the ", 9, None), ("Lobby", 7, "bold")])
                     else:
                         printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to go to the next ", 9, None), ("floor", 4, "bold")])
             elif type(element) == Enemy:
-                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to start the ", 9, None), ("fight", 1, "bold")])
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to start the ", 9, None), ("fight", 4, "bold")])
             elif type(element) == Treasure:
                 printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("treasure", 2, "bold")])
             elif element == "C":
-                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open your ", 9, None), ("inventory", 3, "bold")])
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open your ", 9, None), ("inventory", 2, "bold")])
             elif element == "G":
                 printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to see your ", 9, None), ("spell tree", 4, "bold")])
             elif element == "S":
-                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("shop", 3, "bold")])
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("shop", 2, "bold")])
 
     def playerMove(self, direction):
         """Player Movement Handler. Move the player in the room depending on the direction"""
@@ -1297,27 +1315,27 @@ class Game:
         if self.currentRoom == self.lobby:
             mist = False
         else:
-            mist = True
+            mist = False
         self.currentRoom.render = self.currentRoom.colorMap(mist=mist)
         printMap(self.currentRoom.render)
 
         #print player info
         printText(statsWin, 3, [(separator, 9, None)])
         healthText = f'Health: {self.player.health}/100'
-        healthBar = bar(self.player.health, 100)
-        printText(statsWin, 4, [(healthText, 4, None)])
-        printText(statsWin, 5, [(healthBar, 4, None)])
         manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
-        manaBar = bar(self.player.mana, self.player.maxMana)
-        printText(statsWin, 6, [(manaText, 6, None)])
-        printText(statsWin, 7, [(manaBar, 6, None)])
-        printText(statsWin, 8, [(separator, 9, None)])
+        textSpace = " " * (59 - len(healthText) - len(manaText))
+        healthBar = bar(self.player.health, 100)
+        manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
+        barSpace = " " * (59 - len(healthBar) - len(manaBar))
+        printText(statsWin, 4, [(healthText, 4, None), (textSpace, 9, None), (manaText, 6, None)])
+        printText(statsWin, 5, [(healthBar, 4, None), (barSpace, 9, None), (manaBar, 6, None)])
+        printText(statsWin, 6, [(separator, 9, None)])
         expText = f'Exp: {self.player.exp}/{(self.player.level*5)**2}'
         levelText = f'Level: {self.player.level}'
         whiteSpace = " " * (59 - len(expText) - len(levelText))
         expBar = bar(self.player.exp, (self.player.level*10)**2, length=57)
-        printText(statsWin, 9, [(expText, 2, None), (whiteSpace, 9, None), (levelText, 2, None)])
-        printText(statsWin, 10, [(expBar, 2, None)])
+        printText(statsWin, 7, [(expText, 2, None), (whiteSpace, 9, None), (levelText, 2, None)])
+        printText(statsWin, 8, [(expBar, 2, None)])
         self.interactionInfo()
 
     def save(self):
@@ -1658,14 +1676,14 @@ class Fight:
         printText(statsWin, 5, [(separator, 9, None)])
         printText(statsWin, 6, [("You: ", 5, None)])
         healthText = f'Health: {self.player.health}/100'
-        printText(statsWin, 7, [(healthText, 4, None)])
-        healthBar = bar(self.player.health, 100)
-        printText(statsWin, 8, [(healthBar, 4, None)])
         manaText = f'Mana: {self.player.mana}/{self.player.maxMana}'
-        printText(statsWin, 9, [(manaText, 6, None)])
-        manaBar = bar(self.player.mana, self.player.maxMana)
-        printText(statsWin, 10, [(manaBar, 6, None)])
+        textSpace = " " * (59 - len(healthText) - len(manaText))
+        healthBar = bar(self.player.health, 100)
+        manaBar = bar(self.player.mana, self.player.maxMana, reversed=True)
+        barSpace = " " * (59 - len(healthBar) - len(manaBar))
+        printText(statsWin, 7, [(healthText, 4, None), (textSpace, 9, None), (manaText, 6, None)])
+        printText(statsWin, 8, [(healthBar, 4, None), (barSpace, 9, None), (manaBar, 6, None)])
         buffList = [element[0] for element in self.player.buff]
-        printText(statsWin, 11, [(f"Buff: {buffList}", 9, None)])
+        printText(statsWin, 9, [(f"Buff: {buffList}", 9, None)])
         debuffList = [element[0] for element in self.player.debuff]
-        printText(statsWin, 12, [(f"Debuff: {debuffList}", 9, None)])
+        printText(statsWin, 10, [(f"Debuff: {debuffList}", 9, None)])

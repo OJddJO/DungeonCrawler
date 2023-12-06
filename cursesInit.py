@@ -2,12 +2,11 @@ import curses
 
 screen = curses.initscr()
 screen.clear()
-# screen.keypad(True)
 mainWin = curses.newwin(43, 123, 0, 0) #size 41, 121
 mainWin.border()
 statsWin = curses.newwin(43, 61, 0, 124) #size 41, 59
 statsWin.border()
-infoWin = curses.newwin(8, 185, 43, 0) #size 6, 183
+infoWin = curses.newwin(10, 185, 43, 0) #size 8, 183
 infoWin.border()    
 curses.curs_set(0)
 curses.start_color()
@@ -56,6 +55,23 @@ def printMap(matrix):
             mainWin.addch(i, j, element[0], curses.color_pair(element[1]))
     mainWin.refresh()
 
+def printTextR(win, line, text):
+    cursor = 1
+    for element in text:
+        # cut the string if it's too long
+        t = element[0]
+        t = t[:win.getmaxyx()[1]-cursor-1] if len(t) > win.getmaxyx()[1]-cursor-1 else t
+        col = curses.color_pair(element[1])
+        if element[2] == "bold":
+            col += curses.A_BOLD
+        elif element[2] == "italic":
+            col += curses.A_ITALIC
+        for char in t:
+            win.addch(line+1, cursor, char, col)
+            cursor += 1
+    win.refresh()
+
+
 def printText(win, line, text):
     cursor = 1
     for element in text:
@@ -80,7 +96,7 @@ def printInfo(text):
     infoWin.clear()
     infoWin.border()
     infoList.append(text) #need to be [("string", color, type of text)]
-    infoList.pop(0) if len(infoList) > 6 else None
+    infoList.pop(0) if len(infoList) > 8 else None
     for i, text in enumerate(infoList):
         printText(infoWin, i, text)
 
