@@ -23,9 +23,9 @@ color = { #color for rarity
 }
 
 
+keyboard.press("f11")
 os.system("cls")
 
-# keyboard.press("f11")
 refreshAll()
 
 #load keybind from save file
