@@ -613,9 +613,9 @@ class GearUI(Menu):
         """Function to add more infos on the menu"""
         def diffColor(diff):
             if diff < 0:
-                return (diff, 4, None)
+                return (str(diff), 4, None)
             else:
-                return (diff, 5, None)
+                return (str(diff), 5, None)
         text = self.gear.name
         part = type(self.gear)
         if part == Weapon:
@@ -628,69 +628,24 @@ class GearUI(Menu):
         rarityDiff = diffColor(self.gear.rarity - equiped.rarity)
         manaDiff = diffColor(self.gear.mana - equiped.mana)
 
-        printText(mainWin, 0, [(text, color[self.gear.rarity], "bold")])
-        printText(mainWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
-        printText(mainWin, 2, [("Level: ", 9, None), (f"{self.gear.level} ", 9, "bold"), levelDiff])
-        printText(mainWin, 3, [(f"Rarity: {self.gear.rarity} ", color[self.gear.rarity], None), rarityDiff])
+        printText(statsWin, 0, [(text, color[self.gear.rarity], "bold")])
+        printText(statsWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
+        printText(statsWin, 2, [("Level: ", 9, None), (f"{self.gear.level} ", 9, "bold"), levelDiff])
+        printText(statsWin, 3, [(f"Rarity: {self.gear.rarity} ", color[self.gear.rarity], None), rarityDiff])
         if part == Weapon:
-            printText(mainWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} ", 9, "bold"), damageDiff])
+            printText(statsWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} ", 9, "bold"), damageDiff])
         elif part == Armor:
-            printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
-        printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
+            printText(statsWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
+        printText(statsWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
 
-        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
-        printText(mainWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
-        printText(mainWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
+        printText(statsWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
+        printText(statsWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
+        printText(statsWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
         if part == Weapon:
-            printText(mainWin, 10, [("Damage: ", 9, None), (f"{equiped.baseDamage}", 9, "bold")])
+            printText(statsWin, 10, [("Damage: ", 9, None), (f"{equiped.baseDamage}", 9, "bold")])
         elif part == Armor:
-            printText(mainWin, 10, [("Armor: ", 9, None), (f"{equiped.baseArmor}", 9, "bold")])
-        printText(mainWin, 11, [("Mana: ", 9, None), (f"{equiped.mana}", 9, "bold")])
-
-    def printMenu(self):
-        """Prints the menu with the information about the gear"""
-        def diffColor(diff):
-            if diff < 0:
-                return (diff, 4, None)
-            else:
-                return (diff, 5, None)
-        clearAll()
-        printText(mainWin, 0, [(self.title, 9, "bold")])
-        part = type(self.gear)
-        if part == Weapon:
-            equiped = self.player.weapon
-            damageDiff = diffColor(self.gear.baseDamage - equiped.baseDamage)
-        elif part == Armor:
-            equiped = self.player.armor
-            armorDiff = diffColor(self.gear.baseArmor - equiped.baseArmor)
-        levelDiff = diffColor(self.gear.level - equiped.level)
-        rarityDiff = diffColor(self.gear.rarity - equiped.rarity)
-        manaDiff = diffColor(self.gear.mana - equiped.mana)
-
-        printText(mainWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
-        printText(mainWin, 2, [("Level: ", 9, None), (f"{self.gear.level} ", 9, "bold"), levelDiff])
-        printText(mainWin, 3, [(f"Rarity: {self.gear.rarity} ", color[self.gear.rarity], None), rarityDiff])
-        if part == Weapon:
-            printText(mainWin, 4, [("Damage: ", 9, None), (f"{self.gear.baseDamage} ", 9, "bold"), damageDiff])
-        elif part == Armor:
-            printText(mainWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
-        printText(mainWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
-
-        printText(mainWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
-        printText(mainWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
-        printText(mainWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
-        if part == Weapon:
-            printText(mainWin, 10, [("Damage: ", 9, None), (f"{equiped.baseDamage}", 9, "bold")])
-        elif part == Armor:
-            printText(mainWin, 10, [("Armor: ", 9, None), (f"{equiped.baseArmor}", 9, "bold")])
-        printText(mainWin, 11, [("Mana: ", 9, None), (f"{equiped.mana}", 9, "bold")])
-
-        #selected option will be in green
-        for i, option in enumerate(self.option):
-            if i == self.select:
-                printText(mainWin, i+13, [(">", 5, "bold"), (option, 5, "bold")])
-            else:
-                printText(mainWin, i+13, [(option, 9, None)])
+            printText(statsWin, 10, [("Armor: ", 9, None), (f"{equiped.baseArmor}", 9, "bold")])
+        printText(statsWin, 11, [("Mana: ", 9, None), (f"{equiped.mana}", 9, "bold")])
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
@@ -713,15 +668,15 @@ class GearUI(Menu):
                 self.runVar = False
             case 1:
                 cost = self.gear.rank * self.gear.level * 10
-                if self.player.money >= cost:
-                    self.player.money -= cost
+                if self.player.gold >= cost:
+                    self.player.gold -= cost
                     self.gear.upgrade()
                     printInfo([("Gear upgraded", 9, None)])
-                    printInfo([("You have ", 9, None), (self.player.money, 2, "bold"), (" gold left", 9, None)])
+                    printInfo([("You have ", 9, None), (str(self.player.gold), 2, "bold"), (" gold left", 9, None)])
                     spaceToContinue()
                 else:
                     printInfo([("You don't have enough gold", 1, None)])
-                    printInfo([("You need ", 9, None), (cost - self.player.money, 9, "bold"), (" more gold", 9, None)])
+                    printInfo([("You need ", 9, None), (str(cost - self.player.gold), 9, "bold"), (" more gold", 9, None)])
                     spaceToContinue()
             case 2:
                 self.inventory.removeGear(self.gear)
@@ -804,9 +759,9 @@ class SpellTree:
             symbol = branch.spell.symbol
             line1 = [("╔═╩═╗", 9, None)]
             if selected:
-                line2 = [("║", 9, None), (f"{symbol} ", 1, None) , ("║", 9, None)]
+                line2 = [("║", 9, None), (fr"{symbol} ", 1, None) , ("║", 9, None)]
             else:
-                line2 = [(f"║{symbol} ║", 9, None)]
+                line2 = [(fr"║{symbol} ║", 9, None)]
             if len(branch.branches) == 0:
                 line3 = [("╚═╦═╝", 9, None)]
                 line4 = [("     ", 9, None)]
