@@ -8,6 +8,8 @@ Cahier des charges au 22/10/23: [English](./technicalSpecification.md) | [Franç
 
 Jeu au tour par tour, entièrement dans le terminal (peut etre en faire un jeu avec des graphismes)
 
+*Le jeu nécessite que le terminal soit en plein écran*
+
 **Concept** :
 "Dungeon Crawler: Endless Descent" est un jeu d'exploration de donjons sans fin où les joueurs endossent le rôle d'un courageux aventurier plongeant dans les profondeurs d'un donjon généré de manière procédurale, infini. L'objectif est de survivre aussi longtemps que possible, en affrontant des monstres, en collectant du butin et en descendant plus profondément dans le monde souterrain mystérieux.
 

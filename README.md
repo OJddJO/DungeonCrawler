@@ -8,6 +8,8 @@ Technical Specification as of 10/22/23: [English](./technicalSpecification.md) |
 
 Turn based game, entirely in console
 
+*The game needs to set the terminal in fullscreen*
+
 **Concept:**
 "Dungeon Crawler: Endless Descent" is an endless dungeon exploration game where players take on the role of a brave adventurer delving into the depths of a never-ending, procedurally generated dungeon. The objective is to survive as long as possible, defeating monsters, collecting loot, and descending deeper into the mysterious underground world.
 
