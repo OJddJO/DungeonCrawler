@@ -22,11 +22,10 @@ color = { #color for rarity
     6: 4
 }
 
-
-keyboard.press("f11")
+keyboard.press("f11") #enter fullscreen
 os.system("cls")
 
-refreshAll()
+clearAll()
 
 #load keybind from save file
 os.makedirs("save", exist_ok=True)

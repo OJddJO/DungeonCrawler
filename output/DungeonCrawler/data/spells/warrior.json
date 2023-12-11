@@ -1,0 +1,221 @@
+{
+    "Cleave": {
+        "name": "Cleave",
+        "symbol": "劈",
+        "type": "damage",
+        "cost": 20,
+        "damage": 15,
+        "scale": 0,
+        "description": "Swing your weapon in a wide arc, striking multiple nearby enemies with a single blow.",
+        "unlock": {
+            "level": 1,
+            "cost": 0
+        },
+        "next": {
+            "Mighty Strike": {
+                "name": "Mighty Strike",
+                "symbol": "强",
+                "type": "damage",
+                "cost": 50,
+                "damage": 20,
+                "scale": 0,
+                "description": "Strike a single enemy with a powerful blow.",
+                "unlock": {
+                    "level": 5,
+                    "cost": 250
+                },
+                "next": {
+                    "Whirlwind": {
+                        "name": "Whirlwind",
+                        "symbol": "旋",
+                        "type": "damage",
+                        "cost": 100,
+                        "damage": 40,
+                        "scale": 0,
+                        "description": "Spin around, striking all nearby enemies with your weapon.",
+                        "unlock": {
+                            "level": 10,
+                            "cost": 1000
+                        },
+                        "next": {}
+                    },
+                    "Shield Bash": {
+                        "name": "Shield Bash",
+                        "symbol": "击",
+                        "type": "debuff",
+                        "cost": 150,
+                        "damage": 50,
+                        "scale": 0,
+                        "debuff": ["stun"],
+                        "duration": 1,
+                        "description": "Bash your opponent with your shield, stunning and disorienting them, leaving them vulnerable and not able to act for a short time.",
+                        "unlock": {
+                            "level": 20,
+                            "cost": 5000
+                        },
+                        "next": {
+                            "Sundering Strike": {
+                                "name": "Sundering Strike",
+                                "symbol": "裂",
+                                "type": "debuff",
+                                "cost": 200,
+                                "damage": 50,
+                                "scale": 0,
+                                "debuff": ["break"],
+                                "duration": 2,
+                                "description": "Deliver a mighty strike that shatters your enemy's defenses, reducing their armor rating for a duration.",
+                                "unlock": {
+                                    "level": 25,
+                                    "cost": 6000
+                                },
+                                "next": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "Berserk": {
+                "name": "Berserk",
+                "symbol": "狂",
+                "type": "buff",
+                "cost": 50,
+                "heal": 0,
+                "scale": 0,
+                "buff": ["strength"],
+                "duration": 2,
+                "description": "Enter a berserk rage, increasing your damage for a short time.",
+                "unlock": {
+                    "level": 5,
+                    "cost": 250
+                },
+                "next": {
+                    "Rage": {
+                        "name": "Rage",
+                        "symbol": "怒",
+                        "type": "buff",
+                        "cost": 150,
+                        "heal": 0,
+                        "scale": 0,
+                        "buff": ["strength"],
+                        "duration": 4,
+                        "description": "Enter a state of rage, significantly increasing your attack damage for a limited time.",
+                        "unlock": {
+                            "level": 15,
+                            "cost": 2500
+                        },
+                        "next": {}
+                    },
+                    "Infernal Pact": {
+                        "name": "Infernal Pact",
+                        "symbol": "魔",
+                        "type": "buff",
+                        "cost": 150,
+                        "heal": 0,
+                        "scale": 0,
+                        "buff": ["pact", "vampirism"],
+                        "duration": 3,
+                        "description": "Forge a dark covenant with a demon, gaining access to demonic powers and abilities for a limited time.",
+                        "unlock": {
+                            "level": 35,
+                            "cost": 1000
+                        },
+                        "next": {
+                            "Infernal Blade": {
+                                "name": "Infernal Blade",
+                                "symbol": "刃",
+                                "type": "damage",
+                                "cost": 250,
+                                "damage": 60,
+                                "scale": 0,
+                                "description": "Infuse your weapon with demonic energy, allowing it to deal additional dark damage and drain the life force of your enemies with each strike.",
+                                "unlock": {
+                                    "level": 35,
+                                    "cost": 8000
+                                },
+                                "next": {}
+                            },
+                            "Infernal Shield": {
+                                "name": "Demonic Shield",
+                                "symbol": "盾",
+                                "type": "buff",
+                                "cost": 250,
+                                "heal": 0,
+                                "scale": 0,
+                                "buff": ["shield"],
+                                "duration": 3,
+                                "description": "Create a protective barrier of swirling darkness, reducing incoming damage.",
+                                "unlock": {
+                                    "level": 35,
+                                    "cost": 8000
+                                },
+                                "next": {
+                                    "Abyssal Regeneration": {
+                                        "name": "Abyssal Regeneration",
+                                        "symbol": "回",
+                                        "type": "heal",
+                                        "cost": 300,
+                                        "heal": 75,
+                                        "scale": 0,
+                                        "description": "Draw upon the power of the abyss to heal your wounds.",
+                                        "unlock": {
+                                            "level": 40,
+                                            "cost": 10000
+                                        },
+                                        "next": {}
+                                    }
+                                }
+                            },
+                            "Demonic Ascencsion": {
+                                "name": "Demonic Ascension",
+                                "symbol": "升",
+                                "type": "buff",
+                                "cost": 350,
+                                "heal": 100,
+                                "scale": 0,
+                                "buff": ["demonized", "vampirism", "strength"],
+                                "duration": 5,
+                                "description": "Achieve the ultimate form of demonic mastery, gaining near-complete control over dark forces and unlocking unprecedented destructive abilities.",
+                                "unlock": {
+                                    "level": 45,
+                                    "cost": 12500
+                                },
+                                "next": {
+                                    "Demonic Blade": {
+                                        "name": "Demonic Blade",
+                                        "symbol": "刃",
+                                        "type": "damage",
+                                        "cost": 400,
+                                        "damage": 100,
+                                        "scale": 0,
+                                        "description": "Infuse your weapon with demonic energy, allowing it to deal additional dark damage and drain the life force of your enemies with each strike.",
+                                        "unlock": {
+                                            "level": 45,
+                                            "cost": 12500
+                                        },
+                                        "next": {}
+                                    },
+                                    "Demon's Mark": {
+                                        "name": "Demon's Mark",
+                                        "symbol": "印",
+                                        "type": "debuff",
+                                        "cost": 400,
+                                        "damage": 0,
+                                        "scale": 0,
+                                        "debuff": ["break"],
+                                        "duration": 3,
+                                        "description": "Brand a target with the mark of a demon, making them vulnerable to demonic attacks and abilities.",
+                                        "unlock": {
+                                            "level": 45,
+                                            "cost": 12500
+                                        },
+                                        "next": {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

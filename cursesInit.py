@@ -3,11 +3,11 @@ import curses
 screen = curses.initscr()
 screen.clear()
 mainWin = curses.newwin(43, 123, 0, 0) #size 41, 121
-mainWin.border()
+# mainWin.border()
 statsWin = curses.newwin(43, 61, 0, 124) #size 41, 59
-statsWin.border()
+# statsWin.border()
 infoWin = curses.newwin(10, 185, 43, 0) #size 8, 183
-infoWin.border()    
+# infoWin.border()
 curses.curs_set(0)
 curses.start_color()
 curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE) #wall (black on white)
