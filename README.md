@@ -26,3 +26,8 @@ Turn based game, entirely in console
 6. **Leveling and Skill Trees:** Gain experience points by defeating monsters and leveling up. Invest skill points in skill trees to customize character abilities and playstyle.
 
 **"Dungeon Crawler: Endless Descent"** offers a classic and engaging endless game experience, perfect for those who enjoy exploration, combat, and character progression in a dark and mysterious setting.
+
+## Known Issue
+
+**BUG THAT WILL NOT BE CORRECTED DUE TO THE USAGE OF CURSES**
+-   When showing the spell tree, since chinese characters take 2 alphanumeric character width, it will cause minor problem (windows borders and the rendering of the tree).

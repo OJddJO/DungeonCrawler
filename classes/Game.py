@@ -1109,19 +1109,19 @@ class CastSpellUI(Menu):
                 pactRequired = ["Infernal Blade", "Infernal Shield", "Abyssal Regeneration"]
                 demonizedRequired = ["Demonic Blade", "Demon's Mark"]
                 if self.spell.name not in self.player.spells:
-                    printText(mainWin, 0, [("This spell is not unlocked", 1, None)])
+                    printInfo([("This spell is not unlocked", 1, None)])
                     spaceToContinue()
                 elif self.spell.cost > self.player.mana:
-                    printText(mainWin, 0, [("You don't have enough mana", 1, None)])
+                    printInfo([("You don't have enough mana", 1, None)])
                     spaceToContinue()
                 elif self.spell.unlock["level"] > self.player.level:
-                    printText(mainWin, 0, [("Your level is to low to use this spell", 1, None)])
+                    printInfo([("Your level is to low to use this spell", 1, None)])
                     spaceToContinue()
                 elif self.spell.name in pactRequired and not Fight.haveBuff("pact", self.player):
-                    printText(mainWin, 0, [("You need to make a pact with a demon to use  this spell", 1, None)])
+                    printInfo([("You need to make a pact with a demon to use  this spell", 1, None)])
                     spaceToContinue()
                 elif self.spell.name in demonizedRequired and not Fight.haveBuff("demonized", self.player):
-                    printText(mainWin, 0, [("You need in your demon form to use this spell", 1, None)])
+                    printInfo([("You need in your demon form to use this spell", 1, None)])
                     spaceToContinue()
                 elif self.spell.name in self.player.spells:
                     text = self.spell.onUse(self.player, self.getTarget())
@@ -1258,6 +1258,7 @@ class Game:
                     printInfo([("You lose all your gold", 9, None)])
                     self.player.exp = 0
                     self.player.level = 1
+                clearStats()
                 self.save()
                 spaceToContinue()
             elif element == "C": #if there is a chest open it
