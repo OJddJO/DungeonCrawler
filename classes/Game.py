@@ -5,12 +5,12 @@ import random
 from sys import exit
 from datetime import datetime
 from time import sleep
+from cursesInit import *
 from classes.Map import Lobby, Portal
 from classes.Player import Player
 from classes.Enemy import Enemy
 from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
-from cursesInit import *
 
 separator = "─" * 200
 color = { #color for rarity
@@ -153,17 +153,17 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                try:
+                # try:
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         clearMain()
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
-                except Exception as e:
-                    printText(mainWin, 0, [("An error occurred", 1, None)])
-                    printText(mainWin, 1, [(str(e), 1, None)])
-                    spaceToContinue()
+                # except Exception as e:
+                #     printText(mainWin, 0, [("An error occurred", 1, None)])
+                #     printText(mainWin, 1, [(str(e), 1, None)])
+                #     spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -501,13 +501,12 @@ class ItemUI(Menu):
             self.used = False
         title = open('ascii/inventory', 'r').read()
         options = ["Information", "Use", "Throw One", "Throw All", "Back"]
-        super().__init__(title, options, self.onSpace)
+        super().__init__(title, options, self.onSpace, self.addInfos)
 
     def addInfos(self):
         text = f"{self.item.name} x{self.quantity}"
         l = 0
-        printText(mainWin, l, [(text, 9, "bold")])
-        printText(statsWin, l, [(self.item.name, color[self.item.rarity], "bold")])
+        printText(statsWin, l, [(text, color[self.item.rarity], "bold")])
         l += 1
         if len(self.item.description) > 59:
             printText(statsWin, l, [(self.item.description[:59], 9, None)])
@@ -523,8 +522,22 @@ class ItemUI(Menu):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
-                printText(mainWin, 0, [(self.item, 9, None)])
+                clearMain()
+                text = f"{self.item.name} x{self.quantity}"
+                l = 0
+                printText(mainWin, l, [(text, color[self.item.rarity], "bold")])
+                l += 1
+                if len(self.item.description) > 59:
+                    printText(mainWin, l, [(self.item.description[:59], 9, None)])
+                    printText(mainWin, l+1, [(self.item.description[59:], 9, None)])
+                    l += 2
+                else:
+                    printText(mainWin, l, [(self.item.description, 9, None)])
+                    l += 1
+                printText(mainWin, l, [("Rarity: ", 9, None), (str(self.item.rarity), color[self.item.rarity], None)])
+                printText(mainWin, l+1, [("Value: ", 9, None), (str(self.item.value), 2, None)])
                 spaceToContinue()
+                self.runVar = False
             case 1:
                 use = True
                 if not self.inFight and type(self.item) == BuffItem:
@@ -543,8 +556,13 @@ class ItemUI(Menu):
                 self.runVar = False
             case 2:
                 self.inventory.removeItem(self.item)
+                printInfo([("You threw ", 9, None), (self.item.name, 9, "bold")])
+                printInfo([("You now have ", 9, None), (self.quantity, 9, "bold"), (" x ", 9, None), (self.item.name, 9, "bold")])
+                self.runVar = False
             case 3:
                 self.inventory.removeItem(self.item, self.quantity)
+                printInfo([("You threw all your ", 9, None), (self.item.name, 9, "bold")])
+                self.runVar = False
             case 4:
                 self.runVar = False
 
@@ -830,6 +848,7 @@ class SpellTree:
         printText(mainWin, line, [(links, 9, None)])
         line += 1
 
+        # spells
         spells = [sliceSpell(branch, selectedList[i+1]) for i, branch in enumerate(self.current.branches)]
         spellsStr = []
 
@@ -913,27 +932,27 @@ class SpellUI(Menu):
         elif self.spell.unlock["level"] <= self.player.level:
             printText(statsWin, l, [("This spell can be unlocked", 5, None)])
             printText(statsWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
-            printText(statsWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
+            printText(statsWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 2, "bold")])
             l += 3
         else:
             printText(statsWin, l, [("This spell can't be unlocked yet", 4, None)])
             printText(statsWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
             l += 2
-        printText(statsWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
+        printText(statsWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 6, "bold")])
         l += 1
         if type(self.spell) == DamageSpell:
-            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 4, "bold")])
             l += 1
         elif type(self.spell) == HealSpell:
-            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 4, "bold")])
             l += 1
         elif type(self.spell) == BuffSpell:
-            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 4, "bold")])
             printText(statsWin, l+1, [("Buff: ", 9, None), (f"{self.spell.buff}", 9, "bold")])
             printText(statsWin, l+2, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
             l += 3
         elif type(self.spell) == DebuffSpell:
-            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 4, "bold")])
             printText(statsWin, l+1, [("Debuff: ", 9, None), (f"{self.spell.debuff}", 9, "bold")])
             printText(statsWin, l+2, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
             l += 3
@@ -958,27 +977,27 @@ class SpellUI(Menu):
                 elif self.spell.unlock["level"] <= self.player.level:
                     printText(mainWin, l, [("This spell can be unlocked", 5, None)])
                     printText(mainWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
-                    printText(mainWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
+                    printText(mainWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 2, "bold")])
                     l += 3
                 else:
                     printText(mainWin, l, [("This spell can't be unlocked yet", 4, None)])
                     printText(mainWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
                     l += 2
-                printText(mainWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
+                printText(mainWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 6, "bold")])
                 l += 1
                 if type(self.spell) == DamageSpell:
-                    printText(mainWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+                    printText(mainWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 4, "bold")])
                     l += 1
                 elif type(self.spell) == HealSpell:
-                    printText(mainWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+                    printText(mainWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 4, "bold")])
                     l += 1
                 elif type(self.spell) == BuffSpell:
-                    printText(mainWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+                    printText(mainWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 4, "bold")])
                     printText(mainWin, l+1, [("Buff: ", 9, None), (f"{self.spell.buff}", 9, "bold")])
                     printText(mainWin, l+2, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
                     l += 3
                 elif type(self.spell) == DebuffSpell:
-                    printText(mainWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+                    printText(mainWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 4, "bold")])
                     printText(mainWin, l+1, [("Debuff: ", 9, None), (f"{self.spell.debuff}", 9, "bold")])
                     printText(mainWin, l+2, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
                     l += 3
@@ -1047,27 +1066,27 @@ class CastSpellUI(Menu):
         elif self.spell.unlock["level"] <= self.player.level:
             printText(statsWin, l, [("This spell can be unlocked", 5, None)])
             printText(statsWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
-            printText(statsWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 9, "bold")])
+            printText(statsWin, l+2, [("Cost: ", 9, None), (f"{self.spell.unlock['cost']}", 2, "bold")])
             l += 3
         else:
             printText(statsWin, l, [("This spell can't be unlocked yet", 4, None)])
             printText(statsWin, l+1, [("Level required: ", 9, None), (f"{self.spell.unlock['level']}", 9, "bold")])
             l += 2
-        printText(statsWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 9, "bold")])
+        printText(statsWin, l, [("Mana Cost: ", 9, None), (f"{self.spell.cost}", 6, "bold")])
         l += 1
         if type(self.spell) == DamageSpell:
-            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 4, "bold")])
             l += 1
         elif type(self.spell) == HealSpell:
-            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 4, "bold")])
             l += 1
         elif type(self.spell) == BuffSpell:
-            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Heal: ", 9, None), (f"{int(self.spell.heal+(self.spell.scale*self.player.mana))}", 4, "bold")])
             printText(statsWin, l+1, [("Buff: ", 9, None), (f"{self.spell.buff}", 9, "bold")])
             printText(statsWin, l+2, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
             l += 3
         elif type(self.spell) == DebuffSpell:
-            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 9, "bold")])
+            printText(statsWin, l, [("Damage: ", 9, None), (f"{int(self.spell.damage+(self.spell.scale*self.player.mana))}", 4, "bold")])
             printText(statsWin, l+1, [("Debuff: ", 9, None), (f"{self.spell.debuff}", 9, "bold")])
             printText(statsWin, l+2, [("Duration: ", 9, None), (f"{self.spell.duration}", 9, "bold")])
             l += 3
