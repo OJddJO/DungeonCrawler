@@ -98,24 +98,23 @@ class Menu:
     def selectOption(self):
         """Selects the option"""
         getInput = True
-        key = None
         while getInput:
             if keyPress(keybind['up']):
-                key = keybind['up']
+                getInput = False
                 self.select -= 1
                 if self.select < 0:
                     self.select = len(self.option) - 1
             elif keyPress(keybind['down']):
-                key = keybind['down']
+                getInput = False
                 self.select += 1
                 if self.select > len(self.option) - 1:
                     self.select = 0
             elif keyPress('space'):
-                key = 'space'
                 getInput = False
                 self.onSpace(self.select)
-            if key != None:
+            elif keyPress('esc'):
                 getInput = False
+                self.runVar = False
 
     def run(self):
         """Runs the menu"""
@@ -138,7 +137,7 @@ class MainMenu(Menu):
             case 0:
                 if os.path.exists("save/stats.json"):
                     clearMain()
-                    printText(mainWin, 0, [("WARNING", 1, "bold"), (": You will overwrite your save file", 9, None)])
+                    printText(mainWin, 0, [("WARNING", 4, "bold"), (": You will overwrite your save file", 9, None)])
                     printText(mainWin, 1, [("Are you sure you want to start a new game ?", 9, "bold")])
                     printText(mainWin, 2, [("1. Yes    2. No", 9, None)])
                     getInput = True
@@ -278,6 +277,7 @@ class KeybindMenu(Menu):
 
     def replaceKey(self, key):
         """Replaces the key with the input key"""
+        clearMain()
         printText(mainWin, 0, [("Press the key you want to replace", 9, None), (f" {key} ", 5, "bold"), ("with", 9, None)])
         printText(mainWin, 1, [("Press ", 9, None), ("˽", 9, "bold"),  (" to cancel", 9, None)])
         inputKey = keyboard.read_key()
@@ -330,7 +330,7 @@ class PauseMenu(Menu):
                 OptionMenu().run()
             case 3:
                 clearMain()
-                printText(mainWin, 0, [("WARNING", 1, "bold"), (": You will lose your progression", 9, None)])
+                printText(mainWin, 0, [("WARNING", 4, "bold"), (": You will lose your progression", 9, None)])
                 printText(mainWin, 1, [("Are you sure you want to exit ?", 9, "bold")])
                 printText(mainWin, 2, [("1. Yes    2. No", 9, None)])
                 getInput = True
@@ -853,7 +853,6 @@ class SpellTree:
         while self.runVar:
             self.render()
             self.navigate()
-        clearAll()
 
 
 class SpellUI(Menu):
@@ -1062,19 +1061,19 @@ class CastSpellUI(Menu):
                 pactRequired = ["Infernal Blade", "Infernal Shield", "Abyssal Regeneration"]
                 demonizedRequired = ["Demonic Blade", "Demon's Mark"]
                 if self.spell.name not in self.player.spells:
-                    printInfo([("This spell is not unlocked", 1, None)])
+                    printInfo([("This spell is not unlocked", 4, None)])
                     spaceToContinue()
                 elif self.spell.cost > self.player.mana:
-                    printInfo([("You don't have enough mana", 1, None)])
+                    printInfo([("You don't have enough mana", 7, None)])
                     spaceToContinue()
                 elif self.spell.unlock["level"] > self.player.level:
-                    printInfo([("Your level is to low to use this spell", 1, None)])
+                    printInfo([("Your level is to low to use this spell", 4, None)])
                     spaceToContinue()
                 elif self.spell.name in pactRequired and not Fight.haveBuff("pact", self.player):
-                    printInfo([("You need to make a pact with a demon to use  this spell", 1, None)])
+                    printInfo([("You need to make a pact with a demon to use this spell", 4, None)])
                     spaceToContinue()
                 elif self.spell.name in demonizedRequired and not Fight.haveBuff("demonized", self.player):
-                    printInfo([("You need in your demon form to use this spell", 1, None)])
+                    printInfo([("You need in your demon form to use this spell", 4, None)])
                     spaceToContinue()
                 elif self.spell.name in self.player.spells:
                     text = self.spell.onUse(self.player, self.getTarget())
@@ -1220,7 +1219,7 @@ class Game:
             elif element == "G": #if there is a grimoire use it to see the spell tree
                 SpellTree(self.player.role, self.player).run()
                 self.save()
-            elif element == "S":
+            elif element == "S": #if there is a shop open it
                 Shop(self.player).run()
                 self.save()
         self.printRoom()
@@ -1252,26 +1251,31 @@ class Game:
     def playerMove(self, direction):
         """Player Movement Handler. Move the player in the room depending on the direction"""
         coord = self.currentRoom.getPlayerCoord()
+        move = False
         match direction:
             case'up':
                 if self.currentRoom.map[coord[0] - 1][coord[1]] == '.':
                     self.currentRoom.map[coord[0]][coord[1]] = '.'
                     self.currentRoom.map[coord[0] - 1][coord[1]] = self.player
+                    move = True
             case 'down':
                 if self.currentRoom.map[coord[0] + 1][coord[1]] == '.':
                     self.currentRoom.map[coord[0]][coord[1]] = '.'
                     self.currentRoom.map[coord[0] + 1][coord[1]] = self.player
+                    move = True
             case 'left':
                 if self.currentRoom.map[coord[0]][coord[1] - 1] == '.':
                     self.currentRoom.map[coord[0]][coord[1]] = '.'
                     self.currentRoom.map[coord[0]][coord[1] - 1] = self.player
+                    move = True
             case 'right':
                 if self.currentRoom.map[coord[0]][coord[1] + 1] == '.':
                     self.currentRoom.map[coord[0]][coord[1]] = '.'
                     self.currentRoom.map[coord[0]][coord[1] + 1] = self.player
+                    move = True
         # while keyboard.is_pressed(direction): #wait for the key to be released
         #     pass
-        sleep(0.1) #delay to avoid multiple key press
+        sleep(0.1) if move else None #delay to avoid multiple key press
         self.printRoom()
 
     def printRoom(self):
@@ -1447,7 +1451,7 @@ class Fight:
             b = True
         if b:
             spaceToContinue()
-        
+
         # revive buff (player only)
         if self.haveBuff("revive", self.player) and self.player.health <= 0:
             self.player.health = 100
@@ -1461,7 +1465,7 @@ class Fight:
         self.removeBuffDebuff(self.player)
         self.removeBuffDebuff(self.enemy)
         return self.endFight()
-    
+
     def enemySpell(self):
         """Enemy Spell Handler. Manages the enemy spell"""
         def evalSpell(spell):
