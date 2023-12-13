@@ -22,7 +22,6 @@ color = { #color for rarity
     6: 4
 }
 
-keyboard.press("f11") #enter fullscreen
 os.system("cls")
 
 clearAll()
@@ -152,17 +151,17 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                # try:
+                try:
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         clearMain()
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
-                # except Exception as e:
-                #     printText(mainWin, 0, [("An error occurred", 1, None)])
-                #     printText(mainWin, 1, [(str(e), 1, None)])
-                #     spaceToContinue()
+                except Exception as e:
+                    printText(mainWin, 0, [("An error occurred", 1, None)])
+                    printText(mainWin, 1, [(str(e), 1, None)])
+                    spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
