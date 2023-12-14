@@ -19,23 +19,19 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 3. Additional Features
 
--   Crafting and Alchemy *: Crafting items from materials and recipes.
+-   Crafting and Alchemy : Crafting items from materials and recipes.
 -   Scalability: Increasing difficulty with character level.
--   Quest System *: Integration of optional objectives in the dungeon.
--   Random Events *: Introduction of random events to spice up gameplay.
--   ~Multiplayer *: Possibility to play cooperatively. Multiplayer will be local, either on the same computer or on the same network (implemented with the Python library 'socket').~
-
-*: Not implemented in the game in the initial version, as of November 8, 2023.
+-   Quest System : Integration of optional objectives in the dungeon.
+-   Random Events : Introduction of random events to spice up gameplay.
+-   ~Multiplayer : Possibility to play cooperatively. Multiplayer will be local, either on the same computer or on the same network (implemented with the Python library 'socket').~
 
 4. Technical Requirements
 
--   Platform: Compatible with Windows and maybe Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
--   Programming Language: Python
--   User Interface: Terminal-based user interface.
--   Graphics and Sound: Integration of ASCII graphics, no sound.
--   ~Multiplayer *: Implementation of local multiplayer functionality.~
-
-*: Not implemented in the game in the initial version, as of November 8, 2023.
+-   Platform : Compatible with Windows and maybe Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
+-   Programming Language : Python
+-   User Interface : Terminal-based user interface.
+-   Graphics and Sound : Integration of ASCII graphics, no sound.
+-   ~Multiplayer : Implementation of local multiplayer functionality.~
 
 5. Timeline
 
@@ -43,6 +39,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 -   Production Phase: Game development. (Ends on November 1st)
 -   Testing Phase: Testing and debugging. (Ends on November 7th)
 -   First Release Phase: First playable compiled version. (November 8th)
+-   First Update: Addition of the new interface and new features. (December 20th)
 
 6. Development Team
 

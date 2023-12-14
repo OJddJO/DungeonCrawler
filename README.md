@@ -2,7 +2,7 @@
 
 Languages: English | [Français](./infoFr.md)
 
-Technical Specification as of 10/22/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
+Technical Specification as of 12/14/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
 ![poster](dc_poster.png)
 
@@ -32,4 +32,5 @@ Turn based game, entirely in console
 ## Known Issue
 
 **BUG THAT WILL NOT BE CORRECTED DUE TO THE USAGE OF CURSES**
+
 -   When showing the spell tree, since chinese characters take 2 alphanumeric character width, it will cause minor problem (windows borders and the rendering of the tree).
