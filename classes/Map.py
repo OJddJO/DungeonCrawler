@@ -58,7 +58,7 @@ class Room(Maze):
         for i, row in enumerate(self.map):
             render.append([])
             for j, element in enumerate(row):
-                if mist:
+                if mist: #if mist is True, the map is not fully visible and the player can only see the map around him (7x7, line 68)
                     render[i].append((" ", 8))
                 else:
                     if type(element) == str:
@@ -67,9 +67,9 @@ class Room(Maze):
                         render[i].append(colorDict[type(element)])
         if mist:
             coord = self.getPlayerCoord()
-            #arround the player in a square of 5x5 use colorDict
-            for i in range(coord[0] - 4, coord[0] + 5):
-                for j in range(coord[1] - 4, coord[1] + 5):
+            #arround the player in a square of 7x7 use colorDict
+            for i in range(coord[0] - 7, coord[0] + 8):
+                for j in range(coord[1] - 7, coord[1] + 8):
                     #test if the coord is in the map
                     if i >= 0 and i < len(self.map) and j >= 0 and j < len(self.map[0]):
                         if type(self.map[i][j]) == str:

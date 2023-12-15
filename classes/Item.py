@@ -179,23 +179,24 @@ def randomWeapon(role, level):
     if role not in ["warrior", "mage", "archer"]:
         raise KeyError("Invalid role")
     else:
-        if role == "warrior":
-            key = "swords"
-            damageMultiplier = 1 #polyvalent
-            manaMultiplier = 1
-        elif role == "mage":
-            key = "staves"
-            damageMultiplier = 0.5 #relies on skill
-            manaMultiplier = 2
-        elif role == "archer":
-            key = "bows"
-            damageMultiplier = 1.5 #relies on true damage
-            manaMultiplier = 0.5
+        match role:
+            case "warrior":
+                key = "swords"
+                damageMultiplier = 1 #polyvalent
+                manaMultiplier = 1
+            case "mage":
+                key = "staves"
+                damageMultiplier = 0.5 #relies on skill
+                manaMultiplier = 2
+            case "archer":
+                key = "bows"
+                damageMultiplier = 1.5 #relies on true damage
+                manaMultiplier = 0.5
     with open("data/weapon.json", "r") as f:
         data = json.load(f)
 
     weapon = random.choice(data[key])
-    rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
+    rarity = [1]*15 + [2]*10 + [3]*7 + [4]*5 + [5]*2 + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
     baseDamage = int(random.randint(5, 15)*damageMultiplier+level)
@@ -214,23 +215,24 @@ def randomArmor(role, level):
     if role not in ["warrior", "mage", "archer"]:
         raise KeyError("Invalid role")
     else:
-        if role == "warrior":
-            key = "chestplates"
-            armorMultiplier = 1.5 #tanky
-            manaMultiplier = 0.5
-        elif role == "mage":
-            key = "robes"
-            armorMultiplier = 0.5 #relies on skill
-            manaMultiplier = 2
-        elif role == "archer":
-            key = "tunics"
-            armorMultiplier = 1 #polyvalent
-            manaMultiplier = 1
+        match role:
+            case "warrior":
+                key = "chestplates"
+                armorMultiplier = 1.5 #tanky
+                manaMultiplier = 0.5
+            case "mage":
+                key = "robes"
+                armorMultiplier = 0.5 #relies on skill
+                manaMultiplier = 2
+            case "archer":
+                key = "tunics"
+                armorMultiplier = 1 #polyvalent
+                manaMultiplier = 1
     with open("data/armor.json", "r") as f:
         data = json.load(f)
 
     armor = random.choice(data[key])
-    rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
+    rarity = [1]*15 + [2]*10 + [3]*7 + [4]*5 + [5]*2 + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
     baseArmor = int(random.randint(1, 15)*armorMultiplier+level)

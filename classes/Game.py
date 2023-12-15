@@ -208,27 +208,13 @@ class HelpMenu(Menu):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
-                text = """The goal of the game is to go through the dungeon and defeat enemies in the dungeon to get stronger.
-You can move using the arrows or the keys you defined.
-You can interact with the elements around you using the spacebar.
-You can open the menu using the ESC key.
-When your health reaches 0 or below, you die and you will be teleported back to the lobby. You will have a death penalty.
-You can use skills using your mana which regenerate every action you do during a fight."""
+                text = open("data/help/play.txt", "r").read()
                 self.renderText(text)
             case 1:
-                text = """There are different object on the map:
--   @ : This is you. You can move using the arrows or the keys you defined.
--     : This is a path. The player can move on the path.
--   O : This is a portal. If the player is around it, he can interact with it to teleport.
--   C : This is a chest. If the player is around it, he can interact with it to see what's in his inventory.  
--   G : This is a grimoire. If the player is around it, he can interact with it to see his spells.
--   S : This is a shop. If the player is around it, he can interact with it to buy items in the shop.
--   M : This is an enemy. If the player is around him, he can fight with him.
--   $ : This is a treasure. If the player is around it, he can pick it up."""
+                text = open("data/help/map.txt", "r").read()
                 self.renderText(text)
             case 2:
-                text = """To save the game, just press ESC and there is an option to save your progression.
-You can exit the game using the menu that appears when you press the ESC key."""
+                text = open("data/help/save.txt", "r").read()
                 self.renderText(text)
             case 3:
                 self.runVar = False
@@ -340,6 +326,7 @@ class PauseMenu(Menu):
                         exit()
                     elif keyPress('2'):
                         getInput = False
+
 
 #SHOP
 class Shop(Menu):
@@ -614,7 +601,7 @@ class GearUI(Menu):
             if diff < 0:
                 return (str(diff), 4, None)
             else:
-                return (str(diff), 5, None)
+                return (f"+{diff}", 5, None)
         text = self.gear.name
         part = type(self.gear)
         if part == Weapon:
@@ -636,7 +623,7 @@ class GearUI(Menu):
         elif part == Armor:
             printText(statsWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
         printText(statsWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
-
+        printText(statsWin, 6, [(separator, 9, None)])
         printText(statsWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
         printText(statsWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
         printText(statsWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
@@ -645,6 +632,7 @@ class GearUI(Menu):
         elif part == Armor:
             printText(statsWin, 10, [("Armor: ", 9, None), (f"{equiped.baseArmor}", 9, "bold")])
         printText(statsWin, 11, [("Mana: ", 9, None), (f"{equiped.mana}", 9, "bold")])
+        printText(statsWin, 12, [("Rank: ", 9, None), (f"{equiped.rank}", 9, "bold")])
 
     def onSpace(self, select):
         """Function called when the spacebar is pressed"""
@@ -666,7 +654,7 @@ class GearUI(Menu):
                 spaceToContinue()
                 self.runVar = False
             case 1:
-                cost = self.gear.rank * self.gear.level * 10
+                cost = self.gear.rank * self.gear.level * self.gear.rarity * 10
                 if self.player.gold >= cost:
                     self.player.gold -= cost
                     self.gear.upgrade()
@@ -1158,7 +1146,7 @@ class Game:
                 else:
                     self.player.inventory.addItem(item)
                 self.player.gold += money
-                printInfo([(f"You found {color[item.rarity]} {item.name} and {money} gold in the treasure", 9, None)])
+                printInfo([("You found ", 9, None), (item.name, color[item.rarity], "bold"), (f" and {money} gold in the treasure", 9, None)])
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                 self.save()
                 spaceToContinue()
@@ -1207,9 +1195,9 @@ class Game:
                     self.lobby.dungeon.makeDungeon(self.player.level)
                     self.lobby.placePortal()
                     printInfo([("You died, you will be teleported back to the ", 9, None), ("lobby", 3, "bold")])
-                    printInfo([("You lose all your gold", 9, None)])
-                    self.player.exp = 0
-                    self.player.level = 1
+                    printInfo([("You lose half of your experience and level", 9, None)])
+                    self.player.exp = self.player.exp//2
+                    self.player.level = self.player.level//2
                 clearStats()
                 self.save()
                 spaceToContinue()
