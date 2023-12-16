@@ -45,10 +45,11 @@ class Room(Maze):
         # mist = False #testing
         colorDict = { # (char to print, color pair for curses)
             '#': (" ", 1),
-            '.': (" ", 7),
+            '.': (" ", 8),
             'C': ("C", 2),
             'G': ("G", 3),
             'S': ("S", 2),
+            'F': ("F", 7),
             Player: ("@", 5),
             Portal: ("O", 6),
             Enemy: ("M", 4),
@@ -173,13 +174,9 @@ class Lobby(Room):
         self.map = []
         self.player = player
         self.createRoom()
-        self.placePlayer()
         self.dungeon = Dungeon(self.player) #init dungeon in lobby for changing rooms
         self.dungeon.makeDungeon(self.player.level) # dungeon will be reset when the player goes back to the lobby
-        self.placePortal()
-        self.placeChest()
-        self.placeGrimoire()
-        self.placeShop()
+        self.placeEntities()
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
@@ -189,25 +186,18 @@ class Lobby(Room):
             self.map.append(["#"] + ["." for i in range(119)] + ["#"])
         self.map.append(["#" for i in range(121)])
 
-    def placePlayer(self):
-        """Places the player in the lobby"""
-        self.map[21][61] = self.player
-
     def placePortal(self):
         """Places the portal in the lobby"""
+        self.map[21][61] = Portal(self, self.dungeon.rooms[0])
+
+    def placeEntities(self):
+        """Places all entities in the lobby"""
+        self.map[21][61] = self.player
         self.map[16][61] = Portal(self, self.dungeon.rooms[0])
-
-    def placeChest(self):
-        """Places the chest in the lobby"""
         self.map[26][61] = "C"
-
-    def placeGrimoire(self):
-        """Places the grimoire in the lobby"""
-        self.map[21][51] = "G"
-
-    def placeShop(self):
-        """Places the shop in the lobby"""
+        self.map[19][51] = "G"
         self.map[21][71] = "S"
+        self.map[23][51] = "F"
 
 
 class Portal:

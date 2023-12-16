@@ -26,14 +26,10 @@ class Item:
         self.description = description
         self.rarity = rarity
         self.value = value
-    
-    def __str__(self):
-        """Returns a string representation of the info of the item"""
-        text = f"{color[self.rarity]}{self.name}\033[0m\n"
-        text += f"{self.description}\n"
-        text += f"Rarity: {color[self.rarity]+rarities[self.rarity]}\033[0m\n"
-        text += f"Value: {self.value}"
-        return text
+
+    def onUse(self):
+        """Method that is overwritten by the subclasses, by default does nothing"""
+        pass
 
 
 class HealItem(Item):
@@ -106,7 +102,8 @@ class Weapon:
 
     def upgrade(self):
         self.rank += 1
-        self.baseDamage = int(self.baseDamage*1.1)
+        modifier = int(self.baseDamage*0.1)
+        self.baseDamage += modifier if modifier != 0 else 1
 
     def onUse(self):
         """Returns the damage of the weapon"""
@@ -140,7 +137,8 @@ class Armor:
 
     def upgrade(self):
         self.rank += 1
-        self.baseArmor = int(self.baseArmor*1.1)
+        modifier = int(self.baseArmor*0.1)
+        self.baseArmor += modifier if modifier != 0 else 1
 
     def onUse(self):
         """Returns the armor of the armor"""

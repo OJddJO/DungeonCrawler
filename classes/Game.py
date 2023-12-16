@@ -9,7 +9,7 @@ from cursesInit import *
 from classes.Map import Lobby, Portal
 from classes.Player import Player
 from classes.Enemy import Enemy
-from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem
+from classes.Item import Treasure, Weapon, Armor, HealItem, BuffItem, Item, randomWeapon, randomArmor
 from classes.Spell import DamageSpell, HealSpell, BuffSpell, DebuffSpell, Tree
 
 separator = "─" * 200
@@ -150,17 +150,17 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                try:
+                # try:
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         clearMain()
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
-                except Exception as e:
-                    printText(mainWin, 0, [("An error occurred", 1, None)])
-                    printText(mainWin, 1, [(str(e), 1, None)])
-                    spaceToContinue()
+                # except Exception as e:
+                #     printText(mainWin, 0, [("An error occurred", 4, None)])
+                #     printText(mainWin, 1, [(str(e), 4, None)])
+                #     spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -592,7 +592,7 @@ class GearUI(Menu):
         self.gear = gear
         self.player = player
         title = open('ascii/inventory', 'r').read()
-        options = ["Equip", "Upgrade", "Throw", "Back"]
+        options = ["Equip", "Throw", "Back"]
         super().__init__(title, options, self.onSpace, self.addInfos)
 
     def addInfos(self):
@@ -602,7 +602,6 @@ class GearUI(Menu):
                 return (str(diff), 4, None)
             else:
                 return (f"+{diff}", 5, None)
-        text = self.gear.name
         part = type(self.gear)
         if part == Weapon:
             equiped = self.player.weapon
@@ -614,7 +613,7 @@ class GearUI(Menu):
         rarityDiff = diffColor(self.gear.rarity - equiped.rarity)
         manaDiff = diffColor(self.gear.mana - equiped.mana)
 
-        printText(statsWin, 0, [(text, color[self.gear.rarity], "bold")])
+        printText(statsWin, 0, [(self.gear.name, color[self.gear.rarity], "bold")])
         printText(statsWin, 1, [("Description: ", 9, None), (self.gear.description, 9, "bold")]) # current gear
         printText(statsWin, 2, [("Level: ", 9, None), (f"{self.gear.level} ", 9, "bold"), levelDiff])
         printText(statsWin, 3, [(f"Rarity: {self.gear.rarity} ", color[self.gear.rarity], None), rarityDiff])
@@ -654,21 +653,9 @@ class GearUI(Menu):
                 spaceToContinue()
                 self.runVar = False
             case 1:
-                cost = self.gear.rank * self.gear.level * self.gear.rarity * 10
-                if self.player.gold >= cost:
-                    self.player.gold -= cost
-                    self.gear.upgrade()
-                    printInfo([("Gear upgraded", 9, None)])
-                    printInfo([("You have ", 9, None), (str(self.player.gold), 2, "bold"), (" gold left", 9, None)])
-                    spaceToContinue()
-                else:
-                    printInfo([("You don't have enough gold", 1, None)])
-                    printInfo([("You need ", 9, None), (str(cost - self.player.gold), 9, "bold"), (" more gold", 9, None)])
-                    spaceToContinue()
-            case 2:
                 self.inventory.removeGear(self.gear)
                 self.runVar = False
-            case 3:
+            case 2:
                 self.runVar = False
 
 #SPELL
@@ -1085,6 +1072,186 @@ class CastSpellUI(Menu):
             case 2:
                 self.runVar = False
 
+#CRAFT
+class ForgeUI(Menu):
+    """ForgeUI class, used to create the craft UI"""
+    def __init__(self, player, inventory):
+        """Constructor for the ForgeUI class, takes in player and inventory"""
+        self.player = player
+        self.inventory = inventory
+        title = open("ascii/craft", "r").read()
+        options = ("Weapon", "Armor", "Consumable", "Upgrade", "Back")
+        super().__init__(title, options, self.onSpace)
+
+    def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
+        match select:
+            case 0:
+                SelectItemUI(self.player, self.inventory, "weapon").run()
+            case 1:
+                SelectItemUI(self.player, self.inventory, "armor").run()
+            case 2:
+                SelectItemUI(self.player, self.inventory, "item").run()
+            case 3:
+                UpgradeUI(self.player, self.inventory).run()
+            case 4:
+                self.runVar = False
+
+
+class SelectItemUI(Menu):
+    """SelectItemUI class, used to create the select item UI"""
+    def __init__(self, player, inventory, itemType):
+        """Constructor for the SelectItemUI class, takes in player, inventory, and itemType"""
+        title = open("ascii/craft", "r").read()
+        self.player = player
+        self.inventory = inventory
+        self.type = itemType
+        self.redefineOptions()
+        super().__init__(title, self.option, self.onSpace)
+
+    def redefineOptions(self):
+        """Redefines the options"""
+        self.option = []
+        data = json.load(open("data/crafting/recipes.json", "r"))
+        for recipe in data[self.type]:
+            recipe = data[self.type][recipe]
+            if self.type == "weapon":
+                if recipe["role"] != self.player.role:
+                    continue
+            self.option.append(recipe["name"])
+        self.option.append("Back")
+
+    def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
+        if select == len(self.option) - 1:
+            self.runVar = False
+        else:
+            data = json.load(open("data/crafting/recipes.json", "r"))[self.type][self.option[select]]
+            CraftItemUI(self.player, self.inventory, data).run()
+
+
+class CraftItemUI(Menu):
+    """CraftItemUI class, used to create the craft item UI"""
+    def __init__(self, player, inventory, item):
+        """Constructor for the CraftItemUI class, takes in player, inventory, and item"""
+        title = open("ascii/craft", "r").read()
+        options = ("Craft", "Back")
+        self.player = player
+        self.inventory = inventory
+        self.item = item #dict of the item to craft
+        self.moneyCost = self.player.level * 100
+        super().__init__(title, options, self.onSpace, self.addInfos)
+
+    def addInfos(self):
+        """Adds the infos of the item to craft"""
+        clearStats()
+        printText(statsWin, 0, [(f"{self.item['name']}", 9, "bold")])
+        printText(statsWin, 1, [("Cost: ", 9, None)])
+        for i, element in enumerate(self.item["recipe"]):
+            printText(statsWin, 2+i, [(f"- {element}", 9, None)])
+        printText(statsWin, 4, [(f"- {self.moneyCost} gold", 2, None)])
+
+    def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
+        match select:
+            case 0:
+                haveItem1 = self.item["recipe"][0] in self.inventory.getExistingItems()
+                haveItem2 = self.item["recipe"][1] in self.inventory.getExistingItems()
+                if self.player.gold >= self.moneyCost and haveItem1 and haveItem2:
+                    for i in range(2):
+                        item = Item(self.item["recipe"][i], "", 0) #simulate the item used in the craft
+                        self.inventory.removeItem(item)
+                    self.player.gold -= self.moneyCost
+                    if self.item["type"] == "weapon":
+                        example = randomWeapon(self.player.role, self.player.level)
+                        item = Weapon(self.item["name"], self.item["description"], example.level, int(example.baseDamage*1.2), example.rarity, int(example.mana*1.2))
+                    elif self.item["type"] == "armor":
+                        example = randomArmor(self.player.role, self.player.level)
+                        item = Armor(self.item["name"], self.item["description"], example.level, int(example.baseHealth*1.2), example.rarity, int(example.mana*1.2))
+                    self.inventory.addGear(item)
+                    printInfo([("Item crafted", 9, None)])
+                    spaceToContinue()
+                else:
+                    if self.player.gold < self.moneyCost:
+                        printInfo([("You don't have enough money", 4, None)])
+                    if not haveItem1 or not haveItem2:
+                        printInfo([("You don't have the required items", 4, None)])
+                    spaceToContinue()
+            case 1:
+                self.runVar = False
+
+
+class UpgradeUI(Menu):
+    """UpgradeUI class, used to create the upgrade UI"""
+    def __init__(self, player, inventory):
+        """Constructor for the UpgradeUI class"""
+        title = open("ascii/craft", "r").read()
+        self.player = player
+        self.inventory = inventory
+        self.redifineOptions()
+        super().__init__(title, self.option, self.onSpace, self.addInfos)
+
+    def redifineOptions(self):
+        """Redefines the options"""
+        self.option = []
+        self.option.append(self.player.weapon.name)
+        self.option.append(self.player.armor.name)
+        for gear in self.inventory.gear:
+            if gear != None:
+                self.option.append(gear.name)
+            else:
+                self.option.append("Empty")
+        self.option.append("Back")
+
+    def getGear(self):
+        """Gets the selected gear"""
+        if self.select == 0:
+            return self.player.weapon
+        elif self.select == 1:
+            return self.player.armor
+        elif self.select >= 2 and self.select-2 < len(self.inventory.gear):
+            return self.inventory.gear[self.select-2]
+        else:
+            return None
+
+    def addInfos(self):
+        """Adds the infos of the item to upgrade"""
+        clearStats()
+        printInfo([("Select an item to upgrade", 9, None)])
+        selected = self.getGear()
+        if selected != None:
+            printText(statsWin, 0, [(selected.name, color[selected.rarity], "bold")])
+            printText(statsWin, 1, [("Description: ", 9, None), (selected.description, 9, "bold")]) # current gear
+            printText(statsWin, 2, [("Level: ", 9, None), (str(selected.level), 9, "bold")])
+            printText(statsWin, 3, [(f"Rarity: {selected.rarity}", color[selected.rarity], None)])
+            if type(selected) == Weapon:
+                printText(statsWin, 4, [("Damage: ", 9, None), (str(selected.baseDamage), 9, "bold")])
+            elif type(selected) == Armor:
+                printText(statsWin, 4, [("Armor: ", 9, None), (str(selected.baseArmor), 9, "bold")])
+            printText(statsWin, 5, [("Mana: ", 9, None), (str(selected.mana), 9, "bold")])
+            printText(statsWin, 6, [(f"Rank: {selected.rank}", 9, "bold")])
+            cost = selected.rank * selected.level * selected.rarity * 10
+            printText(statsWin, 7, [("Upgrade Cost: ", 9, None), (str(cost), 2, "bold")])
+
+    def onSpace(self, select):
+        """Function called when the spacebar is pressed"""
+        if select == len(self.option) - 1:
+            self.runVar = False
+        else:
+            gear = self.getGear()
+            if gear != None:
+                cost = gear.rank * gear.level * gear.rarity * 10
+                if self.player.gold >= cost:
+                    self.player.gold -= cost
+                    gear.upgrade()
+                    printInfo([("Gear upgraded", 9, None)])
+                    printInfo([("You have ", 9, None), (str(self.player.gold), 2, "bold"), (" gold left", 9, None)])
+                    spaceToContinue()
+                else:
+                    printInfo([("You don't have enough gold", 4, None)])
+                    printInfo([("You need ", 9, None), (str(cost - self.player.gold), 9, "bold"), (" more gold", 9, None)])
+                    spaceToContinue()
+
 
 class Game:
     """Game class, main class of the game that contains the player and the current room"""
@@ -1142,9 +1309,11 @@ class Game:
                 item = element.randomLoot()
                 money = element.gold
                 if type(item) in (Weapon, Armor):
-                    self.player.inventory.addGear(item)
+                    pickedUp = self.player.inventory.addGear(item)
                 else:
-                    self.player.inventory.addItem(item)
+                    pickedUp = self.player.inventory.addItem(item)
+                if not pickedUp:
+                    printInfo([("Your inventory is full", 9, None)])
                 self.player.gold += money
                 printInfo([("You found ", 9, None), (item.name, color[item.rarity], "bold"), (f" and {money} gold in the treasure", 9, None)])
                 self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
@@ -1210,6 +1379,9 @@ class Game:
             elif element == "S": #if there is a shop open it
                 Shop(self.player).run()
                 self.save()
+            elif element == "F":
+                ForgeUI(self.player, self.player.inventory).run()
+                self.save()
         self.printRoom()
 
     def interactionInfo(self):
@@ -1235,6 +1407,8 @@ class Game:
                 printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to see your ", 9, None), ("spell tree", 4, "bold")])
             elif element == "S":
                 printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("shop", 2, "bold")])
+            elif element == "F":
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("forge", 2, "bold")])
 
     def playerMove(self, direction):
         """Player Movement Handler. Move the player in the room depending on the direction"""
