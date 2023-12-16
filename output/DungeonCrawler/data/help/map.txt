@@ -1,9 +1,0 @@
-There are different object on the map:
--   @ : This is you. You can move using the arrows or the keys you defined.
--     : This is a path. The player can move on the path.
--   O : This is a portal. If the player is around it, he can interact with it to teleport.
--   C : This is a chest. If the player is around it, he can interact with it to see what's in his inventory.  
--   G : This is a grimoire. If the player is around it, he can interact with it to see his spells.
--   S : This is a shop. If the player is around it, he can interact with it to buy items in the shop.
--   M : This is an enemy. If the player is around him, he can fight with him.
--   $ : This is a treasure. If the player is around it, he can pick it up.
