@@ -80,6 +80,10 @@
   {
    "optionDest": "datas",
    "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/data;data/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/recovery.dc;."
   }
  ],
  "nonPyinstallerOptions": {

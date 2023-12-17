@@ -1,4 +1,4 @@
-from classes.Item import randomWeapon, randomArmor
+from classes.Item import randomWeapon, randomArmor, randomItem
 import random
 from cursesInit import *
 
@@ -15,6 +15,7 @@ class Enemy:
         self.armor = randomArmor("mage", level-1)
         self.exp = random.randint(1, 5)*level
         self.gold = random.randint(1, 10)*level
+        self.loot = randomItem(self.type)
         self.level = level
         self.coord = coord
         self.buff = []

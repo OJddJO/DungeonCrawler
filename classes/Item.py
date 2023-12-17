@@ -27,7 +27,7 @@ class Item:
         self.rarity = rarity
         self.value = value
 
-    def onUse(self):
+    def onUse(self, user):
         """Method that is overwritten by the subclasses, by default does nothing"""
         pass
 
@@ -242,3 +242,16 @@ def randomArmor(role, level):
     mana += modifier
 
     return Armor(armor["name"], armor["description"], level, baseArmor, rarity, mana)
+
+
+def randomItem(enemy):
+    """Returns a random item depending on the enemy"""
+    if enemy not in ["bat", "demon", "ghost", "imp", "mushroom", "spider"]:
+        raise KeyError("Invalid enemy")
+    else:
+        data = json.load(open('data/crafting/drop.json'))[enemy]
+        drop = []
+        for element in data:
+            drop += [element]*(5-data[element]["rarity"])
+        item = random.choice(drop)
+        return Item(data[item]["name"], data[item]["description"], data[item]["rarity"], 0)

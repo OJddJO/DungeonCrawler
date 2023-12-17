@@ -2,9 +2,11 @@ import keyboard
 import os
 import json
 import random
+import zipfile
 from sys import exit
 from datetime import datetime
 from time import sleep
+from shutil import rmtree
 from cursesInit import *
 from classes.Map import Lobby, Portal
 from classes.Player import Player
@@ -42,14 +44,14 @@ else:
         json.dump(keybind, f)
 
 def keyPress(key):
-    """return True if the key is pressed and wait for the key to be released"""
+    """Return True if the key is pressed and released"""
     if keyboard.is_pressed(key):
         while keyboard.is_pressed(key): pass
         return True
     return False
 
 def bar(current, maximum, reversed = False, length = 20):
-    """return a bar with current/max"""
+    """Return a bar with current/max"""
     bar = "■" * (current // (maximum // length))
     bar += " " * (length - current // (maximum // length))
     if reversed:
@@ -58,7 +60,7 @@ def bar(current, maximum, reversed = False, length = 20):
     return bar
 
 def spaceToContinue():
-    """wait for the spacebar to be pressed and released"""
+    """Wait for the spacebar to be pressed and released"""
     printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to continue", 9, None)])
     wait = True
     while wait:
@@ -524,25 +526,25 @@ class ItemUI(Menu):
                 spaceToContinue()
                 self.runVar = False
             case 1:
-                use = True
-                if not self.inFight and type(self.item) == BuffItem:
-                    printInfo([("Can't use this item outside of a fight", 1, None)])
-                    use = False
-                if use:
-                    self.item.onUse(self.player)
-                    self.inventory.removeItem(self.item)
-                    printInfo([("You used ", 9, None), (self.item.name, 9, "bold")])
-                    printInfo([("You now have ", 9, None), (self.quantity, 9, "bold"), (" x ", 9, None), (self.item.name, 9, "bold")])
-                    printInfo([("You have ", 9, None), (self.player.gold, 9, "bold"), (" gold left", 9, None)])
-                if not self.inFight:
-                    spaceToContinue()
-                else:
-                    self.used = True
+                if type(self.item) != Item:
+                    use = True
+                    if not self.inFight and type(self.item) == BuffItem:
+                        printInfo([("Can't use this item outside of a fight", 1, None)])
+                        use = False
+                    if use:
+                        self.item.onUse(self.player)
+                        self.inventory.removeItem(self.item)
+                        printInfo([("You used ", 9, None), (self.item.name, 9, "bold")])
+                        printInfo([("You now have ", 9, None), (str(self.quantity), 9, "bold"), (" x ", 9, None), (self.item.name, 9, "bold")])
+                    if not self.inFight:
+                        spaceToContinue()
+                    else:
+                        self.used = True
                 self.runVar = False
             case 2:
                 self.inventory.removeItem(self.item)
                 printInfo([("You threw ", 9, None), (self.item.name, 9, "bold")])
-                printInfo([("You now have ", 9, None), (self.quantity, 9, "bold"), (" x ", 9, None), (self.item.name, 9, "bold")])
+                printInfo([("You now have ", 9, None), (str(self.quantity), 9, "bold"), (" x ", 9, None), (self.item.name, 9, "bold")])
                 self.runVar = False
             case 3:
                 self.inventory.removeItem(self.item, self.quantity)
@@ -1164,10 +1166,10 @@ class CraftItemUI(Menu):
                     self.player.gold -= self.moneyCost
                     if self.item["type"] == "weapon":
                         example = randomWeapon(self.player.role, self.player.level)
-                        item = Weapon(self.item["name"], self.item["description"], example.level, int(example.baseDamage*1.2), example.rarity, int(example.mana*1.2))
+                        item = Weapon(self.item["name"], self.item["description"], example.level, int(example.baseDamage*1.1), example.rarity, int(example.mana*1.1))
                     elif self.item["type"] == "armor":
                         example = randomArmor(self.player.role, self.player.level)
-                        item = Armor(self.item["name"], self.item["description"], example.level, int(example.baseHealth*1.2), example.rarity, int(example.mana*1.2))
+                        item = Armor(self.item["name"], self.item["description"], example.level, int(example.baseHealth*1.1), example.rarity, int(example.mana*1.1))
                     self.inventory.addGear(item)
                     printInfo([("Item crafted", 9, None)])
                     spaceToContinue()
@@ -1257,6 +1259,17 @@ class Game:
     """Game class, main class of the game that contains the player and the current room"""
     def __init__(self, new = True, role = None):
         """Constructor for the Game class, takes in new and role"""
+        #data recovery
+        def recovery():
+            """Recovers the data from the zip file"""
+            rmtree("data")
+            zipf = zipfile.ZipFile(f"recovery.dc", "r", zipfile.ZIP_DEFLATED)
+            zipf.extractall()
+            zipf.close()
+        if not os.path.exists("recovery.dc"):
+            raise Exception("Recovery file not found. Please reinstall the game")
+        recovery()
+        #end of data recovery
         if new: #new = True if the player start a new game
             clearAll()
             self.player = Player(role)
@@ -1348,8 +1361,10 @@ class Game:
                     self.currentRoom.map[element.coord[0]][element.coord[1]] = '.'
                     printInfo([("You win the fight", 9, None)])
                     printInfo([(f"You gain {element.exp} exp and {element.gold} gold", 9, None)])
+                    printInfo([("You loot ", 9, None), (element.loot.name, color[element.loot.rarity], "bold")])
                     self.player.exp += element.exp
                     self.player.gold += element.gold
+                    self.player.inventory.addItem(element.loot)
                     if self.player.exp >= (self.player.level*5)**2:
                         self.player.exp = 0
                         if self.player.level < 50:
@@ -1367,6 +1382,10 @@ class Game:
                     printInfo([("You lose half of your experience and level", 9, None)])
                     self.player.exp = self.player.exp//2
                     self.player.level = self.player.level//2
+                    if self.player.level < 1:
+                        self.player.level = 1
+                    if self.player.exp < 0:
+                        self.player.exp = 0
                 clearStats()
                 self.save()
                 spaceToContinue()
@@ -1404,11 +1423,11 @@ class Game:
             elif element == "C":
                 printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open your ", 9, None), ("inventory", 2, "bold")])
             elif element == "G":
-                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to see your ", 9, None), ("spell tree", 4, "bold")])
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to see your ", 9, None), ("spell tree", 3, "bold")])
             elif element == "S":
                 printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("shop", 2, "bold")])
             elif element == "F":
-                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("forge", 2, "bold")])
+                printInfo([("Press ", 9, None), ("˽", 9, "bold"), (" to open the ", 9, None), ("forge", 7, "bold")])
 
     def playerMove(self, direction):
         """Player Movement Handler. Move the player in the room depending on the direction"""

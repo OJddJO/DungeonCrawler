@@ -188,7 +188,7 @@ class Lobby(Room):
 
     def placePortal(self):
         """Places the portal in the lobby"""
-        self.map[21][61] = Portal(self, self.dungeon.rooms[0])
+        self.map[16][61] = Portal(self, self.dungeon.rooms[0])
 
     def placeEntities(self):
         """Places all entities in the lobby"""
