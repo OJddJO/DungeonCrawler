@@ -3,32 +3,38 @@
         "Shadowborne Shroud": {
             "name": "Shadowborne Shroud",
             "description": "Sleek armor with shadowy allure.",
-            "recipe": ["Shadowwing Hide", "Bat Ear"]
+            "recipe": ["Shadowwing Hide", "Bat Ear"],
+            "type": "armor"
         },
         "Abyssal Dreadplate Armor": {
             "name": "Abyssal Dreadplate Armor",
             "description": "Sinister armor, demonic strength within.",
-            "recipe": ["Abyssal Scale", "Hellforged Weaponry"]
+            "recipe": ["Abyssal Scale", "Hellforged Weaponry"],
+            "type": "armor"
         },
         "Ethereal Veil Cloak": {
             "name": "Ethereal Veil Cloak",
             "description": "Cloak of ghostly invisibility.",
-            "recipe": ["Ectoplsamic Essence", "Spectral Veil"]
+            "recipe": ["Ectoplsamic Essence", "Spectral Veil"],
+            "type": "armor"
         },
         "Impish Trickster Cloak": {
             "name": "Impish Trickster Cloak",
             "description": "Cloak that grants mischievous powers.",
-            "recipe": ["Impish Charm", "Abyssal Scale"]
+            "recipe": ["Impish Charm", "Abyssal Scale"],
+            "type": "armor"
         },
         "Mycosilk Mantle": {
             "name": "Mycosilk Mantle",
             "description": "Cloak woven from enchanted mycosilk.",
-            "recipe": ["Fungal Fiber", "Mushroom Cap Shield"]
+            "recipe": ["Fungal Fiber", "Mushroom Cap Shield"],
+            "type": "armor"
         },
         "Arachnoshroud Exosuit": {
             "name": "Arachnoshroud Exosuit",
             "description": "Exosuit woven from enchanted silk.",
-            "recipe": ["Spider Silk Thread", "Chitin Plate"]
+            "recipe": ["Spider Silk Thread", "Chitin Plate"],
+            "type": "armor"
         }
     },
     "weapon": {
@@ -36,109 +42,127 @@
             "name": "Echoblade Sword",
             "description": "Razor-sharp, agile wing sword.",
             "role": "warrior",
-            "recipe": ["Bat Fang", "Echo Stone"]
+            "recipe": ["Bat Fang", "Echo Stone"],
+            "type": "weapon"
         },
         "Moonshadow Crossbow": {
             "name": "Moonshadow Crossbow",
             "description": "Accurate crossbow with silent shots.",
             "role": "archer",
-            "recipe": ["Bat Fang", "Moonstone"]
+            "recipe": ["Bat Fang", "Moonstone"],
+            "type": "weapon"
         },
         "Echoharmony Scepter": {
             "name": "Echoharmony Scepter",
             "description": "Resonant staff channels echoing power.",
             "role": "mage",
-            "recipe": ["Echo Stone", "Moonstone"]
+            "recipe": ["Echo Stone", "Moonstone"],
+            "type": "weapon"
         },
         "Abyssal Whip": {
             "name": "Abyssal Whip",
             "description": "Dark, entangling demon weapon.",
             "role": "warrior",
-            "recipe": ["Abyssal Scale", "Hellforged Weaponry"]
+            "recipe": ["Abyssal Scale", "Hellforged Weaponry"],
+            "type": "weapon"
         },
         "Dreadshadow Bow": {
             "name": "Dreadshadow Bow",
             "description": "Bow that casts shadows silently.",
             "role": "archer",
-            "recipe": ["Brimstone Ashes", "Hellforged Weaponry"]
+            "recipe": ["Brimstone Ashes", "Hellforged Weaponry"],
+            "type": "weapon"
         },
         "Soulreaper Scythe": {
             "name": "Soulreaper Scythe",
             "description": "Scythe that reaps souls.",
             "role": "mage",
-            "recipe": ["Demon Horn", "Infernal Essence"]
+            "recipe": ["Demon Horn", "Infernal Essence"],
+            "type": "weapon"
         },
         "Ectoplasmic Essence Bow": {
             "name": "Ectoplasmic Essence Bow",
             "description": "Bow that fires ghostly arrows.",
             "role": "archer",
-            "recipe": ["Spirit's Tear", "Ectoplsamic Essence"]
+            "recipe": ["Spirit's Tear", "Ectoplsamic Essence"],
+            "type": "weapon"
         },
         "Wraithwhisper Dagger": {
             "name": "Wraithwhisper Dagger",
             "description": "Dagger that whispers of death.",
             "role": "warrior",
-            "recipe": ["Spirit's Tear", "Spectral Veil"]
+            "recipe": ["Spirit's Tear", "Spectral Veil"],
+            "type": "weapon"
         },
         "Phantom Enchanter Staff": {
             "name": "Phantom Enchanter Staff",
             "description": "Staff that enchants with ghostly power.",
             "role": "mage",
-            "recipe": ["Spirit's Tear", "Brimstone Ashes"]
+            "recipe": ["Spirit's Tear", "Brimstone Ashes"],
+            "type": "weapon"
         },
         "Mischiefmaker Dagger": {
             "name": "Mischiefmaker Dagger",
             "description": "Impish blade for subtle strikes.",
             "role": "warrior",
-            "recipe": ["Impish Dust", "Demon Horn"]
+            "recipe": ["Impish Dust", "Demon Horn"],
+            "type": "weapon"
         },
         "Whispering Imp Bow": {
             "name": "Whispering Imp Bow",
             "description": "Bow that whispers of mischief.",
             "role": "archer",
-            "recipe": ["Spirit's Tear", "Impish Dust"]
+            "recipe": ["Spirit's Tear", "Impish Dust"],
+            "type": "weapon"
         },
         "Infernal Spark Wand": {
             "name": "Infernal Spark Wand",
             "description": "Wand channels mischievous inferno magic.",
             "role": "mage",
-            "recipe": ["Impish Charm", "Brimstone Ashes"]
+            "recipe": ["Impish Charm", "Brimstone Ashes"],
+            "type": "weapon"
         },
         "Sporeburst Shortsword": {
             "name": "Sporeburst Shortsword",
             "description": "Sword releases burst of spores.",
             "role": "warrior",
-            "recipe": ["Spore Pod", "Mushroom Cap Shield"]
+            "recipe": ["Spore Pod", "Mushroom Cap Shield"],
+            "type": "weapon"
         },
         "Toadstool Longbow": {
             "name": "Toadstool Longbow",
             "description": "Bow made from sturdy toadstools.",
             "role": "archer",
-            "recipe": ["Spore Pod", "Fungal Fiber"]
+            "recipe": ["Spore Pod", "Fungal Fiber"],
+            "type": "weapon"
         },
         "Mycelium Infuser Staff": {
             "name": "Mycelium Infuser Staff",
             "description": "Staff that channels mushroom magic.",
             "role": "mage",
-            "recipe": ["Fungal Fiber", "Mycelium Core"]
+            "recipe": ["Fungal Fiber", "Mycelium Core"],
+            "type": "weapon"
         },
         "Venombite Dagger": {
             "name": "Venombite Dagger",
             "description": "Fang blade with potent venom.",
             "role": "warrior",
-            "recipe": ["Venom Sac", "Webbed Fang"]
+            "recipe": ["Venom Sac", "Webbed Fang"],
+            "type": "weapon"
         },
         "Silkshadow Longbow": {
             "name": "Silkshadow Longbow",
             "description": "Bow crafted from shadow silk.",
             "role": "archer",
-            "recipe": ["Spider Silk Thread", "Shadowwing Hide"]
+            "recipe": ["Spider Silk Thread", "Shadowwing Hide"],
+            "type": "weapon"
         },
         "Venomweave Scepter": {
             "name": "Venomweave Scepter",
             "description": "Scepter channeling potent spider venom.",
             "role": "mage",
-            "recipe": ["Spider Silk Thread", "Venom Sac"]
+            "recipe": ["Spider Silk Thread", "Venom Sac"],
+            "type": "weapon"
         }
     },
     "item": {

@@ -160,6 +160,7 @@ class MainMenu(Menu):
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
                 # except Exception as e:
+                #     clearMain()
                 #     printText(mainWin, 0, [("An error occurred", 4, None)])
                 #     printText(mainWin, 1, [(str(e), 4, None)])
                 #     spaceToContinue()
@@ -821,7 +822,6 @@ class SpellTree:
             for nextKey in data[key]['next']:
                 branches.append(createTree(nextKey, data[key]['next']))
             return Tree(spell, branches)
-
         return createTree(firstKey, data)
 
     def run(self):
@@ -1161,7 +1161,7 @@ class CraftItemUI(Menu):
                 haveItem2 = self.item["recipe"][1] in self.inventory.getExistingItems()
                 if self.player.gold >= self.moneyCost and haveItem1 and haveItem2:
                     for i in range(2):
-                        item = Item(self.item["recipe"][i], "", 0) #simulate the item used in the craft
+                        item = Item(self.item["recipe"][i], "", 0, 0) #simulate the item used in the craft
                         self.inventory.removeItem(item)
                     self.player.gold -= self.moneyCost
                     if self.item["type"] == "weapon":
@@ -1281,8 +1281,8 @@ class Game:
             statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
             inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
             savedTime = json.load(open("save/stats.json", "r"))["date"]
-            if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
-                raise Exception("Save file corrupted/modified")
+            # if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
+            #     raise Exception("Save file corrupted/modified")
             self.player.inventory.loadData()
             self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
         self.lobby = Lobby(self.player)
