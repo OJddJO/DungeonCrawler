@@ -1169,7 +1169,7 @@ class CraftItemUI(Menu):
                         item = Weapon(self.item["name"], self.item["description"], example.level, int(example.baseDamage*1.1), example.rarity, int(example.mana*1.1))
                     elif self.item["type"] == "armor":
                         example = randomArmor(self.player.role, self.player.level)
-                        item = Armor(self.item["name"], self.item["description"], example.level, int(example.baseHealth*1.1), example.rarity, int(example.mana*1.1))
+                        item = Armor(self.item["name"], self.item["description"], example.level, int(example.baseArmor*1.1), example.rarity, int(example.mana*1.1))
                     self.inventory.addGear(item)
                     printInfo([("Item crafted", 9, None)])
                     spaceToContinue()
