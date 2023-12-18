@@ -152,18 +152,18 @@ class MainMenu(Menu):
                 else:
                     RoleMenu().run()
             case 1:
-                # try:
+                try:
                     if os.path.exists("save/stats.json"):
                         Game(new=False).run()
                     else:
                         clearMain()
                         printText(mainWin, 0, [("No save file found", 9, None)])
                         spaceToContinue()
-                # except Exception as e:
-                #     clearMain()
-                #     printText(mainWin, 0, [("An error occurred", 4, None)])
-                #     printText(mainWin, 1, [(str(e), 4, None)])
-                #     spaceToContinue()
+                except Exception as e:
+                    clearMain()
+                    printText(mainWin, 0, [("An error occurred", 4, None)])
+                    printText(mainWin, 1, [(str(e), 4, None)])
+                    spaceToContinue()
             case 2:
                 OptionMenu().run()
             case 3:
@@ -1281,8 +1281,8 @@ class Game:
             statsFileTime = datetime.fromtimestamp(os.path.getmtime("save/stats.json"))
             inventoryFileTime = datetime.fromtimestamp(os.path.getmtime("save/inventory.json"))
             savedTime = json.load(open("save/stats.json", "r"))["date"]
-            # if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
-            #     raise Exception("Save file corrupted/modified")
+            if statsFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime or inventoryFileTime.strftime("%d/%m/%Y-%H:%M:%S") != savedTime:
+                raise Exception("Save file corrupted/modified")
             self.player.inventory.loadData()
             self.player.maxMana = 100 + self.player.armor.mana + self.player.weapon.mana
         self.lobby = Lobby(self.player)
