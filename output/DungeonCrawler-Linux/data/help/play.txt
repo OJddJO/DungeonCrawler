@@ -1,0 +1,6 @@
+The goal of the game is to go through the dungeon and defeat enemies in the dungeon to get stronger.
+You can move using the arrows or the keys you defined.
+You can interact with the elements around you using the spacebar.
+You can open the menu using the ESC key.
+When your health reaches 0 or below, you die and you will be teleported back to the lobby. You will have a death penalty.
+You can use skills using your mana which regenerate every action you do during a fight.

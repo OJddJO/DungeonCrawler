@@ -1,7 +1,7 @@
 import os
 import json
-from classes.Item import Weapon, Armor, HealItem, BuffItem
 from datetime import datetime
+from classes.Item import Weapon, Armor, HealItem, BuffItem, Item
 
 baseWeapon = Weapon("Starter Stick", "A simple stick to start your adventure", 1, 10, 1, 0)
 baseArmor = Armor("Starter Hide", "A simple armor to start your adventure", 1, 5, 1, 0)
@@ -70,36 +70,44 @@ class Inventory:
 
     def loadData(self):
         """Loads the data from the save file"""
-        try:
-            if os.path.exists('save/inventory.json'):
-                with open('save/inventory.json', 'r') as f:
-                    data = json.load(f)
-                    self.gear = []
-                    for element in data['gear']: # GEAR
-                        if element == None:
-                            self.gear.append(None)
-                        elif element['type'] == "weapon":
-                            self.gear.append(Weapon(element['name'], element['description'], element['level'], element['damage'], element['rarity'], element['mana']))
-                        elif element['type'] == "armor":
-                            self.gear.append(Armor(element['name'], element['description'], element['level'], element['armor'], element['rarity'], element['mana']))
-                    self.items = [] # ITEM
-                    itemData = json.load(open('data/items.json', 'r'))
-                    for element in data['items']:
-                        if element[0] == None:
-                            self.items.append([None, 0])
-                        else:
+        # try:
+        if os.path.exists('save/inventory.json'):
+            with open('save/inventory.json', 'r') as f:
+                data = json.load(f)
+                self.gear = []
+                for element in data['gear']: # GEAR
+                    if element == None:
+                        self.gear.append(None)
+                    elif element['type'] == "weapon":
+                        self.gear.append(Weapon(element['name'], element['description'], element['level'], element['damage'], element['rarity'], element['mana']))
+                    elif element['type'] == "armor":
+                        self.gear.append(Armor(element['name'], element['description'], element['level'], element['armor'], element['rarity'], element['mana']))
+                self.items = [] # ITEM
+                itemData = json.load(open('data/items.json', 'r'))
+                dropData = json.load(open('data/crafting/drop.json', 'r'))
+                for element in data['items']:
+                    if element[0] == None:
+                        self.items.append([None, 0])
+                    else:
+                        if element[0] in itemData.keys():
                             if itemData[element[0]]['type'] == "heal":
                                 self.items.append([HealItem(element[0], itemData[element[0]]['description'], itemData[element[0]]['health'], itemData[element[0]]['mana'], itemData[element[0]]['rarity'], itemData[element[0]]['value']), element[1]])
                             elif itemData[element[0]]['type'] == "buff":
                                 self.items.append([BuffItem(element[0], itemData[element[0]]['description'], itemData[element[0]]['health'], itemData[element[0]]['mana'], itemData[element[0]]['buff'], itemData[element[0]]['duration'], itemData[element[0]]['rarity'], itemData[element[0]]['value']), element[1]])
-            else:
-                raise Exception("No save file found")
-        except:
-            raise Exception("Save file corrupted")
+                        else:
+                            key = None
+                            for enemy in dropData.keys():
+                                if element[0] in dropData[enemy]:
+                                    key = enemy
+                            self.items.append([Item(element[0], dropData[key][element[0]]['description'], dropData[key][element[0]]['rarity'], 0), element[1]])
+        else:
+            raise Exception("No save file found")
+        # except:
+            # raise Exception("Save file corrupted")
     
     def save(self):
         """Saves the data to the save file"""
-        #decompose each item and gear to json to save
+        #decompose each item and gear to dict to save
         data = {
             "items": [],
             "gear": []
@@ -136,7 +144,6 @@ class Inventory:
             self.items[self.items.index([None, 0])] = [item, quantity]
             return True
         else:
-            print("Item inventory full.")
             return False
         
     def removeItem(self, item, quantity = 1):
@@ -157,7 +164,6 @@ class Inventory:
             self.gear[self.gear.index(None)] = gear
             return gear
         else:
-            print("Gear inventory full. You didn't pick up the gear.")
             return False
         
     def removeGear(self, gear):

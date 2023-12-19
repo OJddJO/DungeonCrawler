@@ -22,12 +22,16 @@
    "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/icon.ico"
   },
   {
+   "optionDest": "name",
+   "value": "DungeonCrawler-Windows"
+  },
+  {
    "optionDest": "ascii",
    "value": false
   },
   {
    "optionDest": "clean_build",
-   "value": false
+   "value": true
   },
   {
    "optionDest": "strip",
@@ -76,6 +80,10 @@
   {
    "optionDest": "datas",
    "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/data;data/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/recovery.dc;."
   }
  ],
  "nonPyinstallerOptions": {

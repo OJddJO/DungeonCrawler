@@ -1,5 +1,6 @@
-from classes.Item import randomWeapon, randomArmor
+from classes.Item import randomWeapon, randomArmor, randomItem
 import random
+from cursesInit import *
 
 class Enemy:
     """Enemy class, used to create enemies for the player to fight"""
@@ -14,6 +15,7 @@ class Enemy:
         self.armor = randomArmor("mage", level-1)
         self.exp = random.randint(1, 5)*level
         self.gold = random.randint(1, 10)*level
+        self.loot = randomItem(self.type)
         self.level = level
         self.coord = coord
         self.buff = []
@@ -22,4 +24,6 @@ class Enemy:
     def render(self):
         """Renders the enemy's ascii art"""
         with open(f"ascii/enemies/{self.type}", "r") as f:
-            print(f.read())
+            textList = f.read().split("\n")
+            textList = [[(str(line), 9, None)] for line in textList]
+            printMultipleText(mainWin, 0, textList)

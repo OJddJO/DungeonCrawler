@@ -27,7 +27,7 @@ class Dungeon:
 
 class Room(Maze):
     """Room class for the dungeon"""
-    def __init__(self, player, difficulty, nextRoom, width = 30, height = 10):
+    def __init__(self, player, difficulty, nextRoom, width = 60, height = 20):
         """Constructor for the Room class, takes in a player, a difficulty, the next room and the width and height of the room"""
         super().__init__(width, height)
         self.player = player
@@ -43,23 +43,24 @@ class Room(Maze):
     def colorMap(self, mist = True):
         """Returns a matrix of a colored map of the room"""
         # mist = False #testing
-        colorDict = {
-            '#': '\033[47m \033[0m',
-            '.': ' ',
-            'C': '\033[1;35mC\033[0m',
-            'G': '\033[1;95mG\033[0m',
-            'S': '\033[1;36mS\033[0m',
-            Player: '\033[1;32m@\033[0m',
-            Portal: '\033[1;33mO\033[0m',
-            Enemy: '\033[1;31mM\033[0m',
-            Treasure: '\033[1;34m$\033[0m'
+        colorDict = { # (char to print, color pair for curses)
+            '#': (" ", 1),
+            '.': (" ", 8),
+            'C': ("C", 2),
+            'G': ("G", 3),
+            'S': ("S", 2),
+            'F': ("F", 7),
+            Player: ("@", 5),
+            Portal: ("O", 6),
+            Enemy: ("M", 4),
+            Treasure: ("$", 2)
         }
         render = []
         for i, row in enumerate(self.map):
             render.append([])
             for j, element in enumerate(row):
-                if mist:
-                    render[i].append('\033[40m \033[0m')
+                if mist: #if mist is True, the map is not fully visible and the player can only see the map around him (7x7, line 68)
+                    render[i].append((" ", 8))
                 else:
                     if type(element) == str:
                         render[i].append(colorDict[element])
@@ -67,9 +68,9 @@ class Room(Maze):
                         render[i].append(colorDict[type(element)])
         if mist:
             coord = self.getPlayerCoord()
-            #arround the player in a square of 5x5 use colorDict
-            for i in range(coord[0] - 4, coord[0] + 5):
-                for j in range(coord[1] - 4, coord[1] + 5):
+            #arround the player in a square of 7x7 use colorDict
+            for i in range(coord[0] - 7, coord[0] + 8):
+                for j in range(coord[1] - 7, coord[1] + 8):
                     #test if the coord is in the map
                     if i >= 0 and i < len(self.map) and j >= 0 and j < len(self.map[0]):
                         if type(self.map[i][j]) == str:
@@ -160,7 +161,7 @@ class Room(Maze):
 
     def __str__(self):
         """Returns a string representation of the room"""
-        map = []
+        map = [] #map is not self.map because we don't want to modify the original map
         for row in self.render:
             map.append(''.join(row))
         return '\n'.join(map)
@@ -173,43 +174,30 @@ class Lobby(Room):
         self.map = []
         self.player = player
         self.createRoom()
-        self.placePlayer()
         self.dungeon = Dungeon(self.player) #init dungeon in lobby for changing rooms
         self.dungeon.makeDungeon(self.player.level) # dungeon will be reset when the player goes back to the lobby
-        self.placePortal()
-        self.placeChest()
-        self.placeGrimoire()
-        self.placeShop()
+        self.placeEntities()
         self.render = self.colorMap(mist = False) # all the lobby is always visible
 
     def createRoom(self):
         """Creates the lobby"""
-        self.map.append(["#" for i in range(61)])
-        for i in range(19):
-            self.map.append(["#"] + ["." for i in range(59)] + ["#"])
-        self.map.append(["#" for i in range(61)])
-
-    def placePlayer(self):
-        """Places the player in the lobby"""
-        #place player in the middle of the lobby
-        self.map[10][30] = self.player
+        self.map.append(["#" for i in range(121)])
+        for i in range(39):
+            self.map.append(["#"] + ["." for i in range(119)] + ["#"])
+        self.map.append(["#" for i in range(121)])
 
     def placePortal(self):
         """Places the portal in the lobby"""
-        #place portal on the top middle of the lobby
-        self.map[1][30] = Portal(self, self.dungeon.rooms[0])
+        self.map[16][61] = Portal(self, self.dungeon.rooms[0])
 
-    def placeChest(self):
-        """Places the chest in the lobby"""
-        self.map[19][30] = "C"
-
-    def placeGrimoire(self):
-        """Places the grimoire in the lobby"""
-        self.map[10][15] = "G"
-
-    def placeShop(self):
-        """Places the shop in the lobby"""
-        self.map[10][45] = "S"
+    def placeEntities(self):
+        """Places all entities in the lobby"""
+        self.map[21][61] = self.player
+        self.map[16][61] = Portal(self, self.dungeon.rooms[0])
+        self.map[26][61] = "C"
+        self.map[19][51] = "G"
+        self.map[21][71] = "S"
+        self.map[23][51] = "F"
 
 
 class Portal:

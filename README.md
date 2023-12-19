@@ -1,12 +1,15 @@
-# **"Dungeon Crawler: Endless Descent."**
+# **Dungeon Crawler: Endless Descent**
 
 Languages: English | [Français](./infoFr.md)
 
-Technical Specification as of 10/22/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
+Technical Specification as of 12/14/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
 ![poster](dc_poster.png)
+[Trailer](https://youtu.be/U9mkWBV65bo)
 
 Turn based game, entirely in console
+
+*The game needs to set the terminal in fullscreen*
 
 **Concept:**
 "Dungeon Crawler: Endless Descent" is an endless dungeon exploration game where players take on the role of a brave adventurer delving into the depths of a never-ending, procedurally generated dungeon. The objective is to survive as long as possible, defeating monsters, collecting loot, and descending deeper into the mysterious underground world.
@@ -26,3 +29,9 @@ Turn based game, entirely in console
 6. **Leveling and Skill Trees:** Gain experience points by defeating monsters and leveling up. Invest skill points in skill trees to customize character abilities and playstyle.
 
 **"Dungeon Crawler: Endless Descent"** offers a classic and engaging endless game experience, perfect for those who enjoy exploration, combat, and character progression in a dark and mysterious setting.
+
+## Known Issue
+
+**BUG THAT WILL NOT BE CORRECTED DUE TO THE USAGE OF CURSES**
+
+-   When showing the spell tree, since chinese characters take 2 alphanumeric character width, it will cause minor problem (windows borders and the rendering of the tree).

@@ -26,14 +26,10 @@ class Item:
         self.description = description
         self.rarity = rarity
         self.value = value
-    
-    def __str__(self):
-        """Returns a string representation of the info of the item"""
-        text = f"{color[self.rarity]}{self.name}\033[0m\n"
-        text += f"{self.description}\n"
-        text += f"Rarity: {color[self.rarity]+rarities[self.rarity]}\033[0m\n"
-        text += f"Value: {self.value}"
-        return text
+
+    def onUse(self, user):
+        """Method that is overwritten by the subclasses, by default does nothing"""
+        pass
 
 
 class HealItem(Item):
@@ -102,6 +98,12 @@ class Weapon:
         self.level = level
         self.rarity = rarity
         self.mana = mana
+        self.rank = 1
+
+    def upgrade(self):
+        self.rank += 1
+        modifier = int(self.baseDamage*0.1)
+        self.baseDamage += modifier if modifier != 0 else 1
 
     def onUse(self):
         """Returns the damage of the weapon"""
@@ -116,7 +118,8 @@ class Weapon:
             "level": self.level,
             "damage": self.baseDamage,
             "rarity": self.rarity,
-            "mana": self.mana
+            "mana": self.mana,
+            "rank": self.rank
         }
 
 
@@ -130,6 +133,12 @@ class Armor:
         self.level = level
         self.rarity = rarity
         self.mana = mana
+        self.rank = 1
+
+    def upgrade(self):
+        self.rank += 1
+        modifier = int(self.baseArmor*0.1)
+        self.baseArmor += modifier if modifier != 0 else 1
 
     def onUse(self):
         """Returns the armor of the armor"""
@@ -168,23 +177,24 @@ def randomWeapon(role, level):
     if role not in ["warrior", "mage", "archer"]:
         raise KeyError("Invalid role")
     else:
-        if role == "warrior":
-            key = "swords"
-            damageMultiplier = 1 #polyvalent
-            manaMultiplier = 1
-        elif role == "mage":
-            key = "staves"
-            damageMultiplier = 0.5 #relies on skill
-            manaMultiplier = 2
-        elif role == "archer":
-            key = "bows"
-            damageMultiplier = 1.5 #relies on true damage
-            manaMultiplier = 0.5
+        match role:
+            case "warrior":
+                key = "swords"
+                damageMultiplier = 1 #polyvalent
+                manaMultiplier = 1
+            case "mage":
+                key = "staves"
+                damageMultiplier = 0.5 #relies on skill
+                manaMultiplier = 2
+            case "archer":
+                key = "bows"
+                damageMultiplier = 1.5 #relies on true damage
+                manaMultiplier = 0.5
     with open("data/weapon.json", "r") as f:
         data = json.load(f)
 
     weapon = random.choice(data[key])
-    rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
+    rarity = [1]*15 + [2]*10 + [3]*7 + [4]*5 + [5]*2 + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
     baseDamage = int(random.randint(5, 15)*damageMultiplier+level)
@@ -203,23 +213,24 @@ def randomArmor(role, level):
     if role not in ["warrior", "mage", "archer"]:
         raise KeyError("Invalid role")
     else:
-        if role == "warrior":
-            key = "chestplates"
-            armorMultiplier = 1.5 #tanky
-            manaMultiplier = 0.5
-        elif role == "mage":
-            key = "robes"
-            armorMultiplier = 0.5 #relies on skill
-            manaMultiplier = 2
-        elif role == "archer":
-            key = "tunics"
-            armorMultiplier = 1 #polyvalent
-            manaMultiplier = 1
+        match role:
+            case "warrior":
+                key = "chestplates"
+                armorMultiplier = 1.5 #tanky
+                manaMultiplier = 0.5
+            case "mage":
+                key = "robes"
+                armorMultiplier = 0.5 #relies on skill
+                manaMultiplier = 2
+            case "archer":
+                key = "tunics"
+                armorMultiplier = 1 #polyvalent
+                manaMultiplier = 1
     with open("data/armor.json", "r") as f:
         data = json.load(f)
 
     armor = random.choice(data[key])
-    rarity = [1]*10 + [2]*7 + [3]*5 + [4]*3 + [5] + [6]
+    rarity = [1]*15 + [2]*10 + [3]*7 + [4]*5 + [5]*2 + [6]
     random.shuffle(rarity)
     rarity = random.choice(rarity) # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
     baseArmor = int(random.randint(1, 15)*armorMultiplier+level)
@@ -231,3 +242,16 @@ def randomArmor(role, level):
     mana += modifier
 
     return Armor(armor["name"], armor["description"], level, baseArmor, rarity, mana)
+
+
+def randomItem(enemy):
+    """Returns a random item depending on the enemy"""
+    if enemy not in ["bat", "demon", "ghost", "imp", "mushroom", "spider"]:
+        raise KeyError("Invalid enemy")
+    else:
+        data = json.load(open('data/crafting/drop.json'))[enemy]
+        drop = []
+        for element in data:
+            drop += [element]*(5-data[element]["rarity"])
+        item = random.choice(drop)
+        return Item(data[item]["name"], data[item]["description"], data[item]["rarity"], 0)
