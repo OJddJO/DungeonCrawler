@@ -626,9 +626,9 @@ class GearUI(Menu):
             printText(statsWin, 4, [("Armor: ", 9, None), (f"{self.gear.baseArmor} ", 9, "bold"), armorDiff])
         printText(statsWin, 5, [("Mana: ", 9, None), (f"{self.gear.mana} ", 9, "bold"), manaDiff])
         printText(statsWin, 6, [(separator, 9, None)])
-        printText(statsWin, 7, [("Equiped: ", 9, None), (f"{equiped.rarity} {equiped.name}", color[equiped.rarity], "bold")]) # equiped gear
+        printText(statsWin, 7, [("Equiped: ", 9, None), (equiped.name, color[equiped.rarity], "bold")]) # equiped gear
         printText(statsWin, 8, [("Level: ", 9, None), (f"{equiped.level}", 9, "bold")])
-        printText(statsWin, 9, [(f"Rarity: {color[equiped.rarity]}", 9, None)])
+        printText(statsWin, 9, [(f"Rarity: {equiped.rarity}", color[equiped.rarity], None)])
         if part == Weapon:
             printText(statsWin, 10, [("Damage: ", 9, None), (f"{equiped.baseDamage}", 9, "bold")])
         elif part == Armor:
