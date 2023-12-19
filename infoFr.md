@@ -1,11 +1,11 @@
-# **"Dungeon Crawler: Endless Descent."**
+# **Dungeon Crawler: Endless Descent**
 
 Languages: [English](./README.md) | Français
 
 Cahier des charges au 14/12/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
 ![poster](dc_poster.png)
-<iframe width="560" height="315" src="https://www.youtube.com/embed/U9mkWBV65bo?si=9gxXO2Qb6Il-tqWQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+![video](https://www.youtube.com/embed/U9mkWBV65bo?si=9gxXO2Qb6Il-tqWQ)
 
 Jeu au tour par tour, entièrement dans le terminal (peut etre en faire un jeu avec des graphismes)
 
