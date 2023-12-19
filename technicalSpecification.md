@@ -1,13 +1,13 @@
-Technical Specifications for 'Dungeon Crawler: Endless Descent'
+# Technical Specifications for **'Dungeon Crawler: Endless Descent'**
 
 (Also available on GitHub: https://github.com/OJddJO/DungeonCrawler )
 
-1. Introduction
+## 1. ***Introduction***
 
 Project Name: Dungeon Crawler: Endless Descent
 Project Objective: Create a text-based infinite dungeon exploration game with elements of combat, loot, character progression, and resource management.
 
-2. Key Features
+## 2. ***Key Features***
 
 -   Procedurally Generated Dungeons: Randomly generated dungeons featuring various rooms, traps, and enemies. Dungeons are based on mazes generated using a modified Randomized Prim's algorithm.
 -   Real-Time Combat: Combat system allowing players to fight a variety of monsters and bosses.
@@ -17,7 +17,7 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 -   Levels and Skill Trees: Character progression through experience gain and skill point investment.
 -   Story: No story in the game to make it entirely endless. Therefore, the game may be somewhat repetitive and purposeless.
 
-3. Additional Features
+## 3. ***Additional Features***
 
 -   Crafting and Alchemy : Crafting items from materials and recipes.
 -   Scalability: Increasing difficulty with character level.
@@ -25,15 +25,15 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 -   Random Events : Introduction of random events to spice up gameplay.
 -   ~Multiplayer : Possibility to play cooperatively. Multiplayer will be local, either on the same computer or on the same network (implemented with the Python library 'socket').~
 
-4. Technical Requirements
+## 4. ***Technical Requirements***
 
--   Platform : Compatible with Windows and maybe Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows) (To be determined)
+-   Platform : Compatible with Windows and maybe Linux operating systems. (The project is developed on Windows, so it is natively supported by Windows)
 -   Programming Language : Python
 -   User Interface : Terminal-based user interface.
 -   Graphics and Sound : Integration of ASCII graphics, no sound.
 -   ~Multiplayer : Implementation of local multiplayer functionality.~
 
-5. Timeline
+## 5. ***Timeline***
 
 -   Pre-Production Phase: Game planning and design. (Ends on October 1st)
 -   Production Phase: Game development. (Ends on November 1st)
@@ -41,10 +41,14 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 -   First Release Phase: First playable compiled version. (November 8th)
 -   First Update: Addition of the new interface and new features. (December 20th)
 
-6. Development Team
+## 6. ***Development Team***
 
 -   Jérémy: The entire project
 
-7. Review and Approval
+## 7. ***Review and Approval***
 
 -   Mr. Djahnit
+
+## 8. ***Updates***
+
+-   20/12/2020: Addition of the ***new interface***. Addition of the ***Forge***. Addition of the possibility to forge weapons and armors. Addition of the possibility to upgrade equipment. Addition of the possibility to gather materials. ***Beginning of the development/testing phase for linux.***

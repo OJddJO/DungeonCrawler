@@ -1,10 +1,11 @@
-# **"Dungeon Crawler: Endless Descent."**
+# **Dungeon Crawler: Endless Descent**
 
 Languages: English | [Français](./infoFr.md)
 
 Technical Specification as of 12/14/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
 ![poster](dc_poster.png)
+[Trailer](https://youtu.be/U9mkWBV65bo)
 
 Turn based game, entirely in console
 
