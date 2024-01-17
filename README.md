@@ -32,6 +32,4 @@ Turn based game, entirely in console
 
 ## Known Issue
 
-**BUG THAT WILL NOT BE CORRECTED DUE TO THE USAGE OF CURSES**
-
 -   When showing the spell tree, since chinese characters take 2 alphanumeric character width, it will cause minor problem (windows borders and the rendering of the tree).
