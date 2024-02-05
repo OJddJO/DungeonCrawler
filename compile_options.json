@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/main.py"
+   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/src/main.py"
   },
   {
    "optionDest": "onefile",
@@ -75,15 +75,15 @@
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/ascii;ascii/"
+   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/src/ascii;ascii/"
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/data;data/"
+   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/src/data;data/"
   },
   {
    "optionDest": "datas",
-   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/recovery.dc;."
+   "value": "C:/Users/User/Documents/GitHub/DungeonCrawler/src/recovery.dc;."
   }
  ],
  "nonPyinstallerOptions": {
