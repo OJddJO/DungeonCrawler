@@ -43,7 +43,9 @@ Project Objective: Create a text-based infinite dungeon exploration game with el
 
 ## 6. ***Development Team***
 
--   Jérémy: The entire project
+-   Jérémy: Project leader, game designer, and programmer
+-   Kiu Wai: Programmer, interface designer
+-   Guillermo: Programmer, ASCII artist
 
 ## 7. ***Review and Approval***
 

@@ -46,7 +46,9 @@ Objectif du Projet : Créer un jeu d'exploration de donjons infini basé sur du 
 
 ## 7. ***Équipe de Développement***
 
--   Jérémy: Tout le projet
+-   Jérémy: Chef de projet, concepteur de jeu et programmeur
+-   Kiu Wai: Programmeur, concepteur d'interface
+-   Guillermo: Programmeur, artiste ASCII
 
 ## 8. ***Révision et Approbation***
 
