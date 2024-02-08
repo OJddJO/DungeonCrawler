@@ -31,5 +31,6 @@ Turn based game, entirely in console
 **"Dungeon Crawler: Endless Descent"** offers a classic and engaging endless game experience, perfect for those who enjoy exploration, combat, and character progression in a dark and mysterious setting.
 
 ## Known Issue
-
+-   Screen resolution must be equal to or greater than 1920x1080
+-   On Windows 10, the game is sometime not automatically opening in fullscreen.
 -   When showing the spell tree, since chinese characters take 2 alphanumeric character width, it will cause minor problem (windows borders and the rendering of the tree).
