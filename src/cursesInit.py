@@ -1,20 +1,28 @@
 import curses
+from keyboard import wait
 
-screen = curses.initscr()
-mainWin = curses.newwin(43, 123, 0, 0) #size 41, 121
-statsWin = curses.newwin(43, 61, 0, 124) #size 41, 59
-infoWin = curses.newwin(10, 185, 43, 0) #size 8, 183
-curses.curs_set(0)
-curses.start_color()
-curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE) #wall (black on white)
-curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK) #yellow
-curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK) #magenta
-curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLACK) #red
-curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_BLACK) #green
-curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK) #cyan
-curses.init_pair(7, curses.COLOR_BLUE, curses.COLOR_BLACK) #blue
-curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_BLACK) #none
-curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_BLACK) # for text base color (white on black)
+try:
+    screen = curses.initscr()
+    mainWin = curses.newwin(43, 123, 0, 0) #size 41, 121
+    statsWin = curses.newwin(43, 61, 0, 124) #size 41, 59
+    infoWin = curses.newwin(10, 185, 43, 0) #size 8, 183
+    curses.curs_set(0)
+    curses.start_color()
+    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE) #wall (black on white)
+    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK) #yellow
+    curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_BLACK) #magenta
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLACK) #red
+    curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_BLACK) #green
+    curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK) #cyan
+    curses.init_pair(7, curses.COLOR_BLUE, curses.COLOR_BLACK) #blue
+    curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_BLACK) #none
+    curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_BLACK) # for text base color (white on black)
+except:
+    print("Error initializing curses")
+    print("Please set you screen to 1920x1080 with x1 scale and try again")
+    print("Press 'Enter' to continue...")
+    wait('enter')
+    exit()
 
 
 def clearMain():
