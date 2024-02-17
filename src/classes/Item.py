@@ -1,14 +1,6 @@
 import json
 import random
 
-color = { # 1 = common 2 = uncommon 3 = rare 4 = epic 5 = legendary 6 = mythic
-    1: "\033[1;37m",
-    2: "\033[1;36m",
-    3: "\033[1;34m",
-    4: "\033[1;35m",
-    5: "\033[1;33m",
-    6: "\033[1;31m"
-}
 rarities = {
     1: "Common",
     2: "Uncommon",

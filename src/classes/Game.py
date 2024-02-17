@@ -393,6 +393,7 @@ class ItemShop(Menu):
         """Function called when the spacebar is pressed"""
         match select:
             case 0:
+                clearMain()
                 printText(mainWin, 0, [(self.item.name, 9, None)])
                 spaceToContinue()
             case 1:
@@ -406,7 +407,7 @@ class ItemShop(Menu):
                     printInfo([("You have ", 9, None), (str(self.player.gold), 2, "bold"), (" gold left", 9, None)])
                     spaceToContinue()
                 else:
-                    printInfo([("You don't have enough gold", 1, None)])
+                    printInfo([("You don't have enough gold", 4, None)])
                     printInfo([("You need ", 9, None), (f" {self.item.value - self.player.gold} ", 9, "bold"), ("more gold", 9, None)])
                     spaceToContinue()
             case 2:
