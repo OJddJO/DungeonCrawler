@@ -1648,7 +1648,7 @@ class Fight:
         self.removeBuffDebuff(self.enemy)
         return self.endFight()
 
-    def enemySpell(self):
+    def enemySpell(self, spell = None):
         """Enemy Spell Handler. Manages the enemy spell"""
         def evalSpell(spell):
             """Evaluates the spell and returns the spell object"""
@@ -1661,8 +1661,11 @@ class Fight:
             elif self.enemySpellData[spell]["type"] == "debuff":
                 return DebuffSpell(self.enemySpellData[spell]["name"], self.enemySpellData[spell]["symbol"], self.enemySpellData[spell]["cost"], self.enemySpellData[spell]["damage"], self.enemySpellData[spell]["scale"], self.enemySpellData[spell]["debuff"], self.enemySpellData[spell]["duration"], self.enemySpellData[spell]["description"], self.enemySpellData[spell]["unlock"])
         #randomly choose a spell of the enemy level
-        spellList = [evalSpell(element) for element in self.enemy.spells if self.enemySpellData[element]["unlock"]["level"] <= self.enemy.level]
-        spell = random.choice(spellList)
+        if spell == None:
+            spellList = [evalSpell(element) for element in self.enemy.spells if self.enemySpellData[element]["unlock"]["level"] <= self.enemy.level]
+            spell = random.choice(spellList)
+        else:
+            spell = evalSpell(spell)
         #cast the spell
         if spell.cost <= self.enemy.mana:
             if type(spell) == DamageSpell:
@@ -1693,7 +1696,10 @@ class Fight:
                         printInfo([("You ", 5, None), ("are invulnerable !", 9, None)])
                         printInfo([(self.enemy.name, 3, None), ("'s spell has no effect on ", 5, None), ("You", 5, None)])
                     else:
-                        self.enemySpell()
+                        if self.enemy.health < self.enemy.maxHealth // 4:
+                            self.enemySpell("Heal")
+                        else:
+                            self.enemySpell()
         spaceToContinue()
 
     def playerTurn(self):
