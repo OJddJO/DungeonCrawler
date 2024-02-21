@@ -5,7 +5,7 @@ Languages: English | [Français](./infoFr.md)
 Technical Specification as of 12/14/23: [English](./technicalSpecification.md) | [Français](./cahierDesCharges.md)
 
 ![poster](dc_poster.png)
-[Trailer](https://youtu.be/U9mkWBV65bo)
+[Trailer](https://youtu.be/xloDiqyYOFg)
 
 Turn based game, entirely in console
 
