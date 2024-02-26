@@ -11,10 +11,28 @@ Turn based game, entirely in console
 
 *The game needs to set the terminal in fullscreen*
 
-**Concept:**
+## **Run the game**
+### Windows: 
+-   Download the latest release
+-   Extract the zip file
+-   Run the `DungeonCrawler-Windows.exe` file
+
+### Linux:
+-   Download the latest release
+-   Extract the zip file
+-   Install wine (if not already installed)
+-   Run the `DungeonCrawler-Windows.exe` file
+
+### Python:
+-   Download the source code
+-   Install the required packages with `pip install -r requirements.txt`
+-   Run the `main.py` file
+
+## **Concept:**
+
 "Dungeon Crawler: Endless Descent" is an endless dungeon exploration game where players take on the role of a brave adventurer delving into the depths of a never-ending, procedurally generated dungeon. The objective is to survive as long as possible, defeating monsters, collecting loot, and descending deeper into the mysterious underground world.
 
-**Gameplay:**
+## **Gameplay:**
 
 1. **Procedurally Generated Dungeons:** The game features randomly generated dungeons with a variety of rooms, traps, puzzles, and enemies. Each descent into the dungeon is unique, offering a fresh challenge.
 
